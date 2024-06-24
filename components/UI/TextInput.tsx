@@ -27,14 +27,14 @@ export default function TextInput({
   delay,
   minLength,
   maxLength,
-  error,
+  error
 }: Props) {
   const [value, setValue] = useState<string>("");
   const debouncedValue = useDebounce<string>(value, delay);
 
   useEffect(() => {
     // Debounce if there is user input but if its empty just return empty string
-    debouncedValue.length > 0 ? onChange(debouncedValue) : onChange(""); 
+    debouncedValue.length > 0 ? onChange(debouncedValue) : onChange("");
   }, [debouncedValue, onChange]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
