@@ -1,6 +1,7 @@
 // utilities/supabase/checkExisting.ts
 
 import { SupabaseClient } from "@supabase/supabase-js";
+import { enqueueSnackbar } from "notistack";
 
 /**
  * Checks if a row with the given value exists in the specified table.
@@ -20,6 +21,9 @@ const checkExisting = async (
 
   if (error) {
     console.error("Error checking existence:", error);
+    enqueueSnackbar(`Error checking for existing rows`, {
+      variant: "error",
+    });
     return false; // or handle error appropriately
   }
 

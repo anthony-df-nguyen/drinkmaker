@@ -1,32 +1,24 @@
 "use client";
-import { Fragment, useState } from "react";
-import { NavLinks, links } from "./Links";
+import {  useState } from "react";
+import { links } from "./Links";
+import Link from "next/link";
 import { SnackbarProvider } from "notistack";
-import classNames from "@/utilities/classNames";
+import classNames from "@/utils/classNames";
 import {
   Dialog,
   DialogPanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
   Transition,
   TransitionChild,
 } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import {
-  ChevronDownIcon,
-  MagnifyingGlassIcon,
-} from "@heroicons/react/20/solid";
+import Profile from "./Profile";
+
 
 interface Props {
   children: any;
 }
 
-const userNavigation = [
-  { name: "Your profile", href: "#" },
-  { name: "Sign out", href: "#" },
-];
+
 
 export default function Navigation({ children }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -85,7 +77,7 @@ export default function Navigation({ children }: Props) {
                       </div>
                     </TransitionChild>
                     {/* Sidebar component, swap this element with another sidebar if you like */}
-                    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-blue-600 px-6 pb-4">
+                    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-green-600 px-6 pb-4">
                       <div className="flex h-16 shrink-0 items-center">
                         <img
                           className="h-8 w-auto"
@@ -102,14 +94,14 @@ export default function Navigation({ children }: Props) {
                             <ul role="list" className="-mx-2 space-y-1">
                               {links.map((item) => (
                                 <li key={item.name}>
-                                  <a
+                                  <Link
                                     href={item.href}
                                     className={classNames(
                                       "text-white group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
                                     )}
                                   >
                                     {item.name}
-                                  </a>
+                                  </Link>
                                 </li>
                               ))}
                             </ul>
@@ -126,7 +118,7 @@ export default function Navigation({ children }: Props) {
           {/* Static sidebar for desktop */}
           <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
             {/* Sidebar component, swap this element with another sidebar if you like */}
-            <div className=" flex grow flex-col gap-y-5 overflow-y-auto bg-blue-600 px-6 pb-4">
+            <div className=" flex grow flex-col gap-y-5 overflow-y-auto bg-green-600 px-6 pb-4">
               <div className="flex h-16 shrink-0 items-center">
                 <img
                   className="h-8 w-auto"
@@ -140,14 +132,14 @@ export default function Navigation({ children }: Props) {
                     <ul role="list" className="-mx-2 space-y-1">
                       {links.map((item) => (
                         <li key={item.name}>
-                          <a
+                          <Link
                             href={item.href}
                             className={classNames(
                               "text-white group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
                             )}
                           >
                             {item.name}
-                          </a>
+                          </Link>
                         </li>
                       ))}
                     </ul>
@@ -175,72 +167,10 @@ export default function Navigation({ children }: Props) {
               />
 
               <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-                <form className="relative flex flex-1" action="#" method="GET">
-                  <label htmlFor="search-field" className="sr-only">
-                    Search
-                  </label>
-                  <MagnifyingGlassIcon
-                    className="pointer-events-none absolute inset-y-0 left-0 h-full w-5 text-gray-400"
-                    aria-hidden="true"
-                  />
-                  <input
-                    id="search-field"
-                    className="block h-full w-full border-0 py-0 pl-8 pr-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
-                    placeholder="Search..."
-                    type="search"
-                    name="search"
-                  />
-                </form>
+                <div className="relative flex flex-1"></div>
                 <div className="flex items-center gap-x-4 lg:gap-x-6">
-                  {/* Profile dropdown */}
-                  <Menu as="div" className="relative">
-                    <MenuButton className="-m-1.5 flex items-center p-1.5">
-                      <span className="sr-only">Open user menu</span>
-                      <img
-                        className="h-8 w-8 rounded-full bg-gray-50"
-                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                        alt=""
-                      />
-                      <span className="hidden lg:flex lg:items-center">
-                        <span
-                          className="ml-4 text-sm font-semibold leading-6 text-gray-900"
-                          aria-hidden="true"
-                        >
-                          Tom Cook
-                        </span>
-                        <ChevronDownIcon
-                          className="ml-2 h-5 w-5 text-gray-400"
-                          aria-hidden="true"
-                        />
-                      </span>
-                    </MenuButton>
-                    <Transition
-                      enter="transition ease-out duration-100"
-                      enterFrom="transform opacity-0 scale-95"
-                      enterTo="transform opacity-100 scale-100"
-                      leave="transition ease-in duration-75"
-                      leaveFrom="transform opacity-100 scale-100"
-                      leaveTo="transform opacity-0 scale-95"
-                    >
-                      <MenuItems className="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
-                        {userNavigation.map((item) => (
-                          <MenuItem key={item.name}>
-                            {({ focus }) => (
-                              <a
-                                href={item.href}
-                                className={classNames(
-                                  focus ? "bg-gray-50" : "",
-                                  "block px-3 py-1 text-sm leading-6 text-gray-900"
-                                )}
-                              >
-                                {item.name}
-                              </a>
-                            )}
-                          </MenuItem>
-                        ))}
-                      </MenuItems>
-                    </Transition>
-                  </Menu>
+                  {/* Profile Dropdown here */}
+                  <Profile />
                 </div>
               </div>
             </div>

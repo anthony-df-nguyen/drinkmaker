@@ -1,4 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+import { enqueueSnackbar } from "notistack";
 
 /**
  * Creates a row in the specified table with the given values.
@@ -16,10 +17,16 @@ const createRow = async <T>(
 
   if (error) {
     console.error("Error creating row:", error);
+    enqueueSnackbar(`Error creating row for ${value}`, {
+      variant: "error",
+    });
     return false;
+  } else {
+    enqueueSnackbar(`Successfully added ${value}`, {
+      variant: "success",
+    });
+    return true;
   }
-
-  return true;
 };
 
 export default createRow;

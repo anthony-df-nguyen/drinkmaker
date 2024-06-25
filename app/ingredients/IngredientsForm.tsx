@@ -1,80 +1,58 @@
 // components/IngredientForm.tsx
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import TextInput from "@/components/UI/TextInput";
 import Button from "@/components/UI/Button";
-import { sanitizeInput, validateInput } from "@/utilities/sanitizeInput";
-import { useSupabase } from "@/context/Supabase";
-import checkExisting from "@/utilities/supabase/checkExisting";
-import createRow from "@/utilities/supabase/createRow";
+import { sanitizeInput, validateInput } from "@/utils/sanitizeInput";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { queryByIngredient, queryAllIngredients } from "@/app/ingredients/api";
+import checkExisting from "@/utils/supabase/checkExisting";
+import createRow from "@/utils/supabase/createRow";
 import { enqueueSnackbar } from "notistack";
 import { Ingredients } from "@/schema/ingredients";
+import { formatText } from "@/utils/formatText";
 
 interface IngredientFormProps {
-  onSuccess: () => void;
-  onChange: (value: string) => void;
+  updateResults: React.Dispatch<React.SetStateAction<Ingredients[]>>;
+  pg: SupabaseClient;
 }
 
-const IngredientForm: React.FC<IngredientFormProps> = ({
-  onSuccess,
-  onChange,
-}) => {
+const IngredientForm: React.FC<IngredientFormProps> = ({ updateResults, pg }) => {
   const [currentValue, setCurrentValue] = useState<string>("");
   const [enableSubmit, setEnableSubmit] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const pg = useSupabase();
 
-  const handleName = async (val: string) => {
+  const handleName = useCallback(async (val: string) => {
     const cleanString = sanitizeInput(val);
     setCurrentValue(cleanString);
     const validString = validateInput(cleanString, { minLength: 3 });
 
     if (validString.isValid) {
-      // Search through ingredients to display list of search results
-      onChange(currentValue);
+      await queryByIngredient(pg, cleanString, updateResults);
 
-      //Check if there is an exact match
-      const exists = await checkExisting(
-        pg,
-        "ingredients",
-        "name",
-        cleanString
-      );
-      //If there is don't allow user to submit it
+      const exists = await checkExisting(pg, "ingredients", "name", cleanString);
       if (exists) {
-        setErrorMessage("This ingredient already exists");
         setEnableSubmit(false);
-      } 
-      // If it doesn't exist, allow user to submit it
-      else {
+      } else {
         setErrorMessage("");
         setEnableSubmit(true);
       }
-    }
-    // Reset the input logic
-    else {
+    } else {
       setErrorMessage(cleanString.length > 0 ? "Invalid input" : "");
       setEnableSubmit(false);
-      //Show all results again
-      onSuccess();
+      if (cleanString.length === 0) {
+        await queryAllIngredients(pg,updateResults)
+      }
     }
-  };
+  }, [pg, updateResults]);
 
   const handleSubmit = async () => {
     if (enableSubmit) {
-      const success = await createRow<Ingredients>(pg, "ingredients", {
-        name: currentValue,
-      });
-      enqueueSnackbar(
-        `${
-          success ? "Successfully added" : "Failed to add"
-        } ${currentValue} to database`,
-        { variant: success ? "success" : "error" }
-      );
+      const success = await createRow<Ingredients>(pg, "ingredients", { name: currentValue });
       if (success) {
-        setCurrentValue(""); // Reset the text input
-        setEnableSubmit(false); // Disable submit button after reset
-        onSuccess(); // Call onSuccess to refresh the list
+        setCurrentValue("");
+        setEnableSubmit(false);
+        await queryAllIngredients(pg,updateResults)
       }
     }
   };
@@ -86,18 +64,21 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
         type="text"
         label="Name"
         onChange={handleName}
-        delay={500}
+        delay={1000}
         minLength={3}
         error={errorMessage}
         placeholder="Enter an ingredient name"
+        value={currentValue}
       />
-      <div className="text-center mt-4">
-        <Button
-          label="+ Add Ingredient"
-          disabled={!enableSubmit}
-          onClick={handleSubmit}
-        />
-      </div>
+      {currentValue.length > 2 && (
+        <div className="text-center mt-4">
+          <Button
+            label="+ Add Ingredient"
+            disabled={!enableSubmit}
+            onClick={handleSubmit}
+          />
+        </div>
+      )}
     </form>
   );
 };

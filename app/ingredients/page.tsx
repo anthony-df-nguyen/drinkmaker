@@ -1,51 +1,36 @@
-"use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { redirect } from 'next/navigation'
+// import { createSupabaseBrowserClient } from '@/utils/supabase/browser-client'
+import { createSupabaseServerClient } from "@/utils/supabase/server-client";
 import Navigation from "@/components/Layout/Navigation";
 import IngredientForm from "@/app/ingredients/IngredientsForm";
 import IngredientList from "@/app/ingredients/IngredientList";
 import { Ingredients } from "@/schema/ingredients";
-import { useSupabase } from "@/context/Supabase";
-import { enqueueSnackbar } from "notistack";
+import {queryAllIngredients} from "./api";
 
-const Page: React.FC = () => {
-  const [results, setResults] = useState<Ingredients[]>([]);
-  const pg = useSupabase();
+const Page: React.FC = async () => {
+  // const [results, setResults] = useState<Ingredients[]>([]);
+  const supabase = createSupabaseServerClient()
+  //console.log('supabase: ', supabase);
+  const session = await supabase.auth.getUser()
+  console.log('session: ', session);
 
-  const queryAll = async () => {
-    const { data, error, status } = await pg.from("ingredients").select("name");
-    if (status === 200 && data) {
-      setResults(data);
-    } else if (error) {
-      console.error("Error fetching ingredients:", error);
-      enqueueSnackbar("Error searching for ingredients", { variant: "error" });
-    }
-  };
 
-  const query = async (currentValue: string) => {
-    const { data, error } = await pg
-      .from("ingredients")
-      .select("name")
-      .ilike("name", `%${currentValue}%`);
-    if (error) {
-      console.error("Error fetching ingredient:", error);
-      enqueueSnackbar(`Error searching for ingredient ${currentValue}`, {
-        variant: "error",
-      });
-    } else {
-      setResults(data);
-    }
-  };
-
-  useEffect(() => {
-    queryAll();
-  }, []);
+  // useEffect(() => {
+  //   let mounted = true;
+  //   mounted && queryAllIngredients(pg, setResults);
+  //   return () => {
+  //     mounted = false;
+  //   };
+  // }, []);
 
   return (
     <Navigation>
       <div>
-        <h1>Search for Ingredients</h1>
-        <IngredientForm onSuccess={queryAll} onChange={query}/>
-        <IngredientList ingredients={results} />
+        <div className="text-2xl font-medium">Ingredients</div>
+        {/* <p>Hello {data.user.email}</p> */}
+        {/* <IngredientForm updateResults={setResults} pg={pg}/>
+        <IngredientList ingredients={results} /> */}
       </div>
     </Navigation>
   );

@@ -1,5 +1,5 @@
 import React from "react";
-import classNames from "@/utilities/classNames";
+import classNames from "@/utils/classNames";
 
 type Props = {
   label: string;
@@ -21,7 +21,7 @@ export default function Button({ label, onClick, disabled }: Props) {
       onClick={onClick}
       type="button"
       className={classNames(
-        "bg-blue-600 hover:bg-blue-500 focus-visible:outline-blue-600 hover:bg-blue-500  rounded px-4 py-2 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
+        "bg-green-600 hover:bg-green-500 focus-visible:outline-green-600 hover:bg-green-500  rounded px-4 py-2 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
         disabled ? disabledClass : ""
       )}
     >

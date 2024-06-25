@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import { AuthenticatedProvider } from "@/context/Authenticated";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { SupabaseProvider } from "@/context/Supabase";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,12 +16,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full bg-white">
+    <html lang="en" className="h-full bg-gray-100">
       <head>
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css"></link>
+        <script src="https://accounts.google.com/gsi/client" async></script>
       </head>
       <body className="h-full">
-        {<SupabaseProvider>{children}</SupabaseProvider>}
+        <AuthenticatedProvider>{children}</AuthenticatedProvider>
       </body>
     </html>
   );

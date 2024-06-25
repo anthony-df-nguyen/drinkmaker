@@ -6,6 +6,7 @@ interface NavLinks {
 const links = [
   { name: "Drinks", href: "/", icon: "asd" },
   { name: "Ingredients", href: "/ingredients", icon: "asd" },
+
 ];
 
 export type {NavLinks}

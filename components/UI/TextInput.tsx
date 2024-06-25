@@ -8,38 +8,42 @@ interface Props {
   label: string;
   placeholder?: string;
   type: "text" | "email" | "password";
-  // OnChange function is handled by the parent component
   onChange: (value: string) => void;
-  //  If a delay is provided, this will debounce user input before running the onChange handlers
-  delay: number;
+  delay?: number;
   required?: boolean;
   minLength?: number;
   maxLength?: number;
   error?: string;
+  value: string; // Make sure to add value prop to handle controlled input
 }
 
-export default function TextInput({
+const TextInput: React.FC<Props> = ({
   id,
   label,
   placeholder,
   type,
   onChange,
-  delay,
+  delay = 300, // Default delay to 300ms
+  required,
   minLength,
   maxLength,
-  error
-}: Props) {
-  const [value, setValue] = useState<string>("");
-  const debouncedValue = useDebounce<string>(value, delay);
+  error,
+  value,
+}) => {
+  const [inputValue, setInputValue] = useState<string>(value);
+  const debouncedValue = useDebounce<string>(inputValue, delay);
 
   useEffect(() => {
-    // Debounce if there is user input but if its empty just return empty string
-    debouncedValue.length > 0 ? onChange(debouncedValue) : onChange("");
+    onChange(debouncedValue);
   }, [debouncedValue, onChange]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
+    setInputValue(e.target.value);
   };
+
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
 
   return (
     <div>
@@ -54,14 +58,15 @@ export default function TextInput({
           type={type}
           name={id}
           id={id}
-          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
           placeholder={placeholder}
-          value={value}
+          value={inputValue}
           onChange={handleChange}
           minLength={minLength}
           maxLength={maxLength}
-          aria-invalid="true"
-          aria-describedby={`${id}-error`}
+          aria-invalid={error ? "true" : undefined}
+          aria-describedby={error ? `${id}-error` : undefined}
+          required={required}
         />
         {error && (
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -79,4 +84,6 @@ export default function TextInput({
       )}
     </div>
   );
-}
+};
+
+export default TextInput;
