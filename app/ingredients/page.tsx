@@ -1,36 +1,37 @@
-import React from "react";
-import { redirect } from 'next/navigation'
-// import { createSupabaseBrowserClient } from '@/utils/supabase/browser-client'
-import { createSupabaseServerClient } from "@/utils/supabase/server-client";
+"use client";
+import React, { useState, useEffect } from "react";
 import Navigation from "@/components/Layout/Navigation";
 import IngredientForm from "@/app/ingredients/IngredientsForm";
 import IngredientList from "@/app/ingredients/IngredientList";
-import { Ingredients } from "@/schema/ingredients";
-import {queryAllIngredients} from "./api";
+import { Ingredients } from "./models";
 
-const Page: React.FC = async () => {
-  // const [results, setResults] = useState<Ingredients[]>([]);
-  const supabase = createSupabaseServerClient()
-  //console.log('supabase: ', supabase);
-  const session = await supabase.auth.getUser()
-  console.log('session: ', session);
+const Page: React.FC = () => {
+  const [results, setResults] = useState<Ingredients[]>([]);
 
 
   // useEffect(() => {
-  //   let mounted = true;
-  //   mounted && queryAllIngredients(pg, setResults);
-  //   return () => {
-  //     mounted = false;
+  //   const fetchIngredients = async () => {
+  //     try {
+  //       await queryAllIngredients().then((data) => {
+  //         setResults(data);
+  //       });
+  //     } catch (error) {
+  //       console.error("Failed to fetch ingredients:", error);
+  //       enqueueSnackbar("Could not fetch all ingredients", {
+  //         variant: "error",
+  //       });
+  //     }
   //   };
+  //   fetchIngredients();
+  //   return () => {};
   // }, []);
 
   return (
     <Navigation>
       <div>
         <div className="text-2xl font-medium">Ingredients</div>
-        {/* <p>Hello {data.user.email}</p> */}
-        {/* <IngredientForm updateResults={setResults} pg={pg}/>
-        <IngredientList ingredients={results} /> */}
+        <IngredientForm updateResults={setResults} />
+        <IngredientList ingredients={results} />
       </div>
     </Navigation>
   );

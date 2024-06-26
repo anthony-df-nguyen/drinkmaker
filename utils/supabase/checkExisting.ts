@@ -1,33 +1,33 @@
-// utilities/supabase/checkExisting.ts
+"use server";
+import { createSupabaseServerClient } from "./server-client";
 
-import { SupabaseClient } from "@supabase/supabase-js";
-import { enqueueSnackbar } from "notistack";
-
+const pg = createSupabaseServerClient();
 /**
- * Checks if a row with the given value exists in the specified table.
- * @param pg - Supabase client instance.
- * @param table - The table to check.
- * @param column - The column to search.
- * @param value - The value to search for.
- * @returns A boolean indicating if the row exists.
+ * Checks if a value exists in a specific column of a table in the Supabase database.
+ * @param table - The name of the table to check.
+ * @param column - The name of the column to check.
+ * @param value - The value to check for existence in the specified column.
+ * @returns A Promise that resolves to a boolean indicating whether the value exists in the column.
+ * @throws If there is an error checking the existence or if the value is not a string.
  */
 const checkExisting = async (
-  pg: SupabaseClient,
   table: string,
   column: string,
   value: string
 ): Promise<boolean> => {
-  const { data, error } = await pg.from(table).select(column).eq(column, value);
-
-  if (error) {
+  try {
+    const { data, error } = await pg
+      .from(table)
+      .select(column)
+      .eq(column, value);
+    if (error) {
+      throw new Error(error.message || "Error checking existence");
+    }
+    return data.length > 0 ? true : false;
+  } catch (error) {
     console.error("Error checking existence:", error);
-    enqueueSnackbar(`Error checking for existing rows`, {
-      variant: "error",
-    });
-    return false; // or handle error appropriately
+    throw new Error(`Error checking existence`);
   }
-
-  return data.length > 0;
 };
 
 export default checkExisting;

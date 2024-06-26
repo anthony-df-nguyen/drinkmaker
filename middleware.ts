@@ -11,10 +11,10 @@ export async function middleware(request: NextRequest) {
   const supabase = createSupabaseReqResClient(request, response);
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: {user}
+  } = await supabase.auth.getUser();
 
-  const user = session?.user;
+  //const user = session?.user;
 
   // protects the "/account" route and its sub-routes
   if (!user && request.nextUrl.pathname.startsWith("/ingredients")) {

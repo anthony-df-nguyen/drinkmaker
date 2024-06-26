@@ -1,7 +1,7 @@
 // components/IngredientList.tsx
 
 import React from "react";
-import { Ingredients } from "@/schema/ingredients";
+import { Ingredients } from "./models";
 import { formatText } from "@/utils/formatText";
 import CardList from "@/components/UI/CardList";
 
@@ -9,6 +9,14 @@ interface IngredientListProps {
   ingredients: Ingredients[];
 }
 
+/**
+ * Renders a list of ingredients.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {Array} props.ingredients - The array of ingredients to display.
+ * @returns {JSX.Element} The rendered IngredientList component.
+ */
 const IngredientList: React.FC<IngredientListProps> = ({ ingredients }) => {
   return (
     <div className="mt-4">

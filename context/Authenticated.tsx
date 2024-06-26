@@ -34,7 +34,7 @@ export const AuthenticatedProvider: React.FC<AuthenticatedProviderProps> = ({ ch
     }
   };
 
-  useMemo(() => {
+  useEffect(() => {
     checkAuth();
   }, []);
 
