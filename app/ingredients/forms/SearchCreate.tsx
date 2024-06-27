@@ -1,10 +1,10 @@
 /**
  * Represents a form for adding ingredients.
- * @param {React.Dispatch<React.SetStateAction<Ingredients[]>>} updateResults - A function to update the list of ingredients.
  * @returns {JSX.Element} The ingredient form component.
  */
 import React, { useState, useCallback } from "react";
 import TextInput from "@/components/Inputs/TextInput";
+import { useListIngredients } from "../context/ListIngredientsContext";
 import Button from "@/components/UI/Button";
 import { sanitizeInput, validateInput } from "@/utils/sanitizeInput";
 import {
@@ -13,20 +13,16 @@ import {
   queryAllIngredients,
 } from "@/app/ingredients/actions";
 import checkExisting from "@/utils/supabase/checkExisting";
-import { IngredientsSchema } from "../models";
 import { enqueueSnackbar } from "notistack";
 
-interface IngredientFormProps {
-  updateResults: React.Dispatch<React.SetStateAction<IngredientsSchema[]>>;
-}
-
-const SearchCreate: React.FC<IngredientFormProps> = ({ updateResults }) => {
+const SearchCreate: React.FC = () => {
   const [formState, setFormState] = useState({
-    currentValue: "",
+    displayValue: "",
+    cleanValue: "",
     enableSubmit: false,
     errorMessage: "",
   });
-  console.log(formState)
+  const { ingredients, setIngredients, count, setCount } = useListIngredients();
 
   /**
    * Displays a snackbar notification.
@@ -41,69 +37,65 @@ const SearchCreate: React.FC<IngredientFormProps> = ({ updateResults }) => {
    * Handles the input value for the ingredient name.
    * @param {string} val - The input value for the ingredient name.
    */
-  const handleName = useCallback(
-    async (val: string) => {
-      const cleanString = sanitizeInput(val);
-      const validString = validateInput(cleanString, { minLength: 3 });
+  const handleName = useCallback(async (val: string) => {
+    const cleanString = sanitizeInput(val);
+    const validString = validateInput(cleanString, { minLength: 3 });
 
-      // If the input is valid
-      if (validString.isValid) {
-        try {
-          // Search for the ingredient and update the list of displayed results
-          const data = await searchForIngredient(cleanString);
-          updateResults(data);
+    // If the input is valid
+    if (validString.isValid) {
+      try {
+        // Search for the ingredient and update the list of displayed results
+        const data = await searchForIngredient(cleanString);
+        console.log('data: ', data);
+        setIngredients(data);
+        setCount(data.length)
 
-          // Check if the ingredient already exists
-          const exists = await checkExisting(
-            "ingredients",
-            "name",
-            cleanString
-          );
+        // Check if the ingredient already exists
+        const exists = await checkExisting("ingredients", "name", cleanString);
 
-
-          //If it does disable the create button
-          if (exists) {
-            setFormState({
-              currentValue: val,
-              enableSubmit: false,
-              errorMessage: "",
-            });
-          } else {
-            // If it does not exist, enable the create button
-            setFormState({
-              currentValue: val,
-              errorMessage: "",
-              enableSubmit: true,
-            });
-          }
-          
-        } catch (error) {
-          console.error("Failed to fetch ingredients:", error);
-          displaySnackbar("Could not fetch ingredients", "error");
+        //If it does disable the create button
+        if (exists) {
+          setFormState({
+            displayValue: val,
+            cleanValue: cleanString,
+            enableSubmit: false,
+            errorMessage: "",
+          });
+        } else {
+          // If it does not exist, enable the create button
+          setFormState({
+            displayValue: val,
+            cleanValue: cleanString,
+            errorMessage: "",
+            enableSubmit: true,
+          });
         }
+      } catch (error) {
+        console.error("Failed to fetch ingredients:", error);
+        displaySnackbar("Could not fetch ingredients", "error");
       }
-      // If input is invalid
-      else {
-        // Do not allow creation
-        setFormState((prevState) => ({
-          ...prevState,
-          currentValue: val,
-          enableSubmit: false,
-          errorMessage: cleanString.length > 0 ? "Invalid input" : "",
-        }));
-        // If the input is empty, fetch all ingredients
-        if (cleanString.length === 0) {
-          queryAllIngredients()
-            .then(updateResults)
-            .catch((error) => {
-              console.error("Failed to fetch all ingredients:", error);
-              displaySnackbar("Could not fetch ingredients", "error");
-            });
-        }
+    }
+    // If input is invalid
+    else {
+      // Do not allow creation
+      setFormState((prevState) => ({
+        ...prevState,
+        displayValue: val,
+        cleanValue: cleanString,
+        enableSubmit: false,
+        errorMessage: cleanString.length > 0 ? "Invalid input" : "",
+      }));
+      // If the input is empty, fetch all ingredients
+      if (cleanString.length === 0) {
+        queryAllIngredients(1, 10)
+          .then((data) => setIngredients(data))
+          .catch((error) => {
+            console.error("Failed to fetch all ingredients:", error);
+            displaySnackbar("Could not fetch ingredients", "error");
+          });
       }
-    },
-    [updateResults]
-  );
+    }
+  }, []);
 
   /**
    * Handles the form submission.
@@ -111,10 +103,11 @@ const SearchCreate: React.FC<IngredientFormProps> = ({ updateResults }) => {
   const handleSubmit = async () => {
     if (formState.enableSubmit) {
       try {
-        await createIngredient({ name: sanitizeInput(formState.currentValue) });
+        await createIngredient({ name: formState.cleanValue });
         displaySnackbar("Ingredient added", "success");
         setFormState({
-          currentValue: "",
+          displayValue: "",
+          cleanValue: "",
           enableSubmit: false,
           errorMessage: "",
         });
@@ -136,9 +129,9 @@ const SearchCreate: React.FC<IngredientFormProps> = ({ updateResults }) => {
         minLength={3}
         error={formState.errorMessage}
         placeholder="Enter an ingredient name to search or create"
-        value={formState.currentValue}
+        value={formState.displayValue}
       />
-      {formState.currentValue.length > 2 && (
+      {formState.displayValue.length > 2 && (
         <div className="text-center mt-4">
           <Button
             label="+ Add Ingredient"

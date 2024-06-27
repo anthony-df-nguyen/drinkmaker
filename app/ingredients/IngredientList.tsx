@@ -1,39 +1,44 @@
-// components/IngredientList.tsx
 
-import React from "react";
-import { IngredientsSchema } from "./models";
+import React, { useEffect, useState } from "react";
+import { useListIngredients } from "./context/ListIngredientsContext";
 import { formatText } from "@/utils/formatText";
 import Card from "@/components/UI/Card";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/20/solid";
 import EditForm from "./forms/EditForm";
 import DeleteForm from "./forms/DeleteForm";
+import Pagination from "@/components/UI/Pagination";
+import { queryAllIngredients } from "./actions";
 import { useModal } from "@/context/ModalContext";
-
-interface IngredientListProps {
-  ingredients: IngredientsSchema[];
-}
 
 /**
  * Renders a list of ingredients.
  *
  * @component
- * @param {Object} props - The component props.
- * @param {Array} props.ingredients - The array of ingredients to display.
  * @returns {JSX.Element} The rendered IngredientList component.
  */
-const IngredientList: React.FC<IngredientListProps> = ({ ingredients }) => {
+const IngredientList: React.FC = () => {
   const { showModal } = useModal();
+  const { ingredients, setIngredients, count } = useListIngredients();
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const onPageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+  useEffect(() => {
+    try {
+      queryAllIngredients(currentPage, 10).then((data) => setIngredients(data));
+    } catch (error) {
+      console.error("Error querying ingredients: ", error);
+    }
+  }, [currentPage, setIngredients]);
+
   return (
     <div className="mt-4">
-      <div className="flex items-center gap-4 justify-center">
-        <div className="text-lg text-center mt-4">
-          {ingredients.length} Ingredients Found
-        </div>
-      </div>
       <div className="mt-8 grid gap-2">
         {ingredients.map((ingredient) => (
           <Card key={ingredient.name}>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 justify-between w-full">
               <div className="text-md">{formatText(ingredient.name)}</div>
               <div className="flex-1"></div>
               <div
@@ -54,6 +59,12 @@ const IngredientList: React.FC<IngredientListProps> = ({ ingredients }) => {
           </Card>
         ))}
       </div>
+      <Pagination
+        totalItems={count}
+        itemsPerPage={10}
+        currentPage={currentPage}
+        onPageChange={onPageChange}
+      />
     </div>
   );
 };
