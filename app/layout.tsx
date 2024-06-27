@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AuthenticatedProvider } from "@/context/Authenticated";
 import { Inter } from "next/font/google";
+import { ModalProvider } from "@/context/ModalContext";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -22,7 +23,9 @@ export default function RootLayout({
         <script src="https://accounts.google.com/gsi/client" async></script>
       </head>
       <body className="h-full">
-        <AuthenticatedProvider>{children}</AuthenticatedProvider>
+        <AuthenticatedProvider>
+          <ModalProvider>{children}</ModalProvider>
+        </AuthenticatedProvider>
       </body>
     </html>
   );
