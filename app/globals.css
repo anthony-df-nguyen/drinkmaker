@@ -21,8 +21,14 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  
 }
 
 .no-scroll {
   overflow: hidden;
+}
+
+.pageTitle {
+  @apply text-2xl font-semibold;
 }

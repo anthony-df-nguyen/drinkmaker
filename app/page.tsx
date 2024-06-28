@@ -1,14 +1,16 @@
+"use client";
 import Navigation from "@/components/Layout/Navigation";
-import CreateForm from "./drinks/CreateDrink";
+import { ListDrinksProvider } from "./drinks/contexts/DrinksContext";
+import DrinksPage from "./drinks/DrinksPage";
 
-export default async function Home() {
+export default function Home() {
   return (
-    <main className="">
+    <main className="pageTitle">
       <Navigation>
-        <>
-        <div className="text-2xl font-semibold">Drink Maker</div>
-        <CreateForm />
-        </>
+        <ListDrinksProvider>
+          <div className="pageTitle">Drink Maker</div>
+          <DrinksPage />
+        </ListDrinksProvider>
       </Navigation>
     </main>
   );

@@ -19,9 +19,10 @@ type Props = {
   options: Data[];
   defaultValue: Data;
   onChange: (value: string) => void;
+  required?: boolean;
 };
 
-export default function Select({ label, defaultValue, options, onChange }: Props) {
+export default function Select({ label, defaultValue, options, onChange, required }: Props) {
   const [selected, setSelected] = useState<Data>(defaultValue);
   const handleSelectChange = (value: Data) => {
     setSelected(value);
@@ -33,7 +34,7 @@ export default function Select({ label, defaultValue, options, onChange }: Props
       {({ open }) => (
         <>
           <Label className="block text-sm font-medium leading-6 text-gray-900">
-            {label}
+            {label}{required && <span className="text-red-500">*</span>}
           </Label>
           <div className="relative">
             <ListboxButton className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-green-600 sm:text-sm sm:leading-6">

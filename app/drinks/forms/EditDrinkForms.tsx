@@ -1,30 +1,26 @@
 "use client";
 import React, { useState } from "react";
-import { MutableIngredientFields, IngredientsSchema } from "../models";
+import { MutableDrinkFields, DrinkSchema } from "../models";
 import { useAuthenticatedContext } from "@/context/Authenticated";
 import { formatText } from "@/utils/formatText";
 import { sanitizeInput } from "@/utils/sanitizeInput";
 import TextInput from "@/components/Inputs/TextInput";
 import TextArea from "@/components/Inputs/TextArea";
+import { updateDrink } from "../actions";
 import { enqueueSnackbar } from "notistack";
-import { updateIngredient } from "../actions";
 import { useModal } from "@/context/ModalContext";
 
 interface Props {
-  ingredient: IngredientsSchema;
+  drink: DrinkSchema;
 }
 
-export const EditIngredient: React.FC<Props> = ({ ingredient }) => {
+export const EditDrinksForm: React.FC<Props> = ({ drink }) => {
   const { user } = useAuthenticatedContext();
   const { hideModal } = useModal();
 
-  const [form, setForm] = useState<MutableIngredientFields>(ingredient);
+  const [form, setForm] = useState<MutableDrinkFields>(drink);
   const handleChange = (field: keyof typeof form, value: string) => {
-    if (field === "name") {
-      setForm({ ...form, name: sanitizeInput(value) });
-    } else {
-      setForm({ ...form, image: value });
-    }
+    setForm({ ...form, [field]: value});
   };
 
   /**
@@ -35,13 +31,13 @@ export const EditIngredient: React.FC<Props> = ({ ingredient }) => {
     e.preventDefault();
     if (user?.id) {
       try {
-        await updateIngredient(ingredient.id, form);
-        enqueueSnackbar("Ingredient updated successfully", {
+        await updateDrink(drink.id, form);
+        enqueueSnackbar("Drink updated successfully", {
           variant: "success",
         });
         hideModal();
       } catch (error) {
-        enqueueSnackbar("Cannot update ingredient", {
+        enqueueSnackbar("Cannot update drink", {
           variant: "error",
         });
       }
@@ -53,26 +49,31 @@ export const EditIngredient: React.FC<Props> = ({ ingredient }) => {
     }
   };
   return (
-    <form onSubmit={handleUpdate} className="grid gap-4 max-w-[300px] md:max-w-lg w-screen">
-      <div className="text-lg font-medium">Edit Ingredient</div>
+    <form
+      onSubmit={handleUpdate}
+      className="grid gap-4 max-w-[300px] md:max-w-lg w-screen"
+    >
+      <div className="text-lg font-medium">Edit Drink</div>
       <TextInput
         id="drinkName"
         label="Name"
-        value={formatText(ingredient.name)}
+        value={formatText(drink.name)}
         onChange={(value: string) => handleChange("name", value || "")}
         delay={500}
         minLength={3}
         maxLength={50}
         type="text"
       />
-      <TextArea
-        id="drinkName"
-        label="Image URL"
-        value={ingredient.image || ""}
-        onChange={(value: string) => handleChange("image", value)}
+      <TextArea 
+        id="drinkDescription"
+        label="Description"
+        value={drink.description}
+        onChange={(value: string) => handleChange("description", value || "")}
         delay={500}
         minLength={3}
+        maxLength={250}
       />
+
       <div className="flex items-center justify-end">
         <button
           type="submit"
@@ -85,4 +86,4 @@ export const EditIngredient: React.FC<Props> = ({ ingredient }) => {
   );
 };
 
-export default EditIngredient;
+export default EditDrinksForm;

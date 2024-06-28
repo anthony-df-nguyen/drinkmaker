@@ -19,7 +19,7 @@ export default function Profile({}: Props) {
   return (
     <>
       {/* Sign In When Not */}
-      {!session && <Link href="/signin">Sign In</Link>}
+      {!session && <Link className="text-base" href="/signin">Sign In</Link>}
       {/* Profile dropdown when logged in */}
       {session && (
         <Menu as="div" className="relative">

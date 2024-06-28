@@ -12,5 +12,5 @@ export default function LogoutButton() {
     location.reload();
   };
 
-  return <div className="cursor-pointer" onClick={handleLogout}>Sign Out</div>;
+  return <div className="cursor-pointer text-base" onClick={handleLogout}>Sign Out</div>;
 }

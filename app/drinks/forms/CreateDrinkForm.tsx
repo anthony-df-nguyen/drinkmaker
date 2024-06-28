@@ -5,20 +5,24 @@ import TextArea from "@/components/Inputs/TextArea";
 import Select from "@/components/Inputs/Select";
 import { useAuthenticatedContext } from "@/context/Authenticated";
 import { enqueueSnackbar } from "notistack";
-import { CreateDrinkFields } from "./models";
-import { createDrink } from "./actions";
+import { CreateDrinkFields } from "../models";
+import { createDrink } from "../actions";
+import { useModal } from "@/context/ModalContext";
+import { sanitizeInput } from "@/utils/sanitizeInput";
 
 /**
  * Component for creating a new drink.
  */
 const CreateForm = () => {
   const { user } = useAuthenticatedContext();
+  const { hideModal } = useModal();
 
   const [form, setForm] = useState<CreateDrinkFields>({
     name: "",
+    unique_name: "",
     description: "",
-    createdby: "",
-    drinktype: "",
+    created_by: "",
+    drink_type: "cocktail",
   });
 
   /**
@@ -27,7 +31,7 @@ const CreateForm = () => {
    * @param value - The new value for the field.
    */
   const handleChange = (field: keyof typeof form, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((prev) => ({ ...prev, [field]: value, unique_name: sanitizeInput(value)}));
   };
 
   /**
@@ -38,10 +42,11 @@ const CreateForm = () => {
     e.preventDefault();
     if (user?.id) {
       try {
-        await createDrink({ ...form, createdby: user.id });
+        await createDrink({ ...form, created_by: user.id });
         enqueueSnackbar("Drink created successfully", {
           variant: "success",
         });
+        hideModal();
       } catch (error) {
         enqueueSnackbar("Cannot create drink", {
           variant: "error",
@@ -58,7 +63,8 @@ const CreateForm = () => {
   const isDescriptionTooLong = form.description.length > 10000;
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto grid gap-4">
+    <form onSubmit={handleSubmit} className="grid gap-4 max-w-[300px] md:max-w-lg w-screen">
+      <div className="text-lg font-medium">Create Drink</div>
       <TextInput
         id="drinkName"
         label="Name"
@@ -68,17 +74,11 @@ const CreateForm = () => {
         minLength={3}
         maxLength={50}
         type="text"
-      />
-      <TextArea
-        id="drinkDescription"
-        label="Description"
-        value={form.description}
-        onChange={(value: string) => handleChange("description", value)}
-        maxLength={10000}
-        error={isDescriptionTooLong ? "Description is too long" : ""}
+        required
       />
       <Select
         label="Drink Type"
+        required
         options={[
           { value: "cocktail", label: "Cocktail" },
           { value: "coffee", label: "Coffee" },
@@ -90,8 +90,17 @@ const CreateForm = () => {
           { value: "other", label: "Other" },
         ]}
         defaultValue={{ value: "cocktail", label: "Cocktail" }}
-        onChange={(value: string) => handleChange("drinktype", value)}
+        onChange={(value: string) => handleChange("drink_type", value)}
       />
+      <TextArea
+        id="drinkDescription"
+        label="Description"
+        value={form.description}
+        onChange={(value: string) => handleChange("description", value)}
+        maxLength={250}
+        error={isDescriptionTooLong ? "Description is too long" : ""}
+      />
+      
       <div className="flex items-center justify-between">
         <button
           type="submit"

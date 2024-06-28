@@ -6,7 +6,11 @@
  * @returns The sanitized string.
  */
 export const sanitizeInput = (input: string): string => {
-  return input.trim().replace(/\s+/g, " ").replace(/ /g, "_").toLowerCase();
+  return input.trim()
+              .replace(/\s+/g, " ")
+              .replace(/ /g, "_")
+              .replace(/[^\w-]/g, "") // This line removes special characters except underscores and hyphens
+              .toLowerCase();
 };
 
 /**

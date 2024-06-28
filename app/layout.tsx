@@ -22,9 +22,10 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css"></link>
         <script src="https://accounts.google.com/gsi/client" async></script>
       </head>
+
       <body className="h-full">
         <AuthenticatedProvider>
-          <ModalProvider>{children}</ModalProvider>
+          <ModalProvider>{children} </ModalProvider>
         </AuthenticatedProvider>
       </body>
     </html>

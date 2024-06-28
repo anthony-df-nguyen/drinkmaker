@@ -50,7 +50,7 @@ const TextArea: React.FC<Props> = ({
         htmlFor={id}
         className="block text-sm font-medium leading-6 text-gray-900"
       >
-        {label}
+        {label}{required && <span className="text-red-500">*</span>}
       </label>
       <div className="relative mt-2 rounded-md shadow-sm">
         <textarea
@@ -77,11 +77,16 @@ const TextArea: React.FC<Props> = ({
           </div>
         )}
       </div>
-      {error && (
+      <div className="flex justify-between gap-2">
         <p className="mt-2 text-sm text-red-600" id={`${id}-error`}>
           {error}
         </p>
-      )}
+        {maxLength && ( // Show the character count if maxLength is provided
+          <p className="mt-2 text-sm text-gray-500">
+            {inputValue.length}/{maxLength}
+          </p>
+        )}
+      </div>
     </div>
   );
 };
