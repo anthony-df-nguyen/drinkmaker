@@ -1,5 +1,5 @@
 "use client";
-import {  useState } from "react";
+import { useState } from "react";
 import { links } from "./Links";
 import Link from "next/link";
 import { SnackbarProvider } from "notistack";
@@ -13,20 +13,21 @@ import {
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Profile from "./Profile";
 
-
 interface Props {
   children: any;
 }
-
-
 
 export default function Navigation({ children }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <>
-      <SnackbarProvider>
-        {" "}
+      <SnackbarProvider
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+      >
         <div>
           <Transition show={sidebarOpen}>
             <Dialog

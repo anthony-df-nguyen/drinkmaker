@@ -33,7 +33,13 @@ type Props = {
 
 export default function Card({ children, className = "", onClick }: Props) {
   return (
-    <div onClick={onClick} className={classNames("relative inline-flex items-center rounded-md bg-white px-3 py-4 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0", className)}>
+    <div
+      onClick={onClick}
+      className={classNames(
+        "relative inline-flex items-center rounded-md bg-white p-4 shadow focus-visible:outline-offset-0",
+        className
+      )}
+    >
       {children}
     </div>
   );

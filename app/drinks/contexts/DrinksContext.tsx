@@ -53,29 +53,18 @@ export const ListDrinksProvider: React.FC<ListDrinksProviderProps> = ({
         /**
          * Fetches the list of drinks.
          */
+        console.log("Initial fetch of drinks on mount")
         const fetchDrinks = async () => {
             try {
-                const drinksData = await queryDrinks(1, 10);
-                setDrinksList(drinksData);
+                const drinksData = await queryDrinks(1, 10, undefined, undefined);
+                setDrinksList(drinksData.data);
+                setCount(drinksData.totalCount);
             } catch (error: any) {
                 console.error("Error querying drinks: ", error);
             }
         };
 
-        /**
-         * Fetches the total count of drinks.
-         */
-        const fetchCount = async () => {
-            try {
-                const countData = await getTotalCount("drinks");
-                setCount(countData);
-            } catch (error: any) {
-                console.error("Error getting total count: ", error);
-            }
-        };
-
         fetchDrinks();
-        fetchCount();
     }, []);
 
     return (

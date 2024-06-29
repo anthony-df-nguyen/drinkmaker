@@ -1,13 +1,8 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
 import { DrinkSchema } from "../models";
-import { InstructionFormat } from "./instructions/models";
-import Badge from "@/components/UI/Badge";
-import { PencilSquareIcon, TrashIcon } from "@heroicons/react/20/solid";
 import { useModal } from "@/context/ModalContext";
-import EditDrinksForm from "../forms/EditDrinkForms";
-import DeleteForm from "../forms/DeleteDrinkForm";
 import ViewInstructions from "./instructions/ViewInstructions";
+import Card from "@/components/UI/Card";
 
 interface ViewOnlyModeProps {
   drink: DrinkSchema;
@@ -21,7 +16,7 @@ const ViewOnlyMode: React.FC<ViewOnlyModeProps> = ({
   return (
     <div>
     
-      <div className="mt-8">{drink.description}</div>
+      <Card className="mt-4 w-full text-base font-light">{drink.description ? drink.description : "No drink description"}</Card>
       <div className="mt-4">
         <ViewInstructions instructions={drink.instructions} />
       </div>

@@ -119,7 +119,7 @@ const SearchCreate: React.FC = () => {
   };
 
   return (
-    <form>
+    <form className="mt-4" onSubmit={handleSubmit}>
       <TextInput
         id="name"
         type="text"
@@ -136,7 +136,8 @@ const SearchCreate: React.FC = () => {
           <Button
             label="+ Add Ingredient"
             disabled={!formState.enableSubmit}
-            onClick={handleSubmit}
+            type="submit"
+            variant="primary"
           />
         </div>
       )}

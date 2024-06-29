@@ -9,6 +9,7 @@ import TextArea from "@/components/Inputs/TextArea";
 import { enqueueSnackbar } from "notistack";
 import { updateIngredient } from "../actions";
 import { useModal } from "@/context/ModalContext";
+import Button from "@/components/UI/Button";
 
 interface Props {
   ingredient: IngredientsSchema;
@@ -31,7 +32,7 @@ export const EditIngredient: React.FC<Props> = ({ ingredient }) => {
    * Handles the form submission event.
    * @param e - The form event.
    */
-  const handleUpdate = async (e: React.FormEvent) => {
+  const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (user?.id) {
       try {
@@ -53,7 +54,10 @@ export const EditIngredient: React.FC<Props> = ({ ingredient }) => {
     }
   };
   return (
-    <form onSubmit={handleUpdate} className="grid gap-4 max-w-[300px] md:max-w-lg w-screen">
+    <form
+      className="grid gap-4 max-w-[300px] md:max-w-lg w-screen"
+      onSubmit={handleUpdate}
+    >
       <div className="text-lg font-medium">Edit Ingredient</div>
       <TextInput
         id="drinkName"
@@ -64,6 +68,7 @@ export const EditIngredient: React.FC<Props> = ({ ingredient }) => {
         minLength={3}
         maxLength={50}
         type="text"
+        required
       />
       <TextArea
         id="drinkName"
@@ -74,12 +79,11 @@ export const EditIngredient: React.FC<Props> = ({ ingredient }) => {
         minLength={3}
       />
       <div className="flex items-center justify-end">
-        <button
+        <Button
+          label="Update"
           type="submit"
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        >
-          Update
-        </button>
+          variant="primary"
+        />
       </div>
     </form>
   );

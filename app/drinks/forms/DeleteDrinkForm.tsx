@@ -1,17 +1,18 @@
 "use client";
-import React from "react";
 import { DrinkSchema } from "../models";
 import { useAuthenticatedContext } from "@/context/Authenticated";
 import { formatText } from "@/utils/formatText";
 import { enqueueSnackbar } from "notistack";
 import { deleteDrink } from "../actions";
 import { useModal } from "@/context/ModalContext";
+import { setTimeout } from "timers";
 
 interface Props {
   drink: DrinkSchema;
+  afterDelete: () => void;
 }
 
-export const DeleteForm: React.FC<Props> = ({ drink }) => {
+export const DeleteForm: React.FC<Props> = ({ drink, afterDelete }) => {
   const { user } = useAuthenticatedContext();
   const { hideModal } = useModal();
 
@@ -28,9 +29,13 @@ export const DeleteForm: React.FC<Props> = ({ drink }) => {
           variant: "success",
         });
         hideModal();
+        setTimeout(() => {
+          afterDelete();
+        }, 3000);
       } catch (error) {
         enqueueSnackbar("Cannot delete ingredient", {
           variant: "error",
+          
         });
       }
     } else {

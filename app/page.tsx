@@ -8,7 +8,6 @@ export default function Home() {
     <main className="pageTitle">
       <Navigation>
         <ListDrinksProvider>
-          <div className="pageTitle">Drink Maker</div>
           <DrinksPage />
         </ListDrinksProvider>
       </Navigation>

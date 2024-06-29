@@ -1,22 +1,40 @@
-"use client";
-import { useState, useEffect, useCallback } from "react";
-import Editor from "./instructions/editor/Editor";
+/**
+ * Component for editing a drink in the view-only mode.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {DrinkSchema} props.drink - The drink object to be edited.
+ * @param {Dispatch<SetStateAction<boolean>>} props.handleCancel - The function to handle canceling the edit mode.
+ * @returns {JSX.Element} The JSX element representing the edit mode form.
+ */
+import { useState, SetStateAction, Dispatch } from "react";
+import Editor from "../[slug]/instructions/editor/Editor";
 import TextInput from "@/components/Inputs/TextInput";
 import TextArea from "@/components/Inputs/TextArea";
 import Select from "@/components/Inputs/Select";
 import Button from "@/components/UI/Button";
-import { DrinkSchema } from "../models";
+import { DrinkSchema, drinkTypes } from "../models";
 import { updateDrink } from "../actions";
-import { InstructionFormat } from "./instructions/models";
 import { sanitizeInput } from "@/utils/sanitizeInput";
 import { enqueueSnackbar } from "notistack";
 
 interface ViewOnlyModeProps {
   drink: DrinkSchema;
+  handleCancel: Dispatch<SetStateAction<boolean>>;
 }
 
-const EditMode: React.FC<ViewOnlyModeProps> = ({ drink }) => {
+const EditDrinkForm: React.FC<ViewOnlyModeProps> = ({
+  drink,
+  handleCancel,
+}) => {
   const [form, setForm] = useState({ ...drink });
+
+  /**
+   * Handles the change of a form field.
+   *
+   * @param {keyof typeof form} field - The field to be changed.
+   * @param {string} value - The new value of the field.
+   */
   const handleChange = (field: keyof typeof form, value: string) => {
     if (field === "name") {
       setForm({ ...form, name: value, unique_name: sanitizeInput(value) });
@@ -24,9 +42,18 @@ const EditMode: React.FC<ViewOnlyModeProps> = ({ drink }) => {
       setForm({ ...form, [field]: value });
     }
   };
-  const submitForm = async () => {
+
+  /**
+   * Submits the form for updating the drink.
+   *
+   * @param {React.FormEvent<HTMLFormElement>} e - The form event.
+   */
+  const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     try {
       await updateDrink(drink.id, form).then(() => {
+        // Close the edit form afetr updating the drink
+        handleCancel(false);
         enqueueSnackbar("Successfully updated drink", { variant: "success" });
       });
     } catch (error) {
@@ -36,7 +63,7 @@ const EditMode: React.FC<ViewOnlyModeProps> = ({ drink }) => {
   };
 
   return (
-    <form className="mt-8">
+    <form className="mt-8" onSubmit={submitForm}>
       <TextInput
         id="drinkName"
         label="Name"
@@ -60,16 +87,7 @@ const EditMode: React.FC<ViewOnlyModeProps> = ({ drink }) => {
       <Select
         label="Drink Type"
         required
-        options={[
-          { value: "cocktail", label: "Cocktail" },
-          { value: "coffee", label: "Coffee" },
-          { value: "juice", label: "Juice" },
-          { value: "mocktail", label: "Mocktail" },
-          { value: "shake", label: "Shake" },
-          { value: "smoothie", label: "Smoothie" },
-          { value: "tea", label: "Tea" },
-          { value: "other", label: "Other" },
-        ]}
+        options={drinkTypes}
         defaultValue={drink.drink_type}
         onChange={(value: string) => handleChange("drink_type", value)}
       />
@@ -80,10 +98,23 @@ const EditMode: React.FC<ViewOnlyModeProps> = ({ drink }) => {
           onChangeHandler={handleChange}
         />
       </div>
-
-      <Button label="Submit" disabled={false} onClick={submitForm} />
+      <div className="flex gap-2 justify-end mt-4">
+        <Button
+          label="Cancel"
+          disabled={false}
+          onClick={handleCancel}
+          type="button"
+          variant="cancel"
+        />
+        <Button
+          label="Submit"
+          disabled={false}
+          type="submit"
+          variant="primary"
+        />
+      </div>
     </form>
   );
 };
 
-export default EditMode;
+export default EditDrinkForm;

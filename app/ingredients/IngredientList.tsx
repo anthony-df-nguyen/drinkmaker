@@ -39,7 +39,7 @@ const IngredientList: React.FC = () => {
         {ingredients.map((ingredient) => (
           <Card key={ingredient.name}>
             <div className="flex items-center gap-2 justify-between w-full">
-              <div className="text-md">{formatText(ingredient.name)}</div>
+              <div className="text-base">{formatText(ingredient.name)}</div>
               <div className="flex-1"></div>
               <div
                 className="text-gray-500 w-5 h-5 cursor-pointer"

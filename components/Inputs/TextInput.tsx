@@ -20,6 +20,7 @@
  * ```
  */
 import React, { useState, useEffect, ChangeEvent } from "react";
+import classNames from "@/utils/classNames";
 import { ExclamationCircleIcon } from "@heroicons/react/20/solid";
 import useDebounce from "@/hooks/useDebounce";
 
@@ -108,7 +109,7 @@ const TextInput: React.FC<Props> = ({
       >
         {label}{required && <span className="text-red-500"> *</span>}
       </label>
-      <div className="relative mt-2 rounded-md">
+      <div className="relative rounded-md">
         <input
           type={type}
           name={id}
@@ -137,7 +138,12 @@ const TextInput: React.FC<Props> = ({
           {error}
         </p>
         {maxLength && ( // Show the character count if maxLength is provided
-          <p className="mt-2 inputLimit">
+          <p  className={classNames(
+            "mt-2 inputLimit ",
+            inputValue.length === maxLength
+              ? " text-red-600"
+              : "text-gray-500"
+          )}>
             {inputValue.length}/{maxLength}
           </p>
         )}

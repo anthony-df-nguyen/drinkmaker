@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { InstructionFormat } from "../models";
 import { modules, formats } from "./modules";
 import { useQuill } from "react-quilljs";
-import Button from "@/components/UI/Button";
+import classNames from "@/utils/classNames";
 import "quill/dist/quill.snow.css";
 
 interface EditorProps {
@@ -16,7 +16,7 @@ const Editor: React.FC<EditorProps> = ({ initialContent, onChangeHandler }) => {
   const [content, setContent] = useState<InstructionFormat>(initialContent);
   const [length, setLength] = useState<number>(0);
 
-  const limit = 10000;
+  const limit = 5000;
   useEffect(() => {
     if (quill) {
       if (initialContent) {
@@ -53,8 +53,13 @@ const Editor: React.FC<EditorProps> = ({ initialContent, onChangeHandler }) => {
           <div ref={quillRef} className="bg-white" />
         </div>
       </div>
-      <div className="inputLimit flex justify-end">
-        <div>
+      <div className="flex justify-end">
+        <div className={classNames(
+              "inputLimit ",
+              length === limit
+                ? " text-red-600"
+                : "text-gray-500"
+            )}>
           {length} / {limit}
         </div>
       </div>

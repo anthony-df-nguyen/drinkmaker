@@ -9,14 +9,13 @@ import {
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import classNames from "@/utils/classNames";
 
-
 type Props = {
   label: string;
   options: {
-    value: string,
-    label: string,
+    value: string | undefined;
+    label: string;
   }[];
-  defaultValue: string;
+  defaultValue: string | undefined;
   onChange: (value: string) => void;
   required?: boolean;
 };
@@ -28,7 +27,7 @@ export default function Select({
   onChange,
   required,
 }: Props) {
-  const [selected, setSelected] = useState<string>(defaultValue);
+  const [selected, setSelected] = useState<string | undefined>(defaultValue);
   const handleSelectChange = (value: any) => {
     const newValue = value.value;
     setSelected(newValue);
@@ -44,8 +43,8 @@ export default function Select({
             {required && <span className="text-red-500">*</span>}
           </Label>
           <div className="relative">
-            <ListboxButton className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-green-600 sm:text-sm sm:leading-6">
-              <span className="block truncate">{selected}</span>
+            <ListboxButton className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900  ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-green-600 sm:text-sm sm:leading-6">
+              <span className="block truncate text-base font-normal">{selected ? selected : "All"}</span>
               <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                 <ChevronUpDownIcon
                   className="h-5 w-5 text-gray-400"

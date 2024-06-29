@@ -3,26 +3,44 @@ import classNames from "@/utils/classNames";
 
 type Props = {
   label: string;
-  onClick: () => void;
-  disabled: boolean;
+  onClick?: any;
+  disabled?: boolean;
+  type: "submit" | "button";
+  variant: "primary" | "cancel" | "delete";
 };
 
 /**
- * Checks if a row with the given value exists in the specified table.
- * @param label - what to name the button
- * @param onClick - Pass in the onClick handler function
- * @param disabled? - boolean
+ * Button component that can be customized with different variants.
+ *
+ * @component
+ *
+ * @param {string} label - The text to display on the button.
+ * @param {function} onClick - The function to be called when the button is clicked.
+ * @param {boolean} [disabled] - Whether the button is disabled or not.
+ * @param {"submit" | "button"} type - The type of the button.
+ * @param {"confirm" | "cancel" | "delete"} variant - The variant of the button.
+ *
+ * @returns {JSX.Element} The rendered Button component.
  */
-
-export default function Button({ label, onClick, disabled }: Props) {
+export default function Button({ label, onClick, disabled, type, variant }: Props) {
   const disabledClass = "opacity-50 cursor-not-allowed";
+  const confirmClass =
+    "bg-green-600 hover:bg-green-500 focus-visible:outline-green-600 hover:bg-green-500";
+  const cancelClass =
+    "bg-gray-600 hover:bg-gray-500 focus-visible:outline-gray-600 hover:bg-gray-500";
+  const deleteClass =
+    "bg-red-600 hover:bg-red-500 focus-visible:outline-red-600 hover:bg-red-500";
+
   return (
     <button
       onClick={onClick}
-      type="button"
+      type={type}
       className={classNames(
-        "bg-green-600 hover:bg-green-500 focus-visible:outline-green-600 hover:bg-green-500  rounded px-4 py-2 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
-        disabled ? disabledClass : ""
+        "rounded px-4 py-2 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
+        disabled ? disabledClass : "",
+        variant === "primary" ? confirmClass : "",
+        variant === "cancel" ? cancelClass : "",
+        variant === "delete" ? deleteClass : ""
       )}
     >
       {label}

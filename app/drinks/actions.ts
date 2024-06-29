@@ -98,20 +98,56 @@ const updateDrink = async (id: string, fields: MutableDrinkFields) => {
 
 const queryDrinks = async (
   page: number,
-  limit: number
-): Promise<DrinkSchema[]> => {
-  const { data, error } = await pg
+  limit: number,
+  searchName?: string,
+  drinkType?: string
+): Promise<{
+  data: DrinkSchema[];
+  totalCount: number;
+}> => {
+  // Count query to get total number of drinks matching the criteria
+  let countQuery = pg.from("drinks").select("*", { count: 'exact', head: true });
+
+  if (searchName) {
+    countQuery = countQuery.ilike("name", `%${searchName}%`);
+  }
+
+  if (drinkType) {
+    countQuery = countQuery.eq("drink_type", drinkType);
+  }
+
+  const countResult = await countQuery;
+  console.log('countResult: ', countResult);
+  if (countResult.error) {
+    console.error("Error getting total count:", countResult.error);
+    throw new Error(`Error getting total count: ${countResult.error.message}`);
+  }
+  const totalCount = countResult.count ?? 0;
+
+  // Main query to fetch drinks with pagination
+  let query = pg
     .from("drinks")
     .select("*")
     .order("name", { ascending: true })
-    .range((page - 1) * limit, page * limit - 1)
-    .limit(limit);
+    .range((page - 1) * limit, page * limit - 1);
 
+  if (searchName) {
+    query = query.ilike("name", `%${searchName}%`);
+  }
+
+  if (drinkType) {
+    query = query.eq("drink_type", drinkType);
+  }
+
+  const { data, error } = await query;
   if (error) {
-    console.error("Error checking existence:", error);
-    throw new Error(`Error querying ingredients: ${error.message}`);
+    console.error("Error querying drinks:", error);
+    throw new Error(`Error querying drinks: ${error.message}`);
   } else {
-    return data;
+    return {
+      data,
+      totalCount,
+    };
   }
 };
 

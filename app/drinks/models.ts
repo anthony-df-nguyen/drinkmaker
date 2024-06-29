@@ -34,3 +34,28 @@ export interface MutableDrinkFields {
   instructions: string | null;
   ingredients: string | null;
 }
+
+export const drinkTypes = [
+  { value: undefined, label: "All" },
+  { value: "cocktail", label: "Cocktail" },
+  { value: "coffee", label: "Coffee" },
+  { value: "juice", label: "Juice" },
+  { value: "mocktail", label: "Mocktail" },
+  { value: "shake", label: "Shake" },
+  { value: "smoothie", label: "Smoothie" },
+  { value: "tea", label: "Tea" },
+  { value: "other", label: "Other" },
+];
+
+export const drinkTypeColors: {
+  [key: string]: string;
+} = {
+  cocktail: "bg-blue-100",
+  coffee: "bg-yellow-100",
+  juice: "bg-green-100",
+  mocktail: "bg-purple-100",
+  shake: "bg-pink-100",
+  smoothie: "bg-red-100",
+  tea: "bg-orange-100",
+  other: "bg-gray-100",
+};

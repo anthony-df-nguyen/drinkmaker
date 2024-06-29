@@ -7,17 +7,20 @@ import { useModal } from "@/context/ModalContext";
 const CreateDrinkContainer: React.FC = () => {
   const { showModal } = useModal();
   return (
-    <div>
-      <div className="mt-4">
-        {" "}
+    <div className="">
+      <div className="flex items-center justify-between">
+        <div className="pageTitle">Drink Maker</div>
         <Button
           onClick={() => showModal(<CreateForm />)}
-          label="Create Drink"
-          disabled={false}
+          label="+ Create Drink"
+          type="button"
+          variant="primary"
         />
       </div>
 
-      <div className="mt-4"><DrinkList /></div>
+      <div className="mt-4">
+        <DrinkList />
+      </div>
     </div>
   );
 };

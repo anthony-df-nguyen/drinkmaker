@@ -1,5 +1,6 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
 import { ExclamationCircleIcon } from "@heroicons/react/20/solid";
+import classNames from "@/utils/classNames";
 import useDebounce from "@/hooks/useDebounce";
 
 interface Props {
@@ -50,9 +51,10 @@ const TextArea: React.FC<Props> = ({
         htmlFor={id}
         className="block text-sm font-medium leading-6 text-gray-900"
       >
-        {label}{required && <span className="text-red-500"> *</span>}
+        {label}
+        {required && <span className="text-red-500"> *</span>}
       </label>
-      <div className="relative mt-2 rounded-md shadow-sm">
+      <div className="relative rounded-md shadow-sm">
         <textarea
           rows={rows}
           name="comment"
@@ -82,7 +84,14 @@ const TextArea: React.FC<Props> = ({
           {error}
         </p>
         {maxLength && ( // Show the character count if maxLength is provided
-          <p className="mt-2 inputLimit">
+          <p
+            className={classNames(
+              "mt-2 inputLimit ",
+              inputValue.length === maxLength
+                ? " text-red-600"
+                : "text-gray-500"
+            )}
+          >
             {inputValue.length}/{maxLength}
           </p>
         )}

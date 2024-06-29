@@ -1,9 +1,8 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import ViewOnlyMode from "./ViewMode";
-import EditMode from "./EditMode";
-import { DrinkSchema } from "../models";
-import { InstructionFormat } from "./instructions/models";
+import EditDrinkForm from "../forms/EditDrinkForm";
+import { DrinkSchema, drinkTypeColors } from "../models";
 import { getDrinkByID } from "../actions";
 import Navigation from "@/components/Layout/Navigation";
 import { enqueueSnackbar } from "notistack";
@@ -11,17 +10,29 @@ import Badge from "@/components/UI/Badge";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/20/solid";
 import { useModal } from "@/context/ModalContext";
 import DeleteForm from "../forms/DeleteDrinkForm";
+import { useRouter } from "next/navigation";
 
-import { getDrinkInstructionByID } from "./instructions/actions";
-
+/**
+ * Renders the page for a specific drink.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {Object} props.params - The parameters object containing the drink slug.
+ * @param {string} props.params.slug - The slug of the drink.
+ * @returns {JSX.Element} The rendered page component.
+ */
 const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
   const { slug } = params;
   const { showModal } = useModal();
   const [drinkData, setDrinkData] = useState<DrinkSchema>();
-  const [drinkInstructions, setDrinkInstructions] =
-    useState<InstructionFormat>(null);
   const [editMode, setEditMode] = useState<boolean>(false);
 
+  const router = useRouter();
+
+  /**
+   * Fetches drink data by ID and updates the state with the fetched data.
+   * If an error occurs, it displays a snackbar with an error message.
+   */
   const fetchData = useCallback(async () => {
     try {
       const data = await getDrinkByID(slug);
@@ -31,50 +42,61 @@ const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
     }
   }, [slug]);
 
-  const fetchInstructions = useCallback(async () => {
-    if (!drinkData?.id) return;
-    try {
-      const data = await getDrinkInstructionByID(drinkData.id);
-      setDrinkInstructions(data?.instructions ?? null);
-    } catch (error) {
-      enqueueSnackbar(`Error loading instructions`, { variant: "error" });
-    }
-  }, [drinkData]);
-
+  // Fetch data on mount and when edit mode is toggled
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
-
-  useEffect(() => {
-    fetchInstructions();
-  }, [fetchInstructions]);
+  }, [fetchData, editMode]);
 
   const renderContent = () => {
-    return drinkData && (
-      <div>
+    return (
+      drinkData && (
         <div>
-          <div className="flex items-center gap-2">
-            <div className="pageTitle flex-1">{drinkData.name}</div>
-            <div
-              className="text-gray-500 w-8 h-8 cursor-pointer"
-              onClick={() => setEditMode(true)}
-            >
-              <PencilSquareIcon />
-            </div>
-            <div
-              className="text-gray-500 w-8 h-8 cursor-pointer"
-              onClick={() => showModal(<DeleteForm drink={drinkData} />)}
-            >
-              <TrashIcon />
-            </div>
-          </div>
           <div>
-            <Badge label={drinkData.drink_type} color="bg-blue-100" />
+            <div className="flex items-center gap-2">
+              <div className=" flex-1">
+                <Badge
+                  label={drinkData.drink_type}
+                  color={drinkTypeColors[drinkData.drink_type]}
+                />
+                <div className="pageTitle">{drinkData.name}</div>
+              </div>
+              {!editMode && (
+                <div
+                  className="text-gray-500 w-8 h-8 cursor-pointer"
+                  onClick={() => setEditMode(true)}
+                >
+                  <PencilSquareIcon />
+                </div>
+              )}
+              {!editMode && (
+                <div
+                  className="text-gray-500 w-8 h-8 cursor-pointer"
+                  onClick={() =>
+                    showModal(
+                      <DeleteForm
+                        drink={drinkData}
+                        afterDelete={() => {
+                          console.log("Should redirect");
+                          router.push("/");
+                        }}
+                      />
+                    )
+                  }
+                >
+                  <TrashIcon />
+                </div>
+              )}
+            </div>
           </div>
+          {!editMode && <ViewOnlyMode drink={drinkData} />}
+          {editMode && (
+            <EditDrinkForm
+              drink={drinkData}
+              handleCancel={() => setEditMode(false)}
+            />
+          )}
         </div>
-        {!editMode && <ViewOnlyMode drink={drinkData} />}
-        {editMode && <EditMode drink={drinkData} />}
-      </div>
+      )
     );
   };
 
