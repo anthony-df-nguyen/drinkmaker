@@ -9,24 +9,30 @@ import {
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import classNames from "@/utils/classNames";
 
-type Data = {
-  label: string;
-  value: string;
-};
 
 type Props = {
   label: string;
-  options: Data[];
-  defaultValue: Data;
+  options: {
+    value: string,
+    label: string,
+  }[];
+  defaultValue: string;
   onChange: (value: string) => void;
   required?: boolean;
 };
 
-export default function Select({ label, defaultValue, options, onChange, required }: Props) {
-  const [selected, setSelected] = useState<Data>(defaultValue);
-  const handleSelectChange = (value: Data) => {
-    setSelected(value);
-    onChange(value.value);
+export default function Select({
+  label,
+  defaultValue,
+  options,
+  onChange,
+  required,
+}: Props) {
+  const [selected, setSelected] = useState<string>(defaultValue);
+  const handleSelectChange = (value: any) => {
+    const newValue = value.value;
+    setSelected(newValue);
+    onChange(newValue);
   };
 
   return (
@@ -34,11 +40,12 @@ export default function Select({ label, defaultValue, options, onChange, require
       {({ open }) => (
         <>
           <Label className="block text-sm font-medium leading-6 text-gray-900">
-            {label}{required && <span className="text-red-500">*</span>}
+            {label}
+            {required && <span className="text-red-500">*</span>}
           </Label>
           <div className="relative">
             <ListboxButton className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-green-600 sm:text-sm sm:leading-6">
-              <span className="block truncate">{selected.label}</span>
+              <span className="block truncate">{selected}</span>
               <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                 <ChevronUpDownIcon
                   className="h-5 w-5 text-gray-400"

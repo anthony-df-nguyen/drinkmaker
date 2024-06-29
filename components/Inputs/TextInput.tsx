@@ -106,7 +106,7 @@ const TextInput: React.FC<Props> = ({
         htmlFor={id}
         className="block text-sm font-medium leading-6 text-gray-900"
       >
-        {label}{required && <span className="text-red-500">*</span>}
+        {label}{required && <span className="text-red-500"> *</span>}
       </label>
       <div className="relative mt-2 rounded-md">
         <input
@@ -137,7 +137,7 @@ const TextInput: React.FC<Props> = ({
           {error}
         </p>
         {maxLength && ( // Show the character count if maxLength is provided
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 inputLimit">
             {inputValue.length}/{maxLength}
           </p>
         )}

@@ -1,6 +1,7 @@
 "use server";
 import { createSupabaseServerComponentClient } from "@/utils/supabase/server-client";
 import { DrinkSchema, CreateDrinkFields, MutableDrinkFields } from "./models";
+import { InstructionFormat } from "./[slug]/instructions/models";
 import { sanitizeInput } from "@/utils/sanitizeInput";
 
 const pg = createSupabaseServerComponentClient();
@@ -8,25 +9,30 @@ const pg = createSupabaseServerComponentClient();
 const getExistingDrinksWithName = async (name: string) => {
   const sanitizedName = sanitizeInput(name);
   const { data, error } = await pg
-    .from('drinks')
-    .select('unique_name')
-    .ilike('unique_name', `${sanitizedName}%`);
+    .from("drinks")
+    .select("unique_name")
+    .ilike("unique_name", `${sanitizedName}%`);
 
   if (error) {
-    throw new Error('Error fetching drinks with the same name');
+    throw new Error("Error fetching drinks with the same name");
   }
 
   return data;
 };
 
-const getNextFriendlyNumber = (existingDrinks: { unique_name: string }[], name: string): number => {
+const getNextFriendlyNumber = (
+  existingDrinks: { unique_name: string }[],
+  name: string
+): number => {
   const sanitizedName = sanitizeInput(name);
   const numbers = existingDrinks
-    .map(drink => {
-      const match = drink.unique_name.match(new RegExp(`${sanitizedName}(_(\\d+))?$`));
+    .map((drink) => {
+      const match = drink.unique_name.match(
+        new RegExp(`${sanitizedName}(_(\\d+))?$`)
+      );
       return match ? (match[2] ? parseInt(match[2], 10) : 1) : 0;
     })
-    .filter(number => !isNaN(number))
+    .filter((number) => !isNaN(number))
     .sort((a, b) => a - b);
 
   for (let i = 1; i <= numbers.length; i++) {
@@ -34,14 +40,17 @@ const getNextFriendlyNumber = (existingDrinks: { unique_name: string }[], name: 
       return i;
     }
   }
-  
+
   return numbers.length + 1;
 };
 
 const createDrink = async (formData: CreateDrinkFields) => {
   const existingDrinks = await getExistingDrinksWithName(formData.name);
   const friendlyNumber = getNextFriendlyNumber(existingDrinks, formData.name);
-  const newUniqueName = friendlyNumber === 1 ? sanitizeInput(formData.name) : `${sanitizeInput(formData.name)}_${friendlyNumber}`;
+  const newUniqueName =
+    friendlyNumber === 1
+      ? sanitizeInput(formData.name)
+      : `${sanitizeInput(formData.name)}_${friendlyNumber}`;
   formData.unique_name = newUniqueName;
 
   try {
@@ -85,7 +94,7 @@ const updateDrink = async (id: string, fields: MutableDrinkFields) => {
     console.error("Drink could not be updated", error);
     throw error;
   }
-}
+};
 
 const queryDrinks = async (
   page: number,
@@ -119,7 +128,6 @@ const getDrinkByID = async (slug: string): Promise<DrinkSchema> => {
   } else {
     return data;
   }
-
-}
+};
 
 export { createDrink, deleteDrink, updateDrink, queryDrinks, getDrinkByID };

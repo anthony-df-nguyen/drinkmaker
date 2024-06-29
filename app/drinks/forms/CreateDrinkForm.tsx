@@ -24,6 +24,7 @@ const CreateForm = () => {
     created_by: "",
     drink_type: "cocktail",
   });
+  console.log(form)
 
   /**
    * Handles the change event for the form fields.
@@ -31,7 +32,11 @@ const CreateForm = () => {
    * @param value - The new value for the field.
    */
   const handleChange = (field: keyof typeof form, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value, unique_name: sanitizeInput(value)}));
+    if (field === "name") {
+      setForm((prev) => ({ ...prev, name: value, unique_name: sanitizeInput(value) }));
+    } else {
+      setForm((prev) => ({ ...prev, [field]: value }));
+    }
   };
 
   /**
@@ -63,7 +68,10 @@ const CreateForm = () => {
   const isDescriptionTooLong = form.description.length > 10000;
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4 max-w-[300px] md:max-w-lg w-screen">
+    <form
+      onSubmit={handleSubmit}
+      className="grid gap-4 max-w-[300px] md:max-w-lg w-screen"
+    >
       <div className="text-lg font-medium">Create Drink</div>
       <TextInput
         id="drinkName"
@@ -89,7 +97,7 @@ const CreateForm = () => {
           { value: "tea", label: "Tea" },
           { value: "other", label: "Other" },
         ]}
-        defaultValue={{ value: "cocktail", label: "Cocktail" }}
+        defaultValue={"cocktail"}
         onChange={(value: string) => handleChange("drink_type", value)}
       />
       <TextArea
@@ -100,8 +108,8 @@ const CreateForm = () => {
         maxLength={250}
         error={isDescriptionTooLong ? "Description is too long" : ""}
       />
-      
-      <div className="flex items-center justify-between">
+
+      <div className="flex items-center justify-end">
         <button
           type="submit"
           className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
