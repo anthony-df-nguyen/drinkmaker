@@ -1,6 +1,6 @@
 export const modules = {
   toolbar: [
-    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+    [{ header: [false, 1, 2, 3, 4, 5] }],
     [{ color: [] }],
     [{ background: [] }],
     ["bold", "italic", "underline", "strike"],
@@ -15,5 +15,5 @@ export const modules = {
 export const formats = [
   'header', 'color', 'background',
   'bold', 'italic', 'underline', 'strike',
-  'align', 'list', 'bullet', 'indent', 'link' // Include link in the formats
+  'align', 'list', 'indent', 'link'
 ];

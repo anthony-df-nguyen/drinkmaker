@@ -42,7 +42,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   const [currentValue, setCurrentValue] = useState<string>(value);
   const handleChange = (e: SelectChangeEvent<unknown>) => {
     const newValue = e.target.value as string;
-    setCurrentValue(newValue)
+    setCurrentValue(newValue);
     onChange(newValue);
   };
 
@@ -54,7 +54,11 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       required={required}
     >
       <InputLabel>{label}</InputLabel>
-      <MySelect value={currentValue} onChange={(e) => handleChange(e)} label={label}>
+      <MySelect
+        value={currentValue}
+        onChange={(e) => handleChange(e)}
+        label={label}
+      >
         {options.map((option) => (
           <MenuItem key={option.label} value={option.value}>
             {option.label}

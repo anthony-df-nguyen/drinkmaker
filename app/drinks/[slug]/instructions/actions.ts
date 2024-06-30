@@ -7,10 +7,10 @@ const pg = createSupabaseServerComponentClient();
 
 const getDrinkInstructionByID = async (
   drink_id: string
-): Promise<DrinkInstructionSchema | null> => {
+): Promise< {instructions: InstructionFormat} | null> => {
   const { data, error } = await pg
     .from("drink_instructions")
-    .select("*")
+    .select("instructions")
     .eq("drink_id", drink_id)
     .single();
 

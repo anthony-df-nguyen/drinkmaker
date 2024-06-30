@@ -1,15 +1,11 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import ViewOnlyMode from "./ViewMode";
-import EditDrinkForm from "../forms/EditDrinkForm";
+import DrinkBasics from "./DrinkBasics";
+import DrinkInstructions from "./instructions/DrinkInstructions";
 import { DrinkSchema, drinkTypeColors } from "../models";
 import { getDrinkByID } from "../actions";
 import Navigation from "@/components/Layout/Navigation";
 import { enqueueSnackbar } from "notistack";
-import Badge from "@/components/UI/Badge";
-import { PencilSquareIcon, TrashIcon } from "@heroicons/react/20/solid";
-import { useModal } from "@/context/ModalContext";
-import DeleteForm from "../forms/DeleteDrinkForm";
 import { useRouter } from "next/navigation";
 import { ListIngredientsProvider } from "@/app/ingredients/context/ListIngredientsContext";
 
@@ -24,9 +20,7 @@ import { ListIngredientsProvider } from "@/app/ingredients/context/ListIngredien
  */
 const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
   const { slug } = params;
-  const { showModal } = useModal();
   const [drinkData, setDrinkData] = useState<DrinkSchema>();
-  const [editMode, setEditMode] = useState<boolean>(true);
 
   const router = useRouter();
 
@@ -46,59 +40,17 @@ const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
   // Fetch data on mount and when edit mode is toggled
   useEffect(() => {
     fetchData();
-  }, [fetchData, editMode]);
+  }, [fetchData]);
 
-  const renderContent = () => {
+  const renderComponents = () => {
     return (
       drinkData && (
-        <div>
-          <div>
-            <div className="flex items-center gap-2">
-              <div className=" flex-1">
-                <div className="pageTitle mb-2">{drinkData.name}</div>
-                <Badge
-                  label={drinkData.drink_type}
-                  color={drinkTypeColors[drinkData.drink_type]}
-                />
-              </div>
-              {!editMode && (
-                <div
-                  className="text-gray-500 w-8 h-8 cursor-pointer"
-                  onClick={() => setEditMode(true)}
-                >
-                  <PencilSquareIcon />
-                </div>
-              )}
-              {!editMode && (
-                <div
-                  className="text-gray-500 w-8 h-8 cursor-pointer"
-                  onClick={() =>
-                    showModal(
-                      <DeleteForm
-                        drink={drinkData}
-                        afterDelete={() => {
-                          console.log("Should redirect");
-                          router.push("/");
-                        }}
-                      />
-                    )
-                  }
-                >
-                  <TrashIcon />
-                </div>
-              )}
-            </div>
+        <main>
+          <div className="grid gap-4 w-full">
+            <DrinkBasics drink={drinkData} />
+            <DrinkInstructions drinkID={drinkData.id} />
           </div>
-          <div className="mt-4">
-            {!editMode && <ViewOnlyMode drink={drinkData} />}
-            {editMode && (
-              <EditDrinkForm
-                drink={drinkData}
-                handleCancel={() => setEditMode(false)}
-              />
-            )}
-          </div>
-        </div>
+        </main>
       )
     );
   };
@@ -106,8 +58,7 @@ const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
   return (
     <Navigation>
       <ListIngredientsProvider>
-        {" "}
-        <main>{renderContent()}</main>
+        <main>{drinkData ? renderComponents() : "Loading..."}</main>
       </ListIngredientsProvider>
     </Navigation>
   );

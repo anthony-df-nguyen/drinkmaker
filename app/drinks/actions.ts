@@ -79,9 +79,10 @@ const deleteDrink = async (id: string) => {
   }
 };
 
-const updateDrink = async (id: string, fields: MutableDrinkFields) => {
+const updateDrinkBasics = async (id: string, fields: MutableDrinkFields) => {
   try {
     const { data, error } = await pg
+      .schema("public")
       .from("drinks")
       .update(fields)
       .match({ id: id });
@@ -106,9 +107,11 @@ const queryDrinks = async (
   totalCount: number;
 }> => {
   // Count query to get total number of drinks matching the criteria
-  let countQuery = pg.from("drinks").select("*", { count: 'exact', head: true });
+  let countQuery = pg
+    .schema("public")
+    .from("drinks")
+    .select("*", { count: "exact", head: true });
 
-  console.log(drinkType)
   if (searchName) {
     countQuery = countQuery.ilike("name", `%${searchName}%`);
   }
@@ -167,4 +170,4 @@ const getDrinkByID = async (slug: string): Promise<DrinkSchema> => {
   }
 };
 
-export { createDrink, deleteDrink, updateDrink, queryDrinks, getDrinkByID };
+export { createDrink, deleteDrink, updateDrinkBasics, queryDrinks, getDrinkByID };

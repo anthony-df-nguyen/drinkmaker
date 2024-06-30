@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import { InstructionFormat } from "../models";
 import { modules, formats } from "./modules";
@@ -7,16 +8,22 @@ import "quill/dist/quill.snow.css";
 
 interface EditorProps {
   initialContent: InstructionFormat;
-  onChangeHandler: (field: "instructions", value: string) => void;
-  //onSubmit: (content: InstructionFormat) => void;
+  onChangeHandler: (value: string) => void;
 }
 
-const Editor: React.FC<EditorProps> = ({ initialContent, onChangeHandler }) => {
-  const { quill, quillRef } = useQuill({ modules, formats });
-  const [content, setContent] = useState<InstructionFormat>(initialContent);
+const Editor: React.FC<EditorProps> = ({
+  initialContent,
+  onChangeHandler,
+}) => {
+  const { quill, quillRef } = useQuill({
+    modules: modules,
+    formats: formats,
+  });
+
   const [length, setLength] = useState<number>(0);
 
   const limit = 5000;
+
   useEffect(() => {
     if (quill) {
       if (initialContent) {
@@ -33,33 +40,23 @@ const Editor: React.FC<EditorProps> = ({ initialContent, onChangeHandler }) => {
         setLength(len);
         const content = quill.getContents();
         const stringContent = JSON.stringify(content);
-        onChangeHandler("instructions", stringContent);
+        onChangeHandler(stringContent);
       });
     }
-  }, [quill, initialContent]);
+  }, [quill, onChangeHandler, initialContent]);
 
   return (
-    <div className="grid gap-2 ">
-      <label
-        htmlFor="recipe"
-        className="block text-sm font-medium leading-6 text-gray-900"
-      >
-        Instructions
-      </label>
-      {/* Editor */}
-
-      <div className="border-gray-100 relative bg-white ">
-        <div className="">
-          <div ref={quillRef} className="bg-white" />
-        </div>
+    <div id="myQuillEditor" className="relative">
+      <div className="w-auto">
+        <div ref={quillRef} />
       </div>
       <div className="flex justify-end">
-        <div className={classNames(
-              "inputLimit ",
-              length === limit
-                ? " text-red-600"
-                : "text-gray-500"
-            )}>
+        <div
+          className={classNames(
+            "inputLimit",
+            length === limit ? "text-red-600" : "text-gray-500"
+          )}
+        >
           {length} / {limit}
         </div>
       </div>

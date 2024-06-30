@@ -39,6 +39,9 @@
 }
 
 /* Quill Stuff */
+.noBorder {
+  @apply border-none
+}
 .controls {
   display: flex;
   border: 1px solid #ccc;

@@ -11,8 +11,6 @@ export interface DrinkSchema {
   downvotes: number;
   published: boolean;
   drink_type: string;
-  instructions: string | null;
-  ingredients: string | null;
 }
 
 export interface CreateDrinkFields {
@@ -25,14 +23,13 @@ export interface CreateDrinkFields {
 
 export interface MutableDrinkFields {
   name: string;
+  unique_name: string;
   description: string;
   picture: string;
   upvotes: number;
   downvotes: number;
   published: boolean;
   drink_type: string;
-  instructions: string | null;
-  ingredients: string | null;
 }
 
 export const drinkTypes = [
