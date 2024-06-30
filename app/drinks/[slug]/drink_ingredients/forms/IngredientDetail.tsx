@@ -1,8 +1,21 @@
+
+/**
+ * Renders a form for editing the details of a drink ingredient.
+ *
+ * @component
+ * @param {object} props - The component props.
+ * @param {string} props.id - The ID of the ingredient.
+ * @param {string} props.label - The label of the ingredient.
+ * @param {number} props.quantity - The quantity of the ingredient.
+ * @param {string} props.unit - The unit of measurement for the ingredient.
+ * @param {(value: DrinkIngredientDetail) => void} props.onChange - The callback function to be called when the ingredient details are changed.
+ */
 import React from "react";
 import { DrinkIngredientDetail } from "../models";
 import { getStepForUnit } from "../utils";
 import DebouncedTextInput from "@/components/MUIInputs/TextInput";
 import CustomSelect from "@/components/MUIInputs/Select";
+import { measuringUnits } from "../utils";
 
 interface IngredientDetailProps {
   id: string;
@@ -50,23 +63,7 @@ const IngredientDetail: React.FC<IngredientDetailProps> = ({
           label="Unit"
           value={unit}
           onChange={(value: string) => handleChange("unit", value)}
-          options={[
-            { value: "oz", label: "oz" },
-            { value: "ml", label: "ml" },
-            { value: "dash", label: "dash" },
-            { value: "tsp", label: "tsp" },
-            { value: "tbsp", label: "tbsp" },
-            { value: "cup", label: "cup" },
-            { value: "part", label: "part" },
-            { value: "slice", label: "slice" },
-            { value: "wedge", label: "wedge" },
-            { value: "piece", label: "piece" },
-            { value: "pinch", label: "pinch" },
-            { value: "drop", label: "drop" },
-            { value: "splash", label: "splash" },
-            { value: "shot", label: "shot" },
-            { value: "glass", label: "glass" },
-          ]}
+          options={measuringUnits}
         />
       </div>
     </div>

@@ -4,6 +4,12 @@ export interface DrinkIngredientDetail {
   unit: string;
 }
 
+export interface DrinkIngredientViewData {
+  name: string,
+  quantity: number;
+  unit: string;
+}
+
 export type DrinkIngredientSchema = {
   drink_id: string;
 } & DrinkIngredientDetail;

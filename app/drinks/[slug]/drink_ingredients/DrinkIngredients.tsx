@@ -1,4 +1,32 @@
 // DrinkIngredients.tsx
+
+/**
+ * `DrinkIngredients` is a React functional component that displays and manages the ingredients
+ * associated with a specific drink. It allows for viewing the ingredients in a read-only mode
+ * and provides an option to switch to an edit mode for modifying the ingredients list.
+ *
+ * Props:
+ * - `drinkID`: A unique identifier for the drink whose ingredients are to be displayed and managed.
+ *
+ * State:
+ * - `editMode`: A boolean state that determines whether the component is in edit mode, allowing
+ *    for modification of the drink's ingredients.
+ * - `hover`: A boolean state that tracks whether the mouse is hovering over the component, which
+ *    can be used to show or hide UI elements dynamically based on user interaction.
+ *
+ * Hooks:
+ * - `useListIngredients()`: A custom hook that fetches the list of all possible ingredients from
+ *    a backend or context. It returns an object with `allIngredients`, an array of ingredient
+ *    options that can be used to populate UI elements such as dropdowns or lists.
+ * - `useMemo()`: React hook used to memoize the `ingredientOptions` computation. This is beneficial
+ *    for performance optimization, especially if deriving `ingredientOptions` from `allIngredients`
+ *    involves complex calculations or transformations.
+ *
+ * The component renders a UI that varies based on the `editMode` state. In read-only mode, it displays
+ * the ingredients associated with the `drinkID`. In edit mode, it provides an interface for adding,
+ * removing, or modifying the ingredients. The transition between these modes is typically controlled
+ * by a button or similar UI element that toggles the `editMode` state.
+ */
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import IngredientForm from "./forms/IngredientForm";
 import ReadView from "./ReadView";
@@ -31,7 +59,6 @@ const DrinkIngredients: React.FC<DrinkIngredientsProps> = ({ drinkID }) => {
     drink_id: drinkID,
     ingredient_details: [],
   });
-  //form.ingredient_details.forEach((ingredient) => console.log(ingredient));
 
   useEffect(() => {
     const fetchDrinkIngredients = async () => {
@@ -62,8 +89,9 @@ const DrinkIngredients: React.FC<DrinkIngredientsProps> = ({ drinkID }) => {
     };
 
     fetchDrinkIngredients();
-  }, [drinkID, ingredientOptions, enqueueSnackbar]);
+  }, [drinkID, ingredientOptions]);
 
+  
   const handleSelectedIngredient = useCallback(
     (value: TagOption[]) => {
       setActiveSelection(value);
@@ -93,6 +121,7 @@ const DrinkIngredients: React.FC<DrinkIngredientsProps> = ({ drinkID }) => {
     setForm((prevForm) => ({
       ...prevForm,
       ingredient_details: prevForm.ingredient_details.map((ingredient) =>
+        // Rest of the code...
         ingredient.ingredient_id === value.ingredient_id ? value : ingredient
       ),
     }));
@@ -122,6 +151,7 @@ const DrinkIngredients: React.FC<DrinkIngredientsProps> = ({ drinkID }) => {
     () => (
       <ReadView
         activeSelection={activeSelection}
+        details={form}
         setEditMode={setEditMode}
         hover={hover}
       />

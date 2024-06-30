@@ -7,7 +7,6 @@ import { DrinkSchema, drinkTypeColors } from "../models";
 import { getDrinkByID } from "../actions";
 import Navigation from "@/components/Layout/Navigation";
 import { enqueueSnackbar } from "notistack";
-import { useRouter } from "next/navigation";
 import { ListIngredientsProvider } from "@/app/ingredients/context/ListIngredientsContext";
 
 /**
@@ -22,8 +21,6 @@ import { ListIngredientsProvider } from "@/app/ingredients/context/ListIngredien
 const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
   const { slug } = params;
   const [drinkData, setDrinkData] = useState<DrinkSchema>();
-
-  const router = useRouter();
 
   /**
    * Fetches drink data by ID and updates the state with the fetched data.

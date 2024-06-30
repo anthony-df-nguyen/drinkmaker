@@ -1,3 +1,4 @@
+import { TagOption } from "@/components/MUIInputs/Tags";
 export const getStepForUnit = (unit: string): number => {
   switch (unit) {
     case "oz":
@@ -23,3 +24,21 @@ export const getStepForUnit = (unit: string): number => {
       return 1;
   }
 };
+
+export const measuringUnits: TagOption[] = [
+  { value: "oz", label: "oz" },
+  { value: "ml", label: "ml" },
+  { value: "dash", label: "dash" },
+  { value: "tsp", label: "tsp" },
+  { value: "tbsp", label: "tbsp" },
+  { value: "cup", label: "cup" },
+  { value: "part", label: "part" },
+  { value: "slice", label: "slice" },
+  { value: "wedge", label: "wedge" },
+  { value: "piece", label: "piece" },
+  { value: "pinch", label: "pinch" },
+  { value: "drop", label: "drop" },
+  { value: "splash", label: "splash" },
+  { value: "shot", label: "shot" },
+  { value: "glass", label: "glass" },
+]

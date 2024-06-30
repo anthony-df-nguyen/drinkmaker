@@ -1,4 +1,21 @@
-// IngredientForm.tsx
+
+
+/**
+ * Represents a form for managing drink ingredients.
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <IngredientForm
+ *   currentForm={currentForm}
+ *   ingredientOptions={ingredientOptions}
+ *   activeSelection={activeSelection}
+ *   handleSelectedIngredient={handleSelectedIngredient}
+ *   handleChangeUnits={handleChangeUnits}
+ *   handleCancel={handleCancel}
+ * />
+ * ```
+ */
 import React, { useCallback } from "react";
 import { upsertDrinkIngredients } from "../actions";
 import Tags, { TagOption } from "@/components/MUIInputs/Tags";
