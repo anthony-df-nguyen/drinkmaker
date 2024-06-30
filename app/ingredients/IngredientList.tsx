@@ -7,7 +7,7 @@ import { PencilSquareIcon, TrashIcon } from "@heroicons/react/20/solid";
 import EditForm from "./forms/EditForm";
 import DeleteForm from "./forms/DeleteForm";
 import Pagination from "@/components/UI/Pagination";
-import { queryAllIngredients } from "./actions";
+import { queryIngredients } from "./actions";
 import { useModal } from "@/context/ModalContext";
 
 /**
@@ -27,11 +27,13 @@ const IngredientList: React.FC = () => {
 
   useEffect(() => {
     try {
-      queryAllIngredients(currentPage, 10).then((data) => setIngredients(data));
+      queryIngredients(currentPage, 10).then((data) => setIngredients(data));
     } catch (error) {
       console.error("Error querying ingredients: ", error);
     }
   }, [currentPage, setIngredients]);
+
+
 
   return (
     <div className="mt-4">

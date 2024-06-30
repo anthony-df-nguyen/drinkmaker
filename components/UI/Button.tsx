@@ -25,7 +25,7 @@ type Props = {
 export default function Button({ label, onClick, disabled, type, variant }: Props) {
   const disabledClass = "opacity-50 cursor-not-allowed";
   const confirmClass =
-    "bg-green-600 hover:bg-green-500 focus-visible:outline-green-600 hover:bg-green-500";
+    "bg-emerald-600 hover:bg-emerald-500 focus-visible:outline-emerald-600 hover:bg-emerald-500";
   const cancelClass =
     "bg-gray-600 hover:bg-gray-500 focus-visible:outline-gray-600 hover:bg-gray-500";
   const deleteClass =

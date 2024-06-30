@@ -11,6 +11,7 @@ import { PencilSquareIcon, TrashIcon } from "@heroicons/react/20/solid";
 import { useModal } from "@/context/ModalContext";
 import DeleteForm from "../forms/DeleteDrinkForm";
 import { useRouter } from "next/navigation";
+import { ListIngredientsProvider } from "@/app/ingredients/context/ListIngredientsContext";
 
 /**
  * Renders the page for a specific drink.
@@ -25,7 +26,7 @@ const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
   const { slug } = params;
   const { showModal } = useModal();
   const [drinkData, setDrinkData] = useState<DrinkSchema>();
-  const [editMode, setEditMode] = useState<boolean>(false);
+  const [editMode, setEditMode] = useState<boolean>(true);
 
   const router = useRouter();
 
@@ -54,11 +55,11 @@ const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
           <div>
             <div className="flex items-center gap-2">
               <div className=" flex-1">
+                <div className="pageTitle mb-2">{drinkData.name}</div>
                 <Badge
                   label={drinkData.drink_type}
                   color={drinkTypeColors[drinkData.drink_type]}
                 />
-                <div className="pageTitle">{drinkData.name}</div>
               </div>
               {!editMode && (
                 <div
@@ -88,13 +89,15 @@ const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
               )}
             </div>
           </div>
-          {!editMode && <ViewOnlyMode drink={drinkData} />}
-          {editMode && (
-            <EditDrinkForm
-              drink={drinkData}
-              handleCancel={() => setEditMode(false)}
-            />
-          )}
+          <div className="mt-4">
+            {!editMode && <ViewOnlyMode drink={drinkData} />}
+            {editMode && (
+              <EditDrinkForm
+                drink={drinkData}
+                handleCancel={() => setEditMode(false)}
+              />
+            )}
+          </div>
         </div>
       )
     );
@@ -102,7 +105,10 @@ const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
 
   return (
     <Navigation>
-      <main>{renderContent()}</main>
+      <ListIngredientsProvider>
+        {" "}
+        <main>{renderContent()}</main>
+      </ListIngredientsProvider>
     </Navigation>
   );
 };

@@ -36,7 +36,7 @@ export interface MutableDrinkFields {
 }
 
 export const drinkTypes = [
-  { value: undefined, label: "All" },
+  { value: "all", label: "All" },
   { value: "cocktail", label: "Cocktail" },
   { value: "coffee", label: "Coffee" },
   { value: "juice", label: "Juice" },
@@ -52,7 +52,7 @@ export const drinkTypeColors: {
 } = {
   cocktail: "bg-blue-100",
   coffee: "bg-yellow-100",
-  juice: "bg-green-100",
+  juice: "bg-emerald-100",
   mocktail: "bg-purple-100",
   shake: "bg-pink-100",
   smoothie: "bg-red-100",

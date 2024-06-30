@@ -32,13 +32,27 @@ const createIngredient = async (formData: CreateIngredientFields) => {
  * @returns A promise that resolves to an array of IngredientsSchema objects.
  * @throws If there is an error querying the ingredients.
  */
-const queryAllIngredients = async (page: number, limit: number): Promise<IngredientsSchema[]> => {
+const queryIngredients = async (page: number, limit: number): Promise<IngredientsSchema[]> => {
   const { data, error } = await pg
     .from("ingredients")
     .select("*")
     .order("name", { ascending: true })
     .range((page - 1) * limit, page * limit - 1)
     .limit(limit);
+
+  if (error) {
+    console.error("Error checking existence:", error);
+    throw new Error(`Error querying ingredients: ${error.message}`);
+  } else {
+    return data;
+  }
+};
+
+const queryAllIngredients = async (): Promise<IngredientsSchema[]> => {
+  const { data, error } = await pg
+    .from("ingredients")
+    .select("id, name")
+    .order("name", { ascending: true })
 
   if (error) {
     console.error("Error checking existence:", error);
@@ -115,4 +129,4 @@ const deleteIngredient = async (id: string) => {
   }
 }
 
-export { createIngredient, queryAllIngredients, searchForIngredient, updateIngredient, deleteIngredient };
+export { createIngredient, queryIngredients, queryAllIngredients, searchForIngredient, updateIngredient, deleteIngredient };

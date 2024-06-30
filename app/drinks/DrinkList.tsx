@@ -1,15 +1,15 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useListDrinks } from "./contexts/DrinksContext";
+import Link from "next/link";
 import Card from "@/components/UI/Card";
 import { useRouter } from "next/navigation";
 import Pagination from "@/components/UI/Pagination";
 import Badge from "@/components/UI/Badge";
 import { queryDrinks } from "./actions";
 import { drinkTypeColors, drinkTypes } from "./models";
-
-import TextInput from "@/components/Inputs/TextInput";
-import Select from "@/components/Inputs/Select";
+import DebouncedTextInput from "@/components/MUIInputs/TextInput";
+import CustomSelect from "@/components/MUIInputs/Select";
 
 const DrinkList: React.FC = () => {
   const { drinksList, setDrinksList, count, setCount } = useListDrinks();
@@ -40,46 +40,39 @@ const DrinkList: React.FC = () => {
       {/* Controls */}
       <div className="lg:flex gap-4 mb-4">
         <div className="w-full lg:w-[300px]">
-          <TextInput
+          <DebouncedTextInput
             label="Search for Drink"
-            placeholder="Drink Name"
-            onChange={(e) => handleSearchTermChange(e)}
-            id="search-drinks"
-            type="text"
             value={searchTerm}
+            onChange={(e) => handleSearchTermChange(e)}
+            placeholder="Drink Name"
+            delay={500}
           />
         </div>
         <div className="lg:w-[200px]">
-          <Select
+          <CustomSelect
             label="Drink Type"
             options={drinkTypes}
-            defaultValue={"All"}
+            value={"all"}
             onChange={(e) => setSelectDrinkType(e)}
           />
         </div>
       </div>
       {/* Grid/Results */}
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 ">
+      <div className="grid gap-4 xl:grid-cols-3">
         {drinksList.map((drink) => {
           const color = drinkTypeColors[drink.drink_type];
           return (
-            <Card
-              key={drink.unique_name}
-              className={"cursor-pointer"}
-              onClick={() => {
-                router.push(`/drinks/${drink.unique_name}`);
-              }}
-            >
-              <div className="flex items-center gap-2 justify-between w-full">
-                <div>
+            <Link key={drink.unique_name} href={`/drinks/${drink.unique_name}`}>
+              <Card className={"w-full h-full"}>
+                <div className="flex flex-col gap-2 justify-start h-full">
                   <div className="text-base">{drink.name}</div>
-                  <div className="text-sm font-light">{drink.description}</div>
-                  <div className="mt-2">
+                  <div className="text-sm font-light flex-1">{drink.description}</div>
+                  <div>
                     <Badge label={drink.drink_type} color={color} />
                   </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </Link>
           );
         })}
       </div>

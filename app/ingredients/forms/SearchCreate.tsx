@@ -3,14 +3,14 @@
  * @returns {JSX.Element} The ingredient form component.
  */
 import React, { useState, useCallback } from "react";
-import TextInput from "@/components/Inputs/TextInput";
+import TextInput from "@/components/MUIInputs/TextInput";
 import { useListIngredients } from "../context/ListIngredientsContext";
 import Button from "@/components/UI/Button";
 import { sanitizeInput, validateInput } from "@/utils/sanitizeInput";
 import {
   createIngredient,
   searchForIngredient,
-  queryAllIngredients,
+  queryIngredients,
 } from "@/app/ingredients/actions";
 import checkExisting from "@/utils/supabase/checkExisting";
 import { enqueueSnackbar } from "notistack";
@@ -46,9 +46,9 @@ const SearchCreate: React.FC = () => {
       try {
         // Search for the ingredient and update the list of displayed results
         const data = await searchForIngredient(cleanString);
-        console.log('data: ', data);
+        console.log("data: ", data);
         setIngredients(data);
-        setCount(data.length)
+        setCount(data.length);
 
         // Check if the ingredient already exists
         const exists = await checkExisting("ingredients", "name", cleanString);
@@ -87,7 +87,7 @@ const SearchCreate: React.FC = () => {
       }));
       // If the input is empty, fetch all ingredients
       if (cleanString.length === 0) {
-        queryAllIngredients(1, 10)
+        queryIngredients(1, 10)
           .then((data) => setIngredients(data))
           .catch((error) => {
             console.error("Failed to fetch all ingredients:", error);
@@ -121,26 +121,24 @@ const SearchCreate: React.FC = () => {
   return (
     <form className="mt-4" onSubmit={handleSubmit}>
       <TextInput
-        id="name"
-        type="text"
-        label="Name"
-        onChange={handleName}
-        delay={1000}
-        minLength={3}
-        error={formState.errorMessage}
-        placeholder="Enter an ingredient name to search or create"
-        value={formState.displayValue}
-      />
-      {formState.displayValue.length > 2 && (
-        <div className="text-center mt-4">
-          <Button
-            label="+ Add Ingredient"
-            disabled={!formState.enableSubmit}
-            type="submit"
-            variant="primary"
-          />
-        </div>
-      )}
+          label="Name"
+          onChange={handleName}
+          delay={1000}
+          required
+          placeholder="Enter an ingredient name to search or create"
+          value={formState.displayValue}
+          error={formState.errorMessage}
+        />
+        {formState.displayValue.length > 2 && (
+          <div className="text-center mt-4">
+            <Button
+              label="+ Add Ingredient"
+              disabled={!formState.enableSubmit}
+              type="submit"
+              variant="primary"
+            />
+          </div>
+        )}
     </form>
   );
 };

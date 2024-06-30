@@ -9,14 +9,15 @@
  */
 import { useState, SetStateAction, Dispatch } from "react";
 import Editor from "../[slug]/instructions/editor/Editor";
-import TextInput from "@/components/Inputs/TextInput";
-import TextArea from "@/components/Inputs/TextArea";
-import Select from "@/components/Inputs/Select";
+import DebouncedTextInput from "@/components/MUIInputs/TextInput";
+import MultiSelect from "@/components/Inputs/MultiSelect";
+import CustomSelect from "@/components/MUIInputs/Select";
 import Button from "@/components/UI/Button";
 import { DrinkSchema, drinkTypes } from "../models";
 import { updateDrink } from "../actions";
 import { sanitizeInput } from "@/utils/sanitizeInput";
 import { enqueueSnackbar } from "notistack";
+import { useListIngredients } from "@/app/ingredients/context/ListIngredientsContext";
 
 interface ViewOnlyModeProps {
   drink: DrinkSchema;
@@ -28,6 +29,14 @@ const EditDrinkForm: React.FC<ViewOnlyModeProps> = ({
   handleCancel,
 }) => {
   const [form, setForm] = useState({ ...drink });
+
+  const { allIngredients } = useListIngredients();
+  const ingredientOptions = allIngredients.map((ingredient) => ({
+    value: ingredient.id,
+    label: ingredient.name,
+  }));
+
+  const [selectedValues, setSelectedValues] = useState<string[]>([]);
 
   /**
    * Handles the change of a form field.
@@ -52,7 +61,7 @@ const EditDrinkForm: React.FC<ViewOnlyModeProps> = ({
     e.preventDefault();
     try {
       await updateDrink(drink.id, form).then(() => {
-        // Close the edit form afetr updating the drink
+        // Close the edit form after updating the drink
         handleCancel(false);
         enqueueSnackbar("Successfully updated drink", { variant: "success" });
       });
@@ -64,40 +73,50 @@ const EditDrinkForm: React.FC<ViewOnlyModeProps> = ({
 
   return (
     <form className="mt-8" onSubmit={submitForm}>
-      <TextInput
-        id="drinkName"
-        label="Name"
-        value={drink.name}
-        onChange={(value: string) => handleChange("name", value || "")}
-        delay={500}
-        minLength={3}
-        maxLength={50}
-        type="text"
-        required
-      />
-      <TextArea
-        id="drinkDescription"
-        label="Description"
-        value={drink.description}
-        onChange={(value: string) => handleChange("description", value || "")}
-        delay={500}
-        minLength={3}
-        maxLength={250}
-      />
-      <Select
-        label="Drink Type"
-        required
-        options={drinkTypes}
-        defaultValue={drink.drink_type}
-        onChange={(value: string) => handleChange("drink_type", value)}
-      />
-      {/* Editor */}
-      <div className="mt-4">
-        <Editor
-          initialContent={drink.instructions}
-          onChangeHandler={handleChange}
+      <div className="grid gap-4">
+        <DebouncedTextInput
+          label="Name"
+          value={drink.name}
+          onChange={(value: string) => handleChange("name", value || "")}
+          required
         />
+        <DebouncedTextInput
+          label="Description"
+          value={drink.description}
+          onChange={(value: string) => handleChange("description", value || "")}
+          multiline
+          minRows={3}
+        />
+        <CustomSelect
+          label="Drink Type"
+          required
+          options={drinkTypes.filter((row) => row.value !== "all")}
+          value={drink.drink_type}
+          onChange={(value: string) => handleChange("drink_type", value)}
+        />
+        <div className="mt-4">
+          <Editor
+            initialContent={drink.instructions}
+            onChangeHandler={handleChange}
+          />
+        </div>
       </div>
+
+      {/* Ingredients */}
+      {/* <div className="mt-4">
+        Ingredients Used in this Drink
+        <div>
+          <MultiSelect
+            label="Ingredients"
+            options={ingredientOptions}
+            selectedValues={selectedValues}
+            onChange={setSelectedValues}
+          />
+        </div>
+      </div> */}
+
+      {/* Editor */}
+
       <div className="flex gap-2 justify-end mt-4">
         <Button
           label="Cancel"

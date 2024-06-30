@@ -8,17 +8,24 @@ interface ViewOnlyModeProps {
   drink: DrinkSchema;
 }
 
-const ViewOnlyMode: React.FC<ViewOnlyModeProps> = ({
-  drink
-}) => {
+const ViewOnlyMode: React.FC<ViewOnlyModeProps> = ({ drink }) => {
   const { showModal } = useModal();
+  const { description, instructions } = drink;
 
   return (
     <div>
-    
-      <Card className="mt-4 w-full text-base font-light">{drink.description ? drink.description : "No drink description"}</Card>
+      <Card className="mt-4 w-full text-base font-light">
+        {description ? (
+          <div>
+            <div className="text-xl font-medium mb-4">Description</div>
+            <div>{description}</div>
+          </div>
+        ) : (
+          "No drink description"
+        )}
+      </Card>
       <div className="mt-4">
-        <ViewInstructions instructions={drink.instructions} />
+        <ViewInstructions instructions={instructions} />
       </div>
     </div>
   );

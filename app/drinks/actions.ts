@@ -108,16 +108,17 @@ const queryDrinks = async (
   // Count query to get total number of drinks matching the criteria
   let countQuery = pg.from("drinks").select("*", { count: 'exact', head: true });
 
+  console.log(drinkType)
   if (searchName) {
     countQuery = countQuery.ilike("name", `%${searchName}%`);
   }
 
-  if (drinkType) {
+  if (drinkType && drinkType !== "all") {
     countQuery = countQuery.eq("drink_type", drinkType);
   }
 
   const countResult = await countQuery;
-  console.log('countResult: ', countResult);
+
   if (countResult.error) {
     console.error("Error getting total count:", countResult.error);
     throw new Error(`Error getting total count: ${countResult.error.message}`);
@@ -135,7 +136,7 @@ const queryDrinks = async (
     query = query.ilike("name", `%${searchName}%`);
   }
 
-  if (drinkType) {
+  if (drinkType && drinkType !== "all") {
     query = query.eq("drink_type", drinkType);
   }
 
