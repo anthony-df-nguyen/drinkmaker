@@ -83,22 +83,21 @@ const CreateForm = () => {
           delay={500}
           required
         />
-         <Select
+        <Select
           label="Drink Type"
           required
           options={drinkTypes.filter((row) => row.value !== "all")}
-          value={"cocktail"}
+          value={form.drink_type}
           onChange={(value: string) => handleChange("drink_type", value)}
         />
         <DebouncedTextInput
           label="Description"
           value={form.description}
           onChange={(value: string) => handleChange("description", value)}
-          error={isDescriptionTooLong ? "Description is too long" : ""}
+          //error={isDescriptionTooLong ? "Description is too long" : ""}
           multiline
           minRows={3}
         />
-       
       </div>
 
       <div className="flex items-center justify-end">

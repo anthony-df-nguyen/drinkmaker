@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import DrinkBasics from "./DrinkBasics";
 import DrinkInstructions from "./instructions/DrinkInstructions";
+import DrinkIngredients from "./drink_ingredients/DrinkIngredients";
 import { DrinkSchema, drinkTypeColors } from "../models";
 import { getDrinkByID } from "../actions";
 import Navigation from "@/components/Layout/Navigation";
@@ -48,7 +49,9 @@ const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
         <main>
           <div className="grid gap-4 w-full">
             <DrinkBasics drink={drinkData} />
+            <DrinkIngredients drinkID={drinkData.id} />
             <DrinkInstructions drinkID={drinkData.id} />
+          
           </div>
         </main>
       )

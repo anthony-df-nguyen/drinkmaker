@@ -127,7 +127,8 @@ const SearchCreate: React.FC = () => {
           required
           placeholder="Enter an ingredient name to search or create"
           value={formState.displayValue}
-          error={formState.errorMessage}
+          error={formState.errorMessage ? true : false}
+          helperText={formState.errorMessage}
         />
         {formState.displayValue.length > 2 && (
           <div className="text-center mt-4">

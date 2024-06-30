@@ -1,5 +1,5 @@
 import * as React from "react";
-import Chip from "@mui/material/Chip";
+import { useState, useEffect } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
@@ -9,6 +9,9 @@ export type TagOption = {
   value: string;
 };
 
+/**
+ * Props for the Tags component.
+ */
 interface TagProps {
   label: string;
   placeholder?: string;
@@ -16,24 +19,41 @@ interface TagProps {
   options: TagOption[];
   onChange: (value: TagOption[]) => void;
 }
+
+/**
+ * A component for selecting tags from a list of options.
+ */
 const Tags: React.FC<TagProps> = ({
   label,
-  defaultValue,
+  defaultValue = [],
   placeholder,
   options,
   onChange,
 }) => {
+  const [selectedTags, setSelectedTags] = useState<TagOption[]>(defaultValue);
+
+  useEffect(() => {
+    setSelectedTags(defaultValue);
+  }, [defaultValue]);
+
+  /**
+   * Handles the change event when tags are selected or deselected.
+   * @param event - The event object.
+   * @param value - The selected tags.
+   */
   const onTagChange = (event: React.SyntheticEvent, value: TagOption[]) => {
+    setSelectedTags(value);
     onChange(value);
   };
+
   return (
-    <Stack spacing={3} sx={{ width: 500 }}>
+    <Stack spacing={3}>
       <Autocomplete
         multiple
         id="tags-outlined"
         options={options}
         getOptionLabel={(option) => option.label}
-        defaultValue={defaultValue}
+        value={selectedTags}
         isOptionEqualToValue={(option, value) => option.value === value.value}
         filterSelectedOptions
         onChange={onTagChange}
