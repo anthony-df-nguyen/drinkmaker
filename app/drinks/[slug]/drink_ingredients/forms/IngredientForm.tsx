@@ -1,29 +1,14 @@
-
-
-/**
- * Represents a form for managing drink ingredients.
- *
- * @component
- * @example
- * ```tsx
- * <IngredientForm
- *   currentForm={currentForm}
- *   ingredientOptions={ingredientOptions}
- *   activeSelection={activeSelection}
- *   handleSelectedIngredient={handleSelectedIngredient}
- *   handleChangeUnits={handleChangeUnits}
- *   handleCancel={handleCancel}
- * />
- * ```
- */
 import React, { useCallback } from "react";
 import { upsertDrinkIngredients } from "../actions";
 import Tags, { TagOption } from "@/components/MUIInputs/Tags";
 import Button from "@/components/UI/Button";
-import IngredientDetail from "./IngredientDetail";
 import { enqueueSnackbar } from "notistack";
 import { DrinkIngredientDetail, InsertDrinkIngredients } from "../models";
 import Card from "@/components/UI/Card";
+import CardTable, { Column } from "@/components/UI/CardTable";
+import DebouncedTextInput from "@/components/MUIInputs/TextInput";
+import CustomSelect from "@/components/MUIInputs/Select";
+import { getStepForUnit, measuringUnits } from "../utils";
 
 interface IngredientFormProps {
   currentForm: InsertDrinkIngredients;
@@ -47,7 +32,7 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
       e.preventDefault();
       try {
         upsertDrinkIngredients(currentForm).then(() => {
-          handleCancel;
+          handleCancel();
           enqueueSnackbar("Drink ingredients updated", { variant: "success" });
         });
       } catch (error) {
@@ -58,6 +43,49 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
     },
     [currentForm, handleCancel]
   );
+
+  const columns: Column<DrinkIngredientDetail>[] = [
+    {
+      header: "Ingredient",
+      accessor: "ingredient_id",
+      render: (row) => (
+        <span>
+          {activeSelection.find((opt) => opt.value === row.ingredient_id)?.label ||
+            ""}
+        </span>
+      ),
+    },
+    {
+      header: "Quantity",
+      accessor: "quantity",
+      render: (row) => (
+        <DebouncedTextInput
+          label="Quantity"
+          value={row.quantity}
+          onChange={(value: number) => handleChangeUnits({ ...row, quantity: value })}
+          type="number"
+          required
+          helperText="Enter a number"
+          inputProps={{
+            min: 0,
+            step: getStepForUnit(row.unit),
+          }}
+        />
+      ),
+    },
+    {
+      header: "Unit",
+      accessor: "unit",
+      render: (row) => (
+        <CustomSelect
+          label="Unit"
+          value={row.unit}
+          onChange={(value: string) => handleChangeUnits({ ...row, unit: value })}
+          options={measuringUnits}
+        />
+      ),
+    },
+  ];
 
   return (
     <Card className="w-full">
@@ -80,20 +108,7 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
               Enter ingredient quantities for 1 serving of the drink
             </div>
             <div className="mt-8 flex flex-col gap-4">
-              {currentForm.ingredient_details.map((row) => (
-                <IngredientDetail
-                  key={row.ingredient_id}
-                  label={
-                    activeSelection.find(
-                      (opt) => opt.value === row.ingredient_id
-                    )?.label || ""
-                  }
-                  id={row.ingredient_id}
-                  quantity={row.quantity}
-                  unit={row.unit}
-                  onChange={handleChangeUnits}
-                />
-              ))}
+              <CardTable<DrinkIngredientDetail> columns={columns} data={currentForm.ingredient_details} />
             </div>
             <div className="flex gap-2 justify-end mt-4">
               <Button
