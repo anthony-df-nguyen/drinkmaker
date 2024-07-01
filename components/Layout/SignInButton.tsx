@@ -12,9 +12,7 @@ export default function SignInButton({ provider, nextUrl }: Props) {
   const supabase = createSupabaseBrowserClient();
 
   const handleLogin = async () => {
-    const redirectTo = `${process.env.NEXT_PUBLIC_ORIGIN}/auth/callback?next=${
-      nextUrl || ""
-    }`;
+    const redirectTo = `/auth/callback?next=${nextUrl || ""}`;
     await supabase.auth.signInWithOAuth({
       provider: provider,
       options: {

@@ -17,7 +17,7 @@ export default function SignInPage() {
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm grid gap-2">
           {providers.map((provider) => (
-            <SignInButton key={provider} provider={provider} nextUrl={process.env.NEXT_PUBLIC_ORIGIN}/>
+            <SignInButton key={provider} provider={provider} nextUrl="/" />
           ))}
         </div>
       </div>

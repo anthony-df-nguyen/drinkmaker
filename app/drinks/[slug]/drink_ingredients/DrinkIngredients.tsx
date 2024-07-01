@@ -159,7 +159,6 @@ const DrinkIngredients: React.FC<DrinkIngredientsProps> = ({ drinkID }) => {
 
   return (
     <div
-      className="max-w-[1200px] w-full block mx-auto"
       onMouseOver={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >

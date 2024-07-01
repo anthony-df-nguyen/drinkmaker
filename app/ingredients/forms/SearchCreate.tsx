@@ -125,6 +125,7 @@ const SearchCreate: React.FC = () => {
           onChange={handleName}
           delay={1000}
           required
+          variant="outlined"
           placeholder="Enter an ingredient name to search or create"
           value={formState.displayValue}
           error={formState.errorMessage ? true : false}

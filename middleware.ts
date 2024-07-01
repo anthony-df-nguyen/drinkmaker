@@ -13,13 +13,12 @@ export async function middleware(request: NextRequest) {
   const {
     data: {user}
   } = await supabase.auth.getUser();
-  console.log("user", user);
-
+  
   //const user = session?.user;
 
   // protects the "/account" route and its sub-routes
-  if (!user && request.nextUrl.pathname.startsWith("/ingredients")) {
-    return NextResponse.redirect(new URL("/", request.url));
+  if (!user) {
+    return NextResponse.redirect(new URL("/signin", request.url));
   }
 
   return response;

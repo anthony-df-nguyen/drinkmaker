@@ -34,6 +34,7 @@ const ViewOnlyQuill: React.FC<EditorProps> = ({ initialContent }) => {
       container.classList.remove("ql-container");
       if (initialContent) {
         quill.setContents(JSON.parse(initialContent));
+        container.classList.remove("hide-ql-container");
       } else {
         container.classList.add("hide-ql-container");
       }
@@ -44,7 +45,7 @@ const ViewOnlyQuill: React.FC<EditorProps> = ({ initialContent }) => {
     <Card className="">
       <div className="w-auto" id="viewOnlyQuill">
         {!initialContent && <div>No instructions written.</div>}
-        <div ref={quillRef} />
+        <div ref={quillRef}  />
       </div>
     </Card>
   );

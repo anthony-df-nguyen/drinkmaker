@@ -2,7 +2,11 @@ import { createSupabaseServerClient } from "@/utils/supabase/server-client";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
+  console.log("This is from the route.ts file")
+  console.log(request.url)
   const { searchParams, origin } = new URL(request.url);
+
+  
   console.log('origin: ', origin);
   const code = searchParams.get("code");
 

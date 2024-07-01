@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import DebouncedTextInput from "@/components/MUIInputs/TextInput";
 import CustomSelect from "@/components/MUIInputs/Select";
 import { DrinkSchema, drinkTypeColors, drinkTypes } from "../models";
-import { PencilSquareIcon, TrashIcon } from "@heroicons/react/20/solid";
+import { PencilSquareIcon } from "@heroicons/react/20/solid";
 import { sanitizeInput } from "@/utils/sanitizeInput";
 import Badge from "@/components/UI/Badge";
 import Card from "@/components/UI/Card";
@@ -21,17 +21,19 @@ const DrinkBasics: React.FC<ViewOnlyModeProps> = ({ drink }) => {
   const [editMode, setEditMode] = useState(false);
   const [hover, setHover] = useState<boolean>(false);
 
-  const handleChange = (field: keyof typeof form, value: string) => {
-    if (field === "name") {
-      setForm({
-        ...form,
-        name: value as string,
-        unique_name: sanitizeInput(value as string),
-      });
-    } else {
-      setForm({ ...form, [field]: value as string });
-    }
-  };
+  const handleChange = useCallback((field: keyof typeof form, value: string) => {
+    setForm((prevForm) => {
+      if (field === "name") {
+        return {
+          ...prevForm,
+          name: value,
+          unique_name: sanitizeInput(value),
+        };
+      } else {
+        return { ...prevForm, [field]: value };
+      }
+    });
+  }, []);
 
   const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -47,54 +49,51 @@ const DrinkBasics: React.FC<ViewOnlyModeProps> = ({ drink }) => {
     }
   };
 
-  const readView = () => {
-    return (
-      <div className="flex justify-between w-full">
+  const readView = () => (
+    <div className="flex justify-between w-full">
       <div className="grid items-center gap-2">
-        <div className="pageTitle mb-2">{drink.name}</div>
-        <div>{description}</div>
         <div>
           <Badge
             label={drink.drink_type}
             color={drinkTypeColors[drink.drink_type]}
           />
         </div>
+        <div className="pageTitle mb-2">{drink.name}</div>
+        <div className="text-sm">{description}</div>
       </div>
-      
-      {hover && <div
-        className="w-8 h-8 cursor-pointer"
-        onClick={() => setEditMode(true)}
-      >
-        <PencilSquareIcon />
-      </div>}
+      {hover && (
+        <div
+          className="w-8 h-8 cursor-pointer"
+          onClick={() => setEditMode(true)}
+        >
+          <PencilSquareIcon color="gray" />
+        </div>
+      )}
     </div>
-    );
-  };
+  );
 
-  const editView = () => {
-    return (
-      <form onSubmit={submitForm} className="w-full ">
+  const editView = () => (
+    <form onSubmit={submitForm} className="w-full">
       <div className="grid gap-8">
         <DebouncedTextInput
           label="Name"
-          value={drink.name}
+          value={form.name}
           onChange={(value: string) => handleChange("name", value || "")}
           required
           variant="outlined"
+          delay={500}
         />
         <DebouncedTextInput
           label="Description"
-          value={drink.description}
-           variant="outlined"
-          onChange={(value: string) =>
-            handleChange("description", value || "")
-          }
+          value={form.description}
+          variant="outlined"
+          delay={500}
+          onChange={(value: string) => handleChange("description", value || "")}
           multiline
           minRows={3}
         />
         <CustomSelect
           label="Drink Type"
-          variant="outlined"
           required
           options={drinkTypes.filter((row) => row.value !== "all")}
           value={form.drink_type}
@@ -117,11 +116,10 @@ const DrinkBasics: React.FC<ViewOnlyModeProps> = ({ drink }) => {
         />
       </div>
     </form>
-    );
-  };
+  );
 
   return (
-    <div className="max-w-[1200px] w-full block mx-auto" onMouseOver={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+    <div onMouseOver={() => setHover(true)} onMouseLeave={() => setHover(false)}>
       {editMode ? editView() : readView()}
     </div>
   );

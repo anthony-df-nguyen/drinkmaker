@@ -65,7 +65,7 @@ const CardTable = <T extends { [key: string]: any }>({
                       {columns.map((column) => (
                         <td
                           key={String(column.accessor)}
-                          className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
+                          className="whitespace-wrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
                         >
                           {column.render
                             ? column.render(item)

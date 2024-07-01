@@ -176,7 +176,7 @@ export default function Navigation({ children }: Props) {
               </div>
             </div>
 
-            <main className="py-10">
+            <main className="py-6">
               <div className="px-4 sm:px-6 lg:px-8">{children}</div>
             </main>
           </div>

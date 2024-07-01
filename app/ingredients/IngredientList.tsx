@@ -42,7 +42,7 @@ const IngredientList: React.FC = () => {
 
   return (
     <div className="mt-4">
-      <div className="mt-8 grid gap-2">
+      <div className="mt-8 grid gap-2 max-h-[65vh] overflow-y-scroll">
         {ingredients.map((ingredient) => (
           <Card key={ingredient.name}>
             <div className="flex items-center gap-2 justify-between w-full">
@@ -52,7 +52,7 @@ const IngredientList: React.FC = () => {
                 className="text-gray-500 w-5 h-5 cursor-pointer"
                 onClick={() => showModal(<EditForm ingredient={ingredient} />)}
               >
-                <PencilSquareIcon />
+                <PencilSquareIcon color="gray"/>
               </div>
               <div
                 className="text-gray-500 w-5 h-5 cursor-pointer"

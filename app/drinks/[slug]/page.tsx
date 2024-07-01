@@ -3,7 +3,8 @@ import { useState, useEffect, useCallback } from "react";
 import DrinkBasics from "./DrinkBasics";
 import DrinkInstructions from "./instructions/DrinkInstructions";
 import DrinkIngredients from "./drink_ingredients/DrinkIngredients";
-import { DrinkSchema, drinkTypeColors } from "../models";
+import MartiniLoader from "@/components/UI/Loading";
+import { DrinkSchema } from "../models";
 import { getDrinkByID } from "../actions";
 import Navigation from "@/components/Layout/Navigation";
 import { enqueueSnackbar } from "notistack";
@@ -44,9 +45,11 @@ const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
     return (
       drinkData && (
         <main>
-          <div className="grid gap-8 lg:gap-16 w-full">
+          <div className="grid gap-8  max-w-[1200px] w-full mx-auto">
             <DrinkBasics drink={drinkData} />
+            <hr />
             <DrinkIngredients drinkID={drinkData.id} />
+            <hr />
             <DrinkInstructions drinkID={drinkData.id} />
           </div>
         </main>
@@ -57,7 +60,7 @@ const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
   return (
     <Navigation>
       <ListIngredientsProvider>
-        <main>{drinkData ? renderComponents() : "Loading..."}</main>
+        <main>{drinkData ? renderComponents() : <MartiniLoader />}</main>
       </ListIngredientsProvider>
     </Navigation>
   );

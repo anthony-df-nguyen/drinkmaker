@@ -38,7 +38,7 @@ const DrinkList: React.FC = () => {
   return (
     <div className="mt-4 grid gap-2">
       {/* Controls */}
-      <div className="lg:flex gap-4 mb-4">
+      <div className="flex flex-col lg:flex-row gap-4 mb-4">
         <div className="w-full lg:w-[300px]">
           <DebouncedTextInput
             label="Search for Drink"
@@ -59,7 +59,7 @@ const DrinkList: React.FC = () => {
         </div>
       </div>
       {/* Grid/Results */}
-      <div className="grid gap-4 xl:grid-cols-3">
+      <div className="grid gap-4 xl:grid-cols-1 max-h-[55vh] overflow-y-scroll">
         {drinksList.map((drink) => {
           const color = drinkTypeColors[drink.drink_type];
           return (

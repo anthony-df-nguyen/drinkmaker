@@ -80,6 +80,9 @@ const deleteDrink = async (id: string) => {
 };
 
 const updateDrinkBasics = async (id: string, fields: MutableDrinkFields) => {
+  console.log("Updating drink", id, fields);
+  const {data: user} = await pg.auth.getUser();
+  console.log('user: ', user);
   try {
     const { data, error } = await pg
       .schema("public")
@@ -88,6 +91,7 @@ const updateDrinkBasics = async (id: string, fields: MutableDrinkFields) => {
       .match({ id: id });
 
     if (error) {
+      console.error("Error updating drink", error);
       throw new Error(error.message || "Error updating drink");
     }
     return data;

@@ -8,6 +8,7 @@ import { CreateDrinkFields, drinkTypes } from "../models";
 import { createDrink } from "../actions";
 import { useModal } from "@/context/ModalContext";
 import { sanitizeInput } from "@/utils/sanitizeInput";
+import {useRouter} from "next/navigation";
 
 /**
  * Component for creating a new drink.
@@ -15,6 +16,7 @@ import { sanitizeInput } from "@/utils/sanitizeInput";
 const CreateForm = () => {
   const { user } = useAuthenticatedContext();
   const { hideModal } = useModal();
+  const router = useRouter();
 
   const [form, setForm] = useState<CreateDrinkFields>({
     name: "",
@@ -50,10 +52,8 @@ const CreateForm = () => {
     if (user?.id) {
       try {
         await createDrink({ ...form, created_by: user.id });
-        enqueueSnackbar("Drink created successfully", {
-          variant: "success",
-        });
         hideModal();
+        router.push(`/drinks/${form.unique_name}`);
       } catch (error) {
         enqueueSnackbar("Cannot create drink", {
           variant: "error",
@@ -82,6 +82,7 @@ const CreateForm = () => {
           onChange={(value: string) => handleChange("name", value)}
           delay={500}
           required
+          variant="outlined"
         />
         <Select
           label="Drink Type"
@@ -97,6 +98,7 @@ const CreateForm = () => {
           //error={isDescriptionTooLong ? "Description is too long" : ""}
           multiline
           minRows={3}
+          variant="outlined"
         />
       </div>
 

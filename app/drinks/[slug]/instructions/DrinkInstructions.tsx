@@ -75,7 +75,7 @@ const DrinkInstructions: React.FC<DrinkInstructionsProps> = ({ drinkID }) => {
   };
 
   return (
-    <div className="max-w-[1200px] w-full block mx-auto" onMouseOver={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+    <div onMouseOver={() => setHover(true)} onMouseLeave={() => setHover(false)}>
       <div className="w-full">
         <form onSubmit={handleSubmit} className="w-full grid gap-4">
           <div className="flex justify-between w-full">
@@ -87,7 +87,7 @@ const DrinkInstructions: React.FC<DrinkInstructionsProps> = ({ drinkID }) => {
             className="w-8 h-8 cursor-pointer"
             onClick={() => setEditMode(true)}
           >
-            <PencilSquareIcon />
+            <PencilSquareIcon color="gray"/>
           </div>}
           </div>
           {editMode ? (
