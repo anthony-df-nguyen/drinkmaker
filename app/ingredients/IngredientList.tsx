@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useListIngredients } from "./context/ListIngredientsContext";
 import { formatText } from "@/utils/formatText";
 import Card from "@/components/UI/Card";
@@ -21,17 +21,22 @@ const IngredientList: React.FC = () => {
   const { ingredients, setIngredients, count } = useListIngredients();
   const [currentPage, setCurrentPage] = useState(1);
 
-  const onPageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-  };
-
-  useEffect(() => {
+  const fetchIngredients = useCallback(async (page: number) => {
     try {
-      queryIngredients(currentPage, 10).then((data) => setIngredients(data));
+      const data = await queryIngredients(page, 10);
+      setIngredients(data);
     } catch (error) {
       console.error("Error querying ingredients: ", error);
     }
-  }, [currentPage, setIngredients]);
+  }, [setIngredients]);
+
+  useEffect(() => {
+    fetchIngredients(currentPage);
+  }, [currentPage, fetchIngredients]);
+
+  const onPageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
 
 
