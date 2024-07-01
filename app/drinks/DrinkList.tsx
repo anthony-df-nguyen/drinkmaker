@@ -15,8 +15,8 @@ const DrinkList: React.FC = () => {
   const { drinksList, setDrinksList, count, setCount } = useListDrinks();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, handleSearchTermChange] = useState<string>("");
-  const [selectDrinkType, setSelectDrinkType] = useState<string | undefined>(
-    undefined
+  const [selectDrinkType, setSelectDrinkType] = useState<string>(
+    "all"
   );
   const onPageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -46,13 +46,14 @@ const DrinkList: React.FC = () => {
             onChange={(e) => handleSearchTermChange(e)}
             placeholder="Drink Name"
             delay={500}
+            variant="outlined"
           />
         </div>
         <div className="lg:w-[200px]">
           <CustomSelect
             label="Drink Type"
             options={drinkTypes}
-            value={"all"}
+            value={selectDrinkType}
             onChange={(e) => setSelectDrinkType(e)}
           />
         </div>

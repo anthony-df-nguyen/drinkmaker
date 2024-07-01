@@ -12,7 +12,7 @@ import React, { useState, useEffect } from "react";
 import { InstructionFormat } from "../models";
 import { formats } from "./modules";
 import { useQuill } from "react-quilljs";
-import classNames from "@/utils/classNames";
+import Card from "@/components/UI/Card";
 import "quill/dist/quill.snow.css";
 
 interface EditorProps {
@@ -32,19 +32,21 @@ const ViewOnlyQuill: React.FC<EditorProps> = ({ initialContent }) => {
       toolbar.container.remove();
       const container = quill.container;
       container.classList.remove("ql-container");
-
       if (initialContent) {
         quill.setContents(JSON.parse(initialContent));
+      } else {
+        container.classList.add("hide-ql-container");
       }
     }
   }, [quill, initialContent]);
 
   return (
-    <div id="myQuillEditor" className="relative">
+    <Card className="">
       <div className="w-auto" id="viewOnlyQuill">
+        {!initialContent && <div>No instructions written.</div>}
         <div ref={quillRef} />
       </div>
-    </div>
+    </Card>
   );
 };
 

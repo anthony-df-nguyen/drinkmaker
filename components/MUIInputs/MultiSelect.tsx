@@ -91,6 +91,7 @@ const CustomMultiSelect: React.FC<CustomSelectProps> = ({
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
               {labelMap.map((label: string, index: number) => (
                 <Chip
+                  sx={{ backgroundColor: 'red' }}
                   key={label}
                   label={label}
                   onDelete={(event) => handleDelete(selected[index], event)}

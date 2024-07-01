@@ -33,6 +33,7 @@ const createIngredient = async (formData: CreateIngredientFields) => {
  * @throws If there is an error querying the ingredients.
  */
 const queryIngredients = async (page: number, limit: number): Promise<IngredientsSchema[]> => {
+  console.debug("Querying ingredients");
   const { data, error } = await pg
     .from("ingredients")
     .select("*")

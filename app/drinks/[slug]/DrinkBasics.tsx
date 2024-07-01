@@ -49,75 +49,74 @@ const DrinkBasics: React.FC<ViewOnlyModeProps> = ({ drink }) => {
 
   const readView = () => {
     return (
-      <Card className="w-full">
-        <div className="flex justify-between w-full">
-          <div className="grid items-center gap-2">
-            <div className="pageTitle mb-2">{drink.name}</div>
-            <div>{description}</div>
-            <div>
-              <Badge
-                label={drink.drink_type}
-                color={drinkTypeColors[drink.drink_type]}
-              />
-            </div>
-          </div>
-          
-          {hover && <div
-            className="w-8 h-8 cursor-pointer"
-            onClick={() => setEditMode(true)}
-          >
-            <PencilSquareIcon />
-          </div>}
+      <div className="flex justify-between w-full">
+      <div className="grid items-center gap-2">
+        <div className="pageTitle mb-2">{drink.name}</div>
+        <div>{description}</div>
+        <div>
+          <Badge
+            label={drink.drink_type}
+            color={drinkTypeColors[drink.drink_type]}
+          />
         </div>
-      </Card>
+      </div>
+      
+      {hover && <div
+        className="w-8 h-8 cursor-pointer"
+        onClick={() => setEditMode(true)}
+      >
+        <PencilSquareIcon />
+      </div>}
+    </div>
     );
   };
 
   const editView = () => {
     return (
-      <Card className="w-full">
-        <form onSubmit={submitForm} className="w-full">
-          <div className="grid gap-8">
-            <DebouncedTextInput
-              label="Name"
-              value={drink.name}
-              onChange={(value: string) => handleChange("name", value || "")}
-              required
-            />
-            <DebouncedTextInput
-              label="Description"
-              value={drink.description}
-              onChange={(value: string) =>
-                handleChange("description", value || "")
-              }
-              multiline
-              minRows={3}
-            />
-            <CustomSelect
-              label="Drink Type"
-              required
-              options={drinkTypes.filter((row) => row.value !== "all")}
-              value={drink.drink_type}
-              onChange={(value: string) => handleChange("drink_type", value)}
-            />
-          </div>
-          <div className="flex gap-2 justify-end mt-4">
-            <Button
-              label="Cancel"
-              disabled={false}
-              onClick={() => setEditMode(false)}
-              type="button"
-              variant="cancel"
-            />
-            <Button
-              label="Submit"
-              disabled={false}
-              type="submit"
-              variant="primary"
-            />
-          </div>
-        </form>
-      </Card>
+      <form onSubmit={submitForm} className="w-full ">
+      <div className="grid gap-8">
+        <DebouncedTextInput
+          label="Name"
+          value={drink.name}
+          onChange={(value: string) => handleChange("name", value || "")}
+          required
+          variant="outlined"
+        />
+        <DebouncedTextInput
+          label="Description"
+          value={drink.description}
+           variant="outlined"
+          onChange={(value: string) =>
+            handleChange("description", value || "")
+          }
+          multiline
+          minRows={3}
+        />
+        <CustomSelect
+          label="Drink Type"
+          variant="outlined"
+          required
+          options={drinkTypes.filter((row) => row.value !== "all")}
+          value={form.drink_type}
+          onChange={(value: string) => handleChange("drink_type", value)}
+        />
+      </div>
+      <div className="flex gap-2 justify-end mt-4">
+        <Button
+          label="Cancel"
+          disabled={false}
+          onClick={() => setEditMode(false)}
+          type="button"
+          variant="cancel"
+        />
+        <Button
+          label="Submit"
+          disabled={false}
+          type="submit"
+          variant="primary"
+        />
+      </div>
+    </form>
     );
   };
 

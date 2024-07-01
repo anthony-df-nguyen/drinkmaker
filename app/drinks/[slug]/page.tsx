@@ -44,11 +44,10 @@ const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
     return (
       drinkData && (
         <main>
-          <div className="grid gap-4 w-full">
+          <div className="grid gap-8 lg:gap-16 w-full">
             <DrinkBasics drink={drinkData} />
             <DrinkIngredients drinkID={drinkData.id} />
             <DrinkInstructions drinkID={drinkData.id} />
-          
           </div>
         </main>
       )

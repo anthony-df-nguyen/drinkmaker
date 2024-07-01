@@ -70,7 +70,6 @@ const DrinkIngredients: React.FC<DrinkIngredientsProps> = ({ drinkID }) => {
             .includes(option.value)
         );
         setActiveSelection(currentSelection);
-
         if (data) {
           setForm({
             drink_id: drinkID,
@@ -91,7 +90,6 @@ const DrinkIngredients: React.FC<DrinkIngredientsProps> = ({ drinkID }) => {
     fetchDrinkIngredients();
   }, [drinkID, ingredientOptions]);
 
-  
   const handleSelectedIngredient = useCallback(
     (value: TagOption[]) => {
       setActiveSelection(value);

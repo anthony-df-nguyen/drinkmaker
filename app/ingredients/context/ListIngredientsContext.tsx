@@ -54,6 +54,7 @@ export const ListIngredientsProvider: React.FC<
      * Fetches the list of ingredients.
      */
     const fetchIngredients = async () => {
+      console.debug("Fetching ingredients...from context");
       try {
         const ingredientsData = await queryIngredients(1, 10);
         setIngredients(ingredientsData);

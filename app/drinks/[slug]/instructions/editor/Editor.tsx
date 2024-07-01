@@ -11,10 +11,7 @@ interface EditorProps {
   onChangeHandler: (value: string) => void;
 }
 
-const Editor: React.FC<EditorProps> = ({
-  initialContent,
-  onChangeHandler,
-}) => {
+const Editor: React.FC<EditorProps> = ({ initialContent, onChangeHandler }) => {
   const { quill, quillRef } = useQuill({
     modules: modules,
     formats: formats,
@@ -46,11 +43,13 @@ const Editor: React.FC<EditorProps> = ({
   }, [quill, onChangeHandler, initialContent]);
 
   return (
-    <div id="myQuillEditor" className="relative">
-      <div className="w-auto">
-        <div ref={quillRef} />
+    <div>
+      <div id="editQuill" className="relative bg-white">
+        <div className="w-auto"  >
+          <div ref={quillRef} />
+        </div>
       </div>
-      <div className="flex justify-end">
+      <div className="flex justify-end mt-2">
         <div
           className={classNames(
             "inputLimit",

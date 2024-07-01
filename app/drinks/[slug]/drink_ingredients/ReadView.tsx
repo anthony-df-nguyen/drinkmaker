@@ -36,7 +36,7 @@ const ReadView: React.FC<ReadViewProps> = ({
   }));
 
   return (
-    <Card className="w-full">
+    <div className="w-full">
       {/* Top Row */}
       <div className="flex justify-between">
         <div className="grid items-center gap-2">
@@ -55,7 +55,7 @@ const ReadView: React.FC<ReadViewProps> = ({
       <div className="mt-4">
         <CardTable<DrinkIngredientViewData> columns={columns} data={data} />
       </div>
-    </Card>
+    </div>
   );
 };
 

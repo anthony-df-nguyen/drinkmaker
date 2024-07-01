@@ -50,8 +50,8 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
       accessor: "ingredient_id",
       render: (row) => (
         <span>
-          {activeSelection.find((opt) => opt.value === row.ingredient_id)?.label ||
-            ""}
+          {activeSelection.find((opt) => opt.value === row.ingredient_id)
+            ?.label || ""}
         </span>
       ),
     },
@@ -62,10 +62,13 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
         <DebouncedTextInput
           label="Quantity"
           value={row.quantity}
-          onChange={(value: number) => handleChangeUnits({ ...row, quantity: value })}
+          onChange={(value: number) =>
+            handleChangeUnits({ ...row, quantity: value })
+          }
           type="number"
           required
           helperText="Enter a number"
+          variant="outlined"
           inputProps={{
             min: 0,
             step: getStepForUnit(row.unit),
@@ -80,7 +83,9 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
         <CustomSelect
           label="Unit"
           value={row.unit}
-          onChange={(value: string) => handleChangeUnits({ ...row, unit: value })}
+          onChange={(value: string) =>
+            handleChangeUnits({ ...row, unit: value })
+          }
           options={measuringUnits}
         />
       ),
@@ -88,47 +93,50 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
   ];
 
   return (
-    <Card className="w-full">
-      <div className="w-full">
-        <div className="grid items-center gap-2">
-          <div className="pageTitle mb-2">Ingredients</div>
-          <div>Step 1: Search and add ingredients</div>
-          <form onSubmit={onSubmit}>
-            <div className="w-full">
-              <Tags
-                label="Ingredients"
-                options={ingredientOptions}
-                defaultValue={activeSelection}
-                placeholder="Select ingredients"
-                onChange={handleSelectedIngredient}
-              />
-            </div>
-            <div className="mt-8">Step 2: Manage Ingredient Details</div>
-            <div className="font-light">
-              Enter ingredient quantities for 1 serving of the drink
-            </div>
-            <div className="mt-8 flex flex-col gap-4">
-              <CardTable<DrinkIngredientDetail> columns={columns} data={currentForm.ingredient_details} />
-            </div>
-            <div className="flex gap-2 justify-end mt-4">
-              <Button
-                label="Cancel"
-                disabled={false}
-                onClick={handleCancel}
-                type="button"
-                variant="cancel"
-              />
-              <Button
-                label="Submit"
-                disabled={false}
-                type="submit"
-                variant="primary"
-              />
-            </div>
-          </form>
-        </div>
+    <div className="w-full">
+      <div className="grid items-center gap-2">
+        <div className="pageTitle mb-2">Ingredients</div>
+        <div className="font-bold">Step 1: Add or remove ingredients</div>
+        <form onSubmit={onSubmit}>
+          <div className="w-full">
+            <Tags
+              label="Ingredients"
+              options={ingredientOptions}
+              defaultValue={activeSelection}
+              placeholder="Select ingredients"
+              onChange={handleSelectedIngredient}
+            />
+          </div>
+          <div className="mt-8 font-bold">Step 2: Manage Ingredient Details</div>
+          <div className="font-light">
+            Enter ingredient quantities for 1 serving of the drink
+          </div>
+          <div className="mt-8 ">
+            <CardTable<DrinkIngredientDetail>
+              columns={columns}
+              data={currentForm.ingredient_details}
+              breakpoint="768px"
+              hideColumnsOnMobile
+            />
+          </div>
+          <div className="flex gap-2 justify-end mt-4">
+            <Button
+              label="Cancel"
+              disabled={false}
+              onClick={handleCancel}
+              type="button"
+              variant="cancel"
+            />
+            <Button
+              label="Submit"
+              disabled={false}
+              type="submit"
+              variant="primary"
+            />
+          </div>
+        </form>
       </div>
-    </Card>
+    </div>
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Select,
   MenuItem,
@@ -12,7 +12,7 @@ import { styled } from "@mui/material/styles";
 
 const MySelect = styled(Select)<SelectProps>(({ theme }) => ({
   "& .MuiSelect-select": {
-    backgroundColor: "white",
+    //backgroundColor: "white",
     "&:hover": {
       backgroundColor: "lightgrey",
     },
@@ -29,7 +29,8 @@ type CustomSelectProps = {
   onChange: (value: string) => void;
   required?: boolean;
   error?: string;
-};
+  variant?: "standard" | "outlined" | "filled";
+} & Omit<SelectProps, "onChange" | "value">;
 
 const CustomSelect: React.FC<CustomSelectProps> = ({
   label,
@@ -38,11 +39,11 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   onChange,
   required,
   error,
+  variant = "outlined",
+  ...props
 }) => {
-  const [currentValue, setCurrentValue] = useState<string>(value);
-  const handleChange = (e: SelectChangeEvent<unknown>) => {
-    const newValue = e.target.value as string;
-    setCurrentValue(newValue);
+  const handleChange = (event: SelectChangeEvent<unknown>) => {
+    const newValue = event.target.value as string;
     onChange(newValue);
   };
 
@@ -54,13 +55,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       required={required}
     >
       <InputLabel>{label}</InputLabel>
-      <MySelect
-        value={currentValue}
-        onChange={(e) => handleChange(e)}
-        label={label}
-      >
+      <MySelect value={value} onChange={handleChange} label={label} variant={variant} {...props}>
         {options.map((option) => (
-          <MenuItem key={option.label} value={option.value}>
+          <MenuItem key={option.value} value={option.value}>
             {option.label}
           </MenuItem>
         ))}
