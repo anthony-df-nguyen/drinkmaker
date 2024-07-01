@@ -13,6 +13,7 @@ export async function middleware(request: NextRequest) {
   const {
     data: {user}
   } = await supabase.auth.getUser();
+  console.log("user", user);
 
   //const user = session?.user;
 
@@ -25,5 +26,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/ingredients/:path*"],
+  matcher: ["/ingredients/:path*"],
 };
