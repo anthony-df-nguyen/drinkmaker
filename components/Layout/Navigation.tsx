@@ -12,6 +12,7 @@ import {
 } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Profile from "./Profile";
+import { usePathname } from "next/navigation";
 
 interface Props {
   children: any;
@@ -19,6 +20,8 @@ interface Props {
 
 export default function Navigation({ children }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
+  console.log('pathname: ', pathname);
 
   return (
     <>
@@ -117,8 +120,7 @@ export default function Navigation({ children }: Props) {
           </Transition>
 
           {/* Static sidebar for desktop */}
-          <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-            {/* Sidebar component, swap this element with another sidebar if you like */}
+          {/* <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
             <div className=" flex grow flex-col gap-y-5 overflow-y-auto bg-emerald-600 px-6 pb-4">
               <div className="flex h-16 shrink-0 items-center">
                 <img
@@ -148,9 +150,10 @@ export default function Navigation({ children }: Props) {
                 </ul>
               </nav>
             </div>
-          </div>
+          </div> */}
 
-          <div className="lg:pl-72">
+          {/* Top header bar */}
+          <div className="">
             <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
               <button
                 type="button"
@@ -160,12 +163,27 @@ export default function Navigation({ children }: Props) {
                 <span className="sr-only">Open sidebar</span>
                 <Bars3Icon className="h-6 w-6" aria-hidden="true" />
               </button>
-
               {/* Separator */}
               <div
                 className="h-6 w-px bg-gray-900/10 lg:hidden"
                 aria-hidden="true"
               />
+              <div className="h-16 shrink-0 items-center hidden lg:flex text-xl font-bold wider text-emerald-600">
+                DRINKMAKER
+                {/* <img
+                  className="h-8 w-auto"
+                  src="https://tailwindui.com/img/logos/mark.svg?color=red"
+                  alt="Your Company"
+                /> */}
+              </div>
+              {/* Links */}
+              <div className="ml-8 hidden lg:flex gap-8">
+                {links.map((row) => (
+                  <Link key={row.name} href={row.href} className={classNames("text-base", pathname === row.href ? "font-semibold" : "font-light text-slate-600")}>
+                    {row.name}
+                  </Link>
+                ))}
+              </div>
 
               <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
                 <div className="relative flex flex-1"></div>

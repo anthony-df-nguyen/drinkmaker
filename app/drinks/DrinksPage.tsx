@@ -11,7 +11,7 @@ const CreateDrinkContainer: React.FC = () => {
     <ListIngredientsProvider>
       <div className="">
         <div className="flex items-center justify-between">
-          <div className="pageTitle">Drink Maker</div>
+          <div className="pageTitle">Drinks</div>
           <Button
             onClick={() => showModal(<CreateForm />)}
             label="+ Create Drink"

@@ -25,7 +25,7 @@ const ReadView: React.FC<ReadViewProps> = ({
     return ingredient?.label;
   };
 
-  const [multiplifier, setMultiplifier] = useState<number>(1);
+  const [multiplier, setMultiplier] = useState<number>(1);
 
   const columns: Column<DrinkIngredientViewData>[] = [
     { header: "Ingredient", accessor: "name" },
@@ -35,13 +35,13 @@ const ReadView: React.FC<ReadViewProps> = ({
 
   const data = details.ingredient_details.map((ing) => ({
     name: findIngredientLabelByValue(ing.ingredient_id)!,
-    quantity: ing.quantity * multiplifier,
+    quantity: ing.quantity * multiplier,
     unit: ing.unit,
   }));
 
   const changeMultiplier = (direction: string) => {
-    direction === "up" && setMultiplifier(multiplifier + 1);
-    direction === "down" && setMultiplifier(multiplifier - 1);
+    direction === "up" && setMultiplier(multiplier + 1);
+    direction === "down" && setMultiplier(multiplier - 1);
   };
 
   return (
@@ -61,27 +61,29 @@ const ReadView: React.FC<ReadViewProps> = ({
         )}
       </div>
       {/* Multipliers */}
-      <div className="flex flex-row items-center gap-4 justify-between">
-        <div className="font-bold"># of Servings: {multiplifier}</div>
-        <div className="flex gap-2">
-          <div className={classNames(multiplifier === 1 ? "hidden" : "")}>
+     {details.ingredient_details.length > 0 &&  <div className="flex flex-row items-center gap-4 justify-between">
+
+        <div className="flex gap-2 items-center">
+          <div className="">
             <Button
-              label="Less"
+              label="▼"
               type="button"
               variant="cancel"
+              disabled={multiplier === 1 ? true : false}
               onClick={() => changeMultiplier("down")}
             />
           </div>
+          <div className="font-semibold">Servings: {multiplier}</div>
           <div>
             <Button
-              label="More"
+              label="▲"
               type="button"
               variant="primary"
               onClick={() => changeMultiplier("up")}
             />
           </div>
         </div>
-      </div>
+      </div>}
       {/* Table */}
       <div className="mt-4">
         <CardTable<DrinkIngredientViewData> columns={columns} data={data} />

@@ -25,7 +25,7 @@ interface DrinkInstructionsProps {
  */
 const DrinkInstructions: React.FC<DrinkInstructionsProps> = ({ drinkID }) => {
   const [editMode, setEditMode] = useState<boolean>(false);
-  const [hover, setHover] = useState<boolean>(false);
+  const [hover, setHover] = useState<boolean>(true);
   const [instructions, setInstructions] = useState<InstructionFormat | null>(
     null
   );

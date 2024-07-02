@@ -29,6 +29,7 @@
  */
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import IngredientForm from "./forms/IngredientForm";
+import { formatText } from "@/utils/formatText";
 import ReadView from "./ReadView";
 import { TagOption } from "@/components/MUIInputs/Tags";
 import { InsertDrinkIngredients, DrinkIngredientDetail } from "./models";
@@ -42,14 +43,14 @@ interface DrinkIngredientsProps {
 
 const DrinkIngredients: React.FC<DrinkIngredientsProps> = ({ drinkID }) => {
   const [editMode, setEditMode] = useState(false);
-  const [hover, setHover] = useState<boolean>(false);
+  const [hover, setHover] = useState<boolean>(true);
 
   const { allIngredients } = useListIngredients();
   const ingredientOptions = useMemo(
     () =>
       allIngredients.map((ingredient) => ({
         value: ingredient.id,
-        label: ingredient.name,
+        label: formatText(ingredient.name),
       })),
     [allIngredients]
   );

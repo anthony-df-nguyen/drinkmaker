@@ -7,6 +7,7 @@ import { DrinkIngredientDetail, InsertDrinkIngredients } from "../models";
 import Card from "@/components/UI/Card";
 import CardTable, { Column } from "@/components/UI/CardTable";
 import DebouncedTextInput from "@/components/MUIInputs/TextInput";
+import NumberInput from "@/components/MUIInputs/NumberInput";
 import CustomSelect from "@/components/MUIInputs/Select";
 import { getStepForUnit, measuringUnits } from "../utils";
 
@@ -59,19 +60,18 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
       header: "Quantity",
       accessor: "quantity",
       render: (row) => (
-        <DebouncedTextInput
+        <NumberInput
           label="Quantity"
           value={row.quantity}
           onChange={(value: number) =>
             handleChangeUnits({ ...row, quantity: value })
           }
-          type="number"
           required
           helperText="Enter a number"
           variant="outlined"
+          delay={500}
           inputProps={{
             min: 0,
-            step: getStepForUnit(row.unit),
           }}
         />
       ),

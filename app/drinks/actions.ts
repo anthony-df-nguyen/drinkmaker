@@ -67,6 +67,7 @@ const createDrink = async (formData: CreateDrinkFields) => {
 };
 
 const deleteDrink = async (id: string) => {
+  console.log("Deleting drink with id", id);
   try {
     const { data, error } = await pg.from("drinks").delete().match({ id: id });
     if (error) {
@@ -80,9 +81,6 @@ const deleteDrink = async (id: string) => {
 };
 
 const updateDrinkBasics = async (id: string, fields: MutableDrinkFields) => {
-  console.log("Updating drink", id, fields);
-  const {data: user} = await pg.auth.getUser();
-  console.log('user: ', user);
   try {
     const { data, error } = await pg
       .schema("public")

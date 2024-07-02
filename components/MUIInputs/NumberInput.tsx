@@ -1,18 +1,16 @@
 import { TextField, TextFieldProps, FormControl } from "@mui/material";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { styled } from "@mui/material/styles";
 import useDebounce from "@/hooks/useDebounce";
 
 // Define the props with conditional types
-type DebouncedTextInputProps<T extends string | number> = {
-  value: T;
-  onChange: (value: T) => void;
+type DebouncedTextInputProps = {
+  value: number;
+  onChange: (value: number) => void;
   delay?: number;
   helperText?: string;
   min?: number;
   max?: number;
-  step?: number;
-  type?: "text" | "number";
 } & Omit<TextFieldProps, "onChange" | "value">; // Omit the existing onChange and value from TextFieldProps
 
 const MyTextInput = styled(TextField)<TextFieldProps>(({ theme }) => ({
@@ -42,49 +40,55 @@ const MyTextInput = styled(TextField)<TextFieldProps>(({ theme }) => ({
       borderColor: "#059669", // Border color when focused
     },
   },
-  // "& .MuiInputLabel-outlined": {
-  //   color: "black", // Default label color
-  // },
   "& .MuiInputLabel-outlined.Mui-focused": {
     color: "#059669", // Label color when focused
   },
 }));
 
-const DebouncedTextInput = <T extends string | number>({
+const DebouncedTextInput = ({
   value,
   onChange,
   delay = 300,
-  type = "text",
   helperText,
   min,
   max,
   ...props
-}: DebouncedTextInputProps<T>) => {
-  const [inputValue, setInputValue] = useState<T>(value);
+}: DebouncedTextInputProps) => {
+  const [inputValue, setInputValue] = useState<string>(value.toString());
   const [isFocused, setIsFocused] = useState<boolean>(false);
-  const debouncedValue = useDebounce<T>(inputValue, delay);
+  const debouncedValue = useDebounce<string>(inputValue, delay);
+  const firstUpdate = useRef(true);
 
   useEffect(() => {
-    if (debouncedValue !== value) {
-      onChange(debouncedValue);
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return;
+    }
+    if (debouncedValue !== "" && debouncedValue !== value.toString()) {
+      onChange(parseFloat(debouncedValue));
     }
   }, [debouncedValue, onChange, value]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let newValue: T = event.target.value as T;
+    const newValue = event.target.value;
 
-    if (type === "number") {
-      const numericValue = Number(newValue);
-      if (min !== undefined && numericValue < min) {
-        newValue = min as T;
-      } else if (max !== undefined && numericValue > max) {
-        newValue = max as T;
-      } else {
-        newValue = numericValue as T;
-      }
+    if (newValue === "" || newValue === "-") {
+      setInputValue(newValue);
+      return;
     }
 
-    setInputValue(newValue);
+    const numericValue = parseFloat(newValue);
+    if (!isNaN(numericValue)) {
+      if (min !== undefined && numericValue < min) {
+        setInputValue(min.toString());
+      } else if (max !== undefined && numericValue > max) {
+        setInputValue(max.toString());
+      } else {
+        setInputValue(newValue);
+      }
+    } else {
+      setInputValue("");
+    }
   };
 
   const handleFocus = () => {
@@ -93,25 +97,30 @@ const DebouncedTextInput = <T extends string | number>({
 
   const handleBlur = () => {
     setIsFocused(false);
+    if (inputValue === "" || inputValue === "-") {
+      setInputValue(value.toString());
+    }
   };
 
   useEffect(() => {
-    setInputValue(value);
+    setInputValue(value.toString());
   }, [value]);
 
   return (
-    <MyTextInput
-      value={inputValue}
-      onChange={handleInputChange}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-      type={type}
-      variant="filled"
-      fullWidth
-      helperText={isFocused ? helperText : ""}
-      inputProps={{ min, max }}
-      {...props}
-    />
+    <FormControl fullWidth>
+      <MyTextInput
+        value={inputValue}
+        onChange={handleInputChange}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        type="text"
+        variant="filled"
+        fullWidth
+        helperText={isFocused ? helperText : ""}
+        inputProps={{ min, max }}
+        {...props}
+      />
+    </FormControl>
   );
 };
 

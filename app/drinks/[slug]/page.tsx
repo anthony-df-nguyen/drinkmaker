@@ -47,9 +47,7 @@ const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
         <main>
           <div className="grid gap-8  max-w-[1200px] w-full mx-auto">
             <DrinkBasics drink={drinkData} />
-            <hr />
             <DrinkIngredients drinkID={drinkData.id} />
-            <hr />
             <DrinkInstructions drinkID={drinkData.id} />
           </div>
         </main>

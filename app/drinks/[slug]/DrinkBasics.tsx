@@ -3,12 +3,12 @@ import React, { useState, useEffect, useCallback } from "react";
 import DebouncedTextInput from "@/components/MUIInputs/TextInput";
 import CustomSelect from "@/components/MUIInputs/Select";
 import { DrinkSchema, drinkTypeColors, drinkTypes } from "../models";
-import { PencilSquareIcon } from "@heroicons/react/20/solid";
+import { PencilSquareIcon, TrashIcon } from "@heroicons/react/20/solid";
 import { sanitizeInput } from "@/utils/sanitizeInput";
 import Badge from "@/components/UI/Badge";
-import Card from "@/components/UI/Card";
+import { useRouter } from "next/navigation";
 import Button from "@/components/UI/Button";
-import { updateDrinkBasics } from "../actions";
+import { updateDrinkBasics, deleteDrink } from "../actions";
 import { enqueueSnackbar } from "notistack";
 
 interface ViewOnlyModeProps {
@@ -19,21 +19,42 @@ const DrinkBasics: React.FC<ViewOnlyModeProps> = ({ drink }) => {
   const { description } = drink;
   const [form, setForm] = useState({ ...drink });
   const [editMode, setEditMode] = useState(false);
-  const [hover, setHover] = useState<boolean>(false);
+  const [hover, setHover] = useState<boolean>(true);
 
-  const handleChange = useCallback((field: keyof typeof form, value: string) => {
-    setForm((prevForm) => {
-      if (field === "name") {
-        return {
-          ...prevForm,
-          name: value,
-          unique_name: sanitizeInput(value),
-        };
-      } else {
-        return { ...prevForm, [field]: value };
-      }
-    });
-  }, []);
+  const router = useRouter();
+
+  const handleChange = useCallback(
+    (field: keyof typeof form, value: string) => {
+      setForm((prevForm) => {
+        if (field === "name") {
+          return {
+            ...prevForm,
+            name: value,
+            unique_name: sanitizeInput(value),
+          };
+        } else {
+          return { ...prevForm, [field]: value };
+        }
+      });
+    },
+    []
+  );
+
+  const handleDelete = async () => {
+    try {
+      deleteDrink(drink.id).then(() => {
+        enqueueSnackbar("Successfully deleted drink", {
+          variant: "success",
+        });
+        setTimeout(() => {
+          router.push("/");
+        }, 2500);
+      });
+    } catch (error) {
+      console.error("Error deleting drink: ", error);
+      enqueueSnackbar("Error deleting drink", { variant: "error" });
+    }
+  };
 
   const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -50,25 +71,33 @@ const DrinkBasics: React.FC<ViewOnlyModeProps> = ({ drink }) => {
   };
 
   const readView = () => (
-    <div className="flex justify-between w-full">
-      <div className="grid items-center gap-2">
-        <div>
-          <Badge
-            label={drink.drink_type}
-            color={drinkTypeColors[drink.drink_type]}
-          />
-        </div>
-        <div className="pageTitle mb-2">{drink.name}</div>
-        <div className="text-sm">{description}</div>
+    <div className="w-full">
+      <div className="flex items-center justify-between">
+        <div className="pageTitle">{drink.name}</div>
+        {/* Buttons */}
+        {hover && (
+          <div className="flex items-center gap-2">
+            {" "}
+            <div
+              className="w-8 h-8 cursor-pointer"
+              onClick={() => handleDelete()}
+            >
+              <TrashIcon color="gray" />
+            </div>
+            <div
+              className="w-8 h-8 cursor-pointer"
+              onClick={() => setEditMode(true)}
+            >
+              <PencilSquareIcon color="gray" />
+            </div>
+          </div>
+        )}
       </div>
-      {hover && (
-        <div
-          className="w-8 h-8 cursor-pointer"
-          onClick={() => setEditMode(true)}
-        >
-          <PencilSquareIcon color="gray" />
-        </div>
-      )}
+      <div className="text-sm">{description}</div>
+      <Badge
+        label={drink.drink_type}
+        color={drinkTypeColors[drink.drink_type]}
+      />
     </div>
   );
 
@@ -119,7 +148,10 @@ const DrinkBasics: React.FC<ViewOnlyModeProps> = ({ drink }) => {
   );
 
   return (
-    <div onMouseOver={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+    <div
+      onMouseOver={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+    >
       {editMode ? editView() : readView()}
     </div>
   );

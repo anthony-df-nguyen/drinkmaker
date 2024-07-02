@@ -33,10 +33,10 @@ export default function Button({ label, onClick, disabled, type, variant }: Prop
 
   return (
     <button
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
       type={type}
       className={classNames(
-        "rounded px-4 py-2 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
+        "rounded px-3 py-2 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
         disabled ? disabledClass : "",
         variant === "primary" ? confirmClass : "",
         variant === "cancel" ? cancelClass : "",
