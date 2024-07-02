@@ -1,15 +1,13 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { upsertDrinkIngredients } from "../actions";
 import Tags, { TagOption } from "@/components/MUIInputs/Tags";
 import Button from "@/components/UI/Button";
 import { enqueueSnackbar } from "notistack";
 import { DrinkIngredientDetail, InsertDrinkIngredients } from "../models";
-import Card from "@/components/UI/Card";
 import CardTable, { Column } from "@/components/UI/CardTable";
-import DebouncedTextInput from "@/components/MUIInputs/TextInput";
 import NumberInput from "@/components/MUIInputs/NumberInput";
 import CustomSelect from "@/components/MUIInputs/Select";
-import { getStepForUnit, measuringUnits } from "../utils";
+import { measuringUnits } from "../utils";
 
 interface IngredientFormProps {
   currentForm: InsertDrinkIngredients;
@@ -20,6 +18,19 @@ interface IngredientFormProps {
   handleCancel: () => void;
 }
 
+/**
+ * Component for rendering the Ingredient Form.
+ *
+ * @component
+ * @param {IngredientFormProps} props - The component props.
+ * @param {string} props.currentForm - The current form.
+ * @param {Array} props.ingredientOptions - The options for ingredients.
+ * @param {Array} props.activeSelection - The active selection.
+ * @param {Function} props.handleSelectedIngredient - The function to handle selected ingredient.
+ * @param {Function} props.handleChangeUnits - The function to handle unit changes.
+ * @param {Function} props.handleCancel - The function to handle form cancellation.
+ * @returns {JSX.Element} The rendered Ingredient Form component.
+ */
 const IngredientForm: React.FC<IngredientFormProps> = ({
   currentForm,
   ingredientOptions,
@@ -28,9 +39,22 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
   handleChangeUnits,
   handleCancel,
 }) => {
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
+  console.log(errors)
+
+  const handleFieldError = (field: string, hasError: boolean) => {
+    setErrors((prevErrors) => ({ ...prevErrors, [field]: hasError }));
+  };
+
   const onSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      if (Object.values(errors).some((error) => error)) {
+        enqueueSnackbar("Please fix the errors before submitting", {
+          variant: "error",
+        });
+        return;
+      }
       try {
         upsertDrinkIngredients(currentForm).then(() => {
           handleCancel();
@@ -42,7 +66,7 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
         });
       }
     },
-    [currentForm, handleCancel]
+    [currentForm, handleCancel, errors]
   );
 
   const columns: Column<DrinkIngredientDetail>[] = [
@@ -59,7 +83,7 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
     {
       header: "Quantity",
       accessor: "quantity",
-      render: (row) => (
+      render: (row, index) => (
         <NumberInput
           label="Quantity"
           value={row.quantity}
@@ -69,17 +93,15 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
           required
           helperText="Enter a number"
           variant="outlined"
-          delay={500}
-          inputProps={{
-            min: 0,
-          }}
+          min={0}
+          handleError={(hasError) => handleFieldError(`quantity_${index}`, hasError)}
         />
       ),
     },
     {
       header: "Unit",
       accessor: "unit",
-      render: (row) => (
+      render: (row, index) => (
         <CustomSelect
           label="Unit"
           value={row.unit}
@@ -97,6 +119,7 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
       <div className="grid items-center gap-2">
         <div className="pageTitle mb-2">Ingredients</div>
         <div className="font-bold">Step 1: Add or remove ingredients</div>
+        {Object.values(errors).some((error) => error) ? "Error" : null}
         <form onSubmit={onSubmit}>
           <div className="w-full">
             <Tags
@@ -129,7 +152,7 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
             />
             <Button
               label="Submit"
-              disabled={false}
+              disabled={Object.values(errors).some((error) => error)}
               type="submit"
               variant="primary"
             />

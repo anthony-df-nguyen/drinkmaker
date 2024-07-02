@@ -4,7 +4,7 @@ import Card from "./Card";
 interface Column<T> {
   header: string;
   accessor: keyof T;
-  render?: (row: T) => React.ReactNode;
+  render?: (row: T, index: number) => React.ReactNode;
 }
 
 interface TableProps<T> {
@@ -34,7 +34,7 @@ const CardTable = <T extends { [key: string]: any }>({
                     <div className="font-semibold">{column.header}</div>
                   )}
                   <div className="mt-1">
-                    {column.render ? column.render(row) : row[column.accessor]}
+                    {column.render ? column.render(row, colIndex) : row[column.accessor]}
                   </div>
                 </div>
               ))}
@@ -68,7 +68,7 @@ const CardTable = <T extends { [key: string]: any }>({
                           className="whitespace-wrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
                         >
                           {column.render
-                            ? column.render(item)
+                            ? column.render(item, index)
                             : item[column.accessor]}
                         </td>
                       ))}
