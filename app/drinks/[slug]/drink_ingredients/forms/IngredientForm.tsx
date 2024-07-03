@@ -40,7 +40,6 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
   handleCancel,
 }) => {
   const [errors, setErrors] = useState<Record<string, boolean>>({});
-  console.log(errors)
 
   const handleFieldError = (field: string, hasError: boolean) => {
     setErrors((prevErrors) => ({ ...prevErrors, [field]: hasError }));
@@ -69,57 +68,12 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
     [currentForm, handleCancel, errors]
   );
 
-  const columns: Column<DrinkIngredientDetail>[] = [
-    {
-      header: "Ingredient",
-      accessor: "ingredient_id",
-      render: (row) => (
-        <span>
-          {activeSelection.find((opt) => opt.value === row.ingredient_id)
-            ?.label || ""}
-        </span>
-      ),
-    },
-    {
-      header: "Quantity",
-      accessor: "quantity",
-      render: (row, index) => (
-        <NumberInput
-          label="Quantity"
-          value={row.quantity}
-          onChange={(value: number) =>
-            handleChangeUnits({ ...row, quantity: value })
-          }
-          required
-          helperText="Enter a number"
-          variant="outlined"
-          min={0}
-          handleError={(hasError) => handleFieldError(`quantity_${index}`, hasError)}
-        />
-      ),
-    },
-    {
-      header: "Unit",
-      accessor: "unit",
-      render: (row, index) => (
-        <CustomSelect
-          label="Unit"
-          value={row.unit}
-          onChange={(value: string) =>
-            handleChangeUnits({ ...row, unit: value })
-          }
-          options={measuringUnits}
-        />
-      ),
-    },
-  ];
-
+  console.log(currentForm);
   return (
     <div className="w-full">
       <div className="grid items-center gap-2">
         <div className="pageTitle mb-2">Ingredients</div>
         <div className="font-bold">Step 1: Add or remove ingredients</div>
-        {Object.values(errors).some((error) => error) ? "Error" : null}
         <form onSubmit={onSubmit}>
           <div className="w-full">
             <Tags
@@ -130,17 +84,48 @@ const IngredientForm: React.FC<IngredientFormProps> = ({
               onChange={handleSelectedIngredient}
             />
           </div>
-          <div className="mt-8 font-bold">Step 2: Manage Ingredient Details</div>
+          <div className="mt-8 font-bold">
+            Step 2: Manage Ingredient Details
+          </div>
           <div className="font-light">
             Enter ingredient quantities for 1 serving of the drink
           </div>
           <div className="mt-8 ">
-            <CardTable<DrinkIngredientDetail>
-              columns={columns}
-              data={currentForm.ingredient_details}
-              breakpoint="768px"
-              hideColumnsOnMobile
-            />
+            {currentForm.ingredient_details.map((row, index) => {
+              return (
+                <div key={index}>
+                  <span>
+                    {activeSelection.find(
+                      (opt) => opt.value === row.ingredient_id
+                    )?.label || ""}
+                  </span>
+                  <div className="my-4 flex items-center gap-2">
+                    <CustomSelect
+                      label="Unit"
+                      value={row.unit}
+                      onChange={(value: string) =>
+                        handleChangeUnits({ ...row, unit: value })
+                      }
+                      options={measuringUnits}
+                    />
+                    <NumberInput
+                      label="Quantity"
+                      value={row.quantity}
+                      onChange={(value: number) =>
+                        handleChangeUnits({ ...row, quantity: value })
+                      }
+                      required
+                      helperText="Enter a number"
+                      variant="outlined"
+                      min={0}
+                      handleError={(hasError) =>
+                        handleFieldError(`quantity_${index}`, hasError)
+                      }
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
           <div className="flex gap-2 justify-end mt-4">
             <Button
