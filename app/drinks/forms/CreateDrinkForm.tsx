@@ -61,7 +61,7 @@ const CreateForm = () => {
       }
     } else {
       console.error("User is not authenticated");
-      enqueueSnackbar("You must be authenticated to create a drink", {
+      enqueueSnackbar("You must be logged in to create a drink", {
         variant: "error",
       });
     }

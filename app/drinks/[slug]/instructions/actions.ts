@@ -7,7 +7,7 @@ const pg = createSupabaseServerComponentClient();
 
 const getDrinkInstructionByID = async (
   drink_id: string
-): Promise< {instructions: InstructionFormat} | null> => {
+): Promise<{ instructions: InstructionFormat } | null> => {
   const { data, error } = await pg
     .from("drink_instructions")
     .select("instructions")
@@ -17,9 +17,8 @@ const getDrinkInstructionByID = async (
   if (error) {
     console.error(`Error querying instructions`, error);
     return null;
-    //throw new Error(`Error querying for instructions: ${error.message}`);
   } else {
-    return data;
+    return data ? data : null;
   }
 };
 

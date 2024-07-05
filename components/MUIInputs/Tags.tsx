@@ -57,6 +57,7 @@ const Tags: React.FC<TagProps> = ({
         isOptionEqualToValue={(option, value) => option.value === value.value}
         filterSelectedOptions
         onChange={onTagChange}
+        size="small"
         renderInput={(params) => (
           <TextField {...params} label={label} placeholder={placeholder} />
         )}

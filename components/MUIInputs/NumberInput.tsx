@@ -90,6 +90,8 @@ const NumberInput = ({
     const [isFocused, setIsFocused] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
+    
+
     /**
      * Handles the change event for the input element.
      * @param event - The change event object.
@@ -164,6 +166,7 @@ const NumberInput = ({
             error={Boolean(error)}
             helperText={isFocused ? helperText : error}
             inputProps={{ min, max }}
+            size="small"
             {...props}
         />
     );

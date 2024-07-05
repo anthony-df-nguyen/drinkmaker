@@ -21,8 +21,6 @@ interface Props {
 export default function Navigation({ children }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
-  console.log('pathname: ', pathname);
-
   return (
     <>
       <SnackbarProvider

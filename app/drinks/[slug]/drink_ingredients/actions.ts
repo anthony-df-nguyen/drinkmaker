@@ -74,7 +74,7 @@ const getDrinkIngredients = async (
     throw new Error(`Error getting data: ${error.message}`);
   }
 
-  return data;
+  return data.length > 0 ? data : null;
 };
 
 export { upsertDrinkIngredients, getDrinkIngredients };

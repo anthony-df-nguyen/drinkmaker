@@ -78,7 +78,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       error={Boolean(error)}
     >
       <InputLabel>{label}</InputLabel>
-      <MySelect value={currentValue} onChange={handleChange} label={label}>
+      <MySelect value={currentValue} onChange={handleChange} label={label} size="small">
         {options.map((option) => (
           <MenuItem key={option.value} value={option.value}>
             {option.label}

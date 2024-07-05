@@ -6,7 +6,7 @@ type Props = {
   onClick?: any;
   disabled?: boolean;
   type: "submit" | "button";
-  variant: "primary" | "cancel" | "delete";
+  variant: "primary" | "cancel" | "delete" | "info";
 };
 
 /**
@@ -22,7 +22,13 @@ type Props = {
  *
  * @returns {JSX.Element} The rendered Button component.
  */
-export default function Button({ label, onClick, disabled, type, variant }: Props) {
+export default function Button({
+  label,
+  onClick,
+  disabled,
+  type,
+  variant,
+}: Props) {
   const disabledClass = "opacity-50 cursor-not-allowed";
   const confirmClass =
     "bg-emerald-600 hover:bg-emerald-500 focus-visible:outline-emerald-600 hover:bg-emerald-500";
@@ -30,6 +36,8 @@ export default function Button({ label, onClick, disabled, type, variant }: Prop
     "bg-gray-600 hover:bg-gray-500 focus-visible:outline-gray-600 hover:bg-gray-500";
   const deleteClass =
     "bg-red-600 hover:bg-red-500 focus-visible:outline-red-600 hover:bg-red-500";
+  const infoClass =
+    "bg-gray-400 focus-visible:outline-gray-300 hover:bg-gray-400";
 
   return (
     <button
@@ -40,7 +48,8 @@ export default function Button({ label, onClick, disabled, type, variant }: Prop
         disabled ? disabledClass : "",
         variant === "primary" ? confirmClass : "",
         variant === "cancel" ? cancelClass : "",
-        variant === "delete" ? deleteClass : ""
+        variant === "delete" ? deleteClass : "",
+        variant === "info" ? infoClass : "",
       )}
     >
       {label}

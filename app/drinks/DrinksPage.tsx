@@ -1,4 +1,3 @@
-"use client";
 import CreateForm from "./forms/CreateDrinkForm";
 import Button from "@/components/UI/Button";
 import DrinkList from "./DrinkList";

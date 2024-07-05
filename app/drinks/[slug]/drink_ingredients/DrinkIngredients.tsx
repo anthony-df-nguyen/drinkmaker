@@ -1,171 +1,81 @@
-// DrinkIngredients.tsx
-
-/**
- * `DrinkIngredients` is a React functional component that displays and manages the ingredients
- * associated with a specific drink. It allows for viewing the ingredients in a read-only mode
- * and provides an option to switch to an edit mode for modifying the ingredients list.
- *
- * Props:
- * - `drinkID`: A unique identifier for the drink whose ingredients are to be displayed and managed.
- *
- * State:
- * - `editMode`: A boolean state that determines whether the component is in edit mode, allowing
- *    for modification of the drink's ingredients.
- * - `hover`: A boolean state that tracks whether the mouse is hovering over the component, which
- *    can be used to show or hide UI elements dynamically based on user interaction.
- *
- * Hooks:
- * - `useListIngredients()`: A custom hook that fetches the list of all possible ingredients from
- *    a backend or context. It returns an object with `allIngredients`, an array of ingredient
- *    options that can be used to populate UI elements such as dropdowns or lists.
- * - `useMemo()`: React hook used to memoize the `ingredientOptions` computation. This is beneficial
- *    for performance optimization, especially if deriving `ingredientOptions` from `allIngredients`
- *    involves complex calculations or transformations.
- *
- * The component renders a UI that varies based on the `editMode` state. In read-only mode, it displays
- * the ingredients associated with the `drinkID`. In edit mode, it provides an interface for adding,
- * removing, or modifying the ingredients. The transition between these modes is typically controlled
- * by a button or similar UI element that toggles the `editMode` state.
- */
-import React, { useEffect, useState, useCallback, useMemo } from "react";
-import IngredientForm from "./forms/IngredientForm";
-import { formatText } from "@/utils/formatText";
-import ReadView from "./ReadView";
+import React, { useState } from "react";
 import { TagOption } from "@/components/MUIInputs/Tags";
-import { InsertDrinkIngredients, DrinkIngredientDetail } from "./models";
-import { getDrinkIngredients } from "./actions";
+import { useGlobalDrinkForm } from "../context";
+import { InsertDrinkIngredients, DrinkIngredientViewData } from "./models";
+import { PencilSquareIcon } from "@heroicons/react/24/solid";
+import { formatText } from "@/utils/formatText";
+import CardTable, { Column } from "@/components/UI/CardTable";
+import Button from "@/components/UI/Button";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { useListIngredients } from "@/app/ingredients/context/ListIngredientsContext";
-import { enqueueSnackbar } from "notistack";
 
-interface DrinkIngredientsProps {
-  drinkID: string;
-}
-
-const DrinkIngredients: React.FC<DrinkIngredientsProps> = ({ drinkID }) => {
-  const [editMode, setEditMode] = useState(false);
-  const [hover, setHover] = useState<boolean>(true);
-
+const ReadView: React.FC = ({}) => {
+  const { globalDrinkForm } = useGlobalDrinkForm();
   const { allIngredients } = useListIngredients();
-  const ingredientOptions = useMemo(
-    () =>
-      allIngredients.map((ingredient) => ({
-        value: ingredient.id,
-        label: formatText(ingredient.name),
-      })),
-    [allIngredients]
-  );
 
-  const [activeSelection, setActiveSelection] = useState<TagOption[]>([]);
-  const [form, setForm] = useState<InsertDrinkIngredients>({
-    drink_id: drinkID,
-    ingredient_details: [],
-  });
+  const findIngredientLabelByValue = (value: string): string => {
+    const ingredient = allIngredients.find((option) => option.id === value);
+    return formatText(ingredient?.name ?? "") ?? "";
+  };
+  const [multiplier, setMultiplier] = useState<number>(1);
 
-  useEffect(() => {
-    const fetchDrinkIngredients = async () => {
-      try {
-        const data = await getDrinkIngredients(drinkID);
-        const currentSelection = ingredientOptions.filter((option) =>
-          data
-            ?.map((ingredient) => ingredient.ingredient_id)
-            .includes(option.value)
-        );
-        setActiveSelection(currentSelection);
-        if (data) {
-          setForm({
-            drink_id: drinkID,
-            ingredient_details: data.map((ingredient) => ({
-              ingredient_id: ingredient.ingredient_id,
-              quantity: ingredient.quantity,
-              unit: ingredient.unit,
-            })),
-          });
-        }
-      } catch (error) {
-        enqueueSnackbar("Error getting drink ingredients", {
-          variant: "error",
-        });
-      }
-    };
+  const columns: Column<DrinkIngredientViewData>[] = [
+    { header: "Ingredient", accessor: "name" },
+    { header: "Quantity", accessor: "quantity" },
+    { header: "Unit", accessor: "unit" },
+  ];
 
-    fetchDrinkIngredients();
-  }, [drinkID, ingredientOptions]);
+  const data =
+    globalDrinkForm?.ingredients?.map((ing) => ({
+      name: findIngredientLabelByValue(ing.ingredient_id),
+      quantity: ing.quantity * multiplier,
+      unit: ing.unit,
+    })) ?? [];
 
-  const handleSelectedIngredient = useCallback(
-    (value: TagOption[]) => {
-      setActiveSelection(value);
-
-      const updatedIngredientDetails = value.map((option) => {
-        const existingDetail = form.ingredient_details.find(
-          (detail) => detail.ingredient_id === option.value
-        );
-        return (
-          existingDetail || {
-            ingredient_id: option.value,
-            quantity: 0,
-            unit: "oz",
-          }
-        );
-      });
-
-      setForm((prevForm) => ({
-        ...prevForm,
-        ingredient_details: updatedIngredientDetails,
-      }));
-    },
-    [form.ingredient_details]
-  );
-
-  const handleChangeUnits = useCallback((value: DrinkIngredientDetail) => {
-    setForm((prevForm) => ({
-      ...prevForm,
-      ingredient_details: prevForm.ingredient_details.map((ingredient) =>
-        // Rest of the code...
-        ingredient.ingredient_id === value.ingredient_id ? value : ingredient
-      ),
-    }));
-  }, []);
-
-  const editView = useMemo(
-    () => (
-      <IngredientForm
-        currentForm={form}
-        ingredientOptions={ingredientOptions}
-        activeSelection={activeSelection}
-        handleSelectedIngredient={handleSelectedIngredient}
-        handleChangeUnits={handleChangeUnits}
-        handleCancel={() => setEditMode(false)}
-      />
-    ),
-    [
-      form,
-      activeSelection,
-      handleChangeUnits,
-      handleSelectedIngredient,
-      ingredientOptions,
-    ]
-  );
-
-  const readView = useMemo(
-    () => (
-      <ReadView
-        activeSelection={activeSelection}
-        details={form}
-        setEditMode={setEditMode}
-        hover={hover}
-      />
-    ),
-    [activeSelection, hover]
-  );
+  const changeMultiplier = (direction: string) => {
+    direction === "up" && setMultiplier(multiplier + 1);
+    direction === "down" && setMultiplier(multiplier - 1);
+  };
 
   return (
-    <div
-      onMouseOver={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-    >
-      {editMode ? editView : readView}
+    <div className="w-full">
+      {/* Top Row */}
+      <div className="flex items-center justify-between">
+        <div className="pageTitle">Ingredients</div>
+
+        {/* Multipliers */}
+        {data.length > 0 && (
+          <div className="">
+            <span className="isolate inline-flex rounded-md shadow-sm">
+              <button
+                type="button"
+                disabled={multiplier === 1}
+                onClick={() => changeMultiplier("down")}
+                className="relative inline-flex items-center rounded-l-md bg-white px-4 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10"
+              >
+                <span className="sr-only">Previous</span>-
+              </button>
+              <div className="relative -ml-px inline-flex items-center  bg-white px-2 py-2 text-gray-600 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10">
+                {multiplier} Servings
+              </div>
+              <button
+                type="button"
+                onClick={() => changeMultiplier("up")}
+                className="relative -ml-px inline-flex items-center rounded-r-md bg-white px-4 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10"
+              >
+                <span className="sr-only">Next</span>+
+              </button>
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Table */}
+      <div className="mt-4">
+        <CardTable<DrinkIngredientViewData> columns={columns} data={data} />
+      </div>
     </div>
   );
 };
 
-export default DrinkIngredients;
+export default ReadView;

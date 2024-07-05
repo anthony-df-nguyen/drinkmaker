@@ -110,6 +110,7 @@ const DebouncedTextInput = <T extends string | number>({
       fullWidth
       helperText={isFocused ? helperText : ""}
       inputProps={{ min, max }}
+      size="small"
       {...props}
     />
   );

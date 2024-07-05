@@ -38,6 +38,7 @@ const SearchCreate: React.FC = () => {
    * @param {string} val - The input value for the ingredient name.
    */
   const handleName = useCallback(async (val: string) => {
+    // Sanitize and validate the input
     const cleanString = sanitizeInput(val);
     const validString = validateInput(cleanString, { minLength: 3 });
 
