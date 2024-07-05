@@ -1,7 +1,7 @@
 "use server";
 import { createSupabaseServerComponentClient } from "@/utils/supabase/server-client";
 import { DrinkSchema, CreateDrinkFields, MutableDrinkFields } from "./models";
-import { InstructionFormat } from "./[slug]/instructions/models";
+import getUserSession from "@/utils/supabase/isUserAuthed";
 import { sanitizeInput } from "@/utils/sanitizeInput";
 
 const pg = createSupabaseServerComponentClient();
@@ -45,24 +45,28 @@ const getNextFriendlyNumber = (
 };
 
 const createDrink = async (formData: CreateDrinkFields) => {
-  const existingDrinks = await getExistingDrinksWithName(formData.name);
-  const friendlyNumber = getNextFriendlyNumber(existingDrinks, formData.name);
-  const newUniqueName =
-    friendlyNumber === 1
-      ? sanitizeInput(formData.name)
-      : `${sanitizeInput(formData.name)}_${friendlyNumber}`;
-  formData.unique_name = newUniqueName;
+  const authenticated = await getUserSession();
+  if (authenticated) {
+    const existingDrinks = await getExistingDrinksWithName(formData.name);
+    const friendlyNumber = getNextFriendlyNumber(existingDrinks, formData.name);
+    const newUniqueName =
+      friendlyNumber === 1
+        ? sanitizeInput(formData.name)
+        : `${sanitizeInput(formData.name)}_${friendlyNumber}`;
+    formData.unique_name = newUniqueName;
 
-  try {
-    const { data, error } = await pg.from("drinks").insert([formData]);
-    if (error) {
-      throw new Error(error.message || "Error creating drink");
+    try {
+      const { data, error } = await pg.from("drinks").insert([formData]);
+      if (error) {
+        throw new Error(error.message || "Drink could not be created");
+      }
+      return data;
+    } catch (error) {
+      console.error("Drink could not be created", error);
+      throw error;
     }
-
-    return data;
-  } catch (error) {
-    console.error("Drink could not be created", error);
-    throw error;
+  } else {
+    throw new Error("User not authenticated");
   }
 };
 
@@ -172,4 +176,10 @@ const getDrinkByID = async (slug: string): Promise<DrinkSchema> => {
   }
 };
 
-export { createDrink, deleteDrink, updateDrinkBasics, queryDrinks, getDrinkByID };
+export {
+  createDrink,
+  deleteDrink,
+  updateDrinkBasics,
+  queryDrinks,
+  getDrinkByID,
+};

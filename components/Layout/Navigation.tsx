@@ -177,7 +177,7 @@ export default function Navigation({ children }: Props) {
               {/* Links */}
               <div className="ml-8 hidden lg:flex gap-8">
                 {links.map((row) => (
-                  <Link key={row.name} href={row.href} className={classNames("text-base", pathname === row.href ? "font-semibold" : "font-light text-slate-600")}>
+                  <Link key={row.name} href={row.href} className={classNames("text-base", pathname === row.href ? "font-semibold text-emerald-600" : "font-light text-slate-600")}>
                     {row.name}
                   </Link>
                 ))}

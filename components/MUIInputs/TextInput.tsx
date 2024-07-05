@@ -1,4 +1,4 @@
-import { TextField, TextFieldProps, FormControl } from "@mui/material";
+import { TextField, TextFieldProps, FormHelperText } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import useDebounce from "@/hooks/useDebounce";
@@ -6,29 +6,25 @@ import useDebounce from "@/hooks/useDebounce";
 // Define the props with conditional types
 type DebouncedTextInputProps<T extends string | number> = {
   value: T;
-  onChange: (value: T) => void;
+  onChange: (value: string) => void;
   delay?: number;
   helperText?: string;
-  min?: number;
-  max?: number;
-  step?: number;
-  type?: "text" | "number";
-} & Omit<TextFieldProps, "onChange" | "value">; // Omit the existing onChange and value from TextFieldProps
-
+  errorText?: string;
+  error?: boolean;
+} & Omit<TextFieldProps, "onChange" | "value">;
 
 const DebouncedTextInput = <T extends string | number>({
   value,
   onChange,
   delay = 300,
-  type = "text",
   helperText,
-  min,
-  max,
+  errorText,
+  error,
   ...props
-}: DebouncedTextInputProps<T>) => {
-  const [inputValue, setInputValue] = useState<T>(value);
+}: DebouncedTextInputProps<string>) => {
+  const [inputValue, setInputValue] = useState<string>(value);
   const [isFocused, setIsFocused] = useState<boolean>(false);
-  const debouncedValue = useDebounce<T>(inputValue, delay);
+  const debouncedValue = useDebounce<string>(inputValue, delay);
 
   useEffect(() => {
     if (debouncedValue !== value) {
@@ -37,18 +33,7 @@ const DebouncedTextInput = <T extends string | number>({
   }, [debouncedValue, onChange, value]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let newValue: T = event.target.value as T;
-
-    if (type === "number") {
-      const numericValue = Number(newValue);
-      if (min !== undefined && numericValue < min) {
-        newValue = min as T;
-      } else if (max !== undefined && numericValue > max) {
-        newValue = max as T;
-      } else {
-        newValue = numericValue as T;
-      }
-    }
+    let newValue: string = event.target.value as string;
 
     setInputValue(newValue);
   };
@@ -71,11 +56,11 @@ const DebouncedTextInput = <T extends string | number>({
       onChange={handleInputChange}
       onFocus={handleFocus}
       onBlur={handleBlur}
-      type={type}
+      type="text"
       variant="filled"
       fullWidth
-      helperText={isFocused ? helperText : ""}
-      inputProps={{ min, max }}
+      error={error}
+      helperText={error ? errorText : helperText}
       size="small"
       {...props}
     />

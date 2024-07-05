@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import DebouncedTextInput from "@/components/MUIInputs/TextInput";
+import Button from "@/components/UI/Button";
 import Select from "@/components/MUIInputs/Select";
 import { useAuthenticatedContext } from "@/context/Authenticated";
 import { enqueueSnackbar } from "notistack";
@@ -8,7 +9,8 @@ import { CreateDrinkFields, drinkTypes } from "../models";
 import { createDrink } from "../actions";
 import { useModal } from "@/context/ModalContext";
 import { sanitizeInput } from "@/utils/sanitizeInput";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
+import Error from "next/error";
 
 /**
  * Component for creating a new drink.
@@ -25,6 +27,8 @@ const CreateForm = () => {
     created_by: "",
     drink_type: "cocktail",
   });
+
+  const [formErrors, setFormErrors] = useState({});
 
   /**
    * Handles the change event for the form fields.
@@ -49,25 +53,20 @@ const CreateForm = () => {
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (user?.id) {
-      try {
-        await createDrink({ ...form, created_by: user.id });
-        hideModal();
-        router.push(`/drinks/${form.unique_name}`);
-      } catch (error) {
-        enqueueSnackbar("Cannot create drink", {
-          variant: "error",
-        });
-      }
-    } else {
-      console.error("User is not authenticated");
-      enqueueSnackbar("You must be logged in to create a drink", {
+    try {
+      await createDrink({ ...form });
+      hideModal();
+      router.push(`/drinks/${form.unique_name}`);
+    } catch (error: Error | any) {
+      console.error(error.message);
+      enqueueSnackbar(error.message, {
         variant: "error",
       });
     }
   };
 
-  const isDescriptionTooLong = form.description.length > 10000;
+  const maxNameLength = 50;
+  const maxDescriptionLength = 250;
 
   return (
     <form
@@ -80,7 +79,9 @@ const CreateForm = () => {
           label="Name"
           value={form.name}
           onChange={(value: string) => handleChange("name", value)}
-          delay={500}
+          delay={50}
+          error={form.name.length > maxNameLength}
+          errorText="Too many characters"
           required
           variant="outlined"
         />
@@ -95,20 +96,22 @@ const CreateForm = () => {
           label="Description"
           value={form.description}
           onChange={(value: string) => handleChange("description", value)}
-          //error={isDescriptionTooLong ? "Description is too long" : ""}
+          error={form.description.length > maxDescriptionLength}
+          errorText="Too many characters"
           multiline
+          delay={50}
           minRows={3}
           variant="outlined"
         />
       </div>
 
       <div className="flex items-center justify-end">
-        <button
+        <Button
+          label="Create"
           type="submit"
-          className="bg-emerald-500 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        >
-          Create
-        </button>
+          variant="primary"
+          disabled={form.name.length > maxNameLength || form.description.length > maxDescriptionLength}
+        />
       </div>
     </form>
   );

@@ -107,9 +107,9 @@ export default function EditDrinkForm({ setEdit }: Props) {
           onChange={(value) => handleChange("drink_type", value)}
           variant="filled"
         />
-        {/* Step 1 Ingredients */}
+        {/* Ingredients */}
         <h2 className="pageTitle">Ingredients</h2>
-        <div className="border p-4 rounded-lg">
+        <div className="border p-8 rounded-lg">
           <div className="font-semibold mb-8">
             Step 1: Add or remove ingredients
           </div>
@@ -123,11 +123,9 @@ export default function EditDrinkForm({ setEdit }: Props) {
             placeholder="Select ingredients"
             onChange={handleTagsChange}
           />
-        </div>
-
-        {/* Step 2 Ingredients */}
-        <div className="border p-4 rounded-lg">
-          <div className="font-semibold">Step 2: Manage Ingredient Details</div>
+          <div className="font-semibold mt-8">
+            Step 2: Manage Ingredient Details
+          </div>
           <div className="mt-4 lg:grid lg:grid-cols-3 gap-4">
             {liveFormState.ingredients.map((ingredient, index) => (
               <div key={index} className="">
@@ -162,6 +160,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
             ))}
           </div>
         </div>
+
         <div className="pageTitle">Instructions</div>
         <Editor
           initialContent={globalDrinkForm.instructions}
