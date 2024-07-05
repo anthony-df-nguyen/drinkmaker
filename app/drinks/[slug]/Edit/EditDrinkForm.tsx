@@ -17,17 +17,9 @@ type Props = {};
 
 export default function EditDrinkForm({}: Props) {
   const { allIngredients } = useListIngredients();
-  const { globalDrinkForm, setGlobalDrinkForm } = useGlobalDrinkForm();
+  const { globalDrinkForm, setGlobalDrinkForm, setFormSubmitted } = useGlobalDrinkForm();
 
-  const [liveFormState, setLiveFormState] = useState({
-    name: globalDrinkForm?.name ?? "",
-    unique_name: globalDrinkForm?.unique_name ?? "",
-    id: globalDrinkForm?.id ?? "",
-    description: globalDrinkForm?.description ?? "",
-    drink_type: globalDrinkForm?.drink_type ?? "all",
-    ingredients: globalDrinkForm?.ingredients ?? [],
-    instructions: globalDrinkForm?.instructions ?? null,
-  });
+  const [liveFormState, setLiveFormState] = useState(globalDrinkForm);
   const findIngredientById = (id: string) =>
     allIngredients.find((ingredient) => ingredient.id === id);
   const [selectedTags, setSelectedTags] = useState<TagOption[]>(() =>
@@ -36,6 +28,7 @@ export default function EditDrinkForm({}: Props) {
       value: row.ingredient_id,
     }))
   );
+  const [quillEditorContent, setQuillEditorContent] = useState<string>(liveFormState.instructions ?? "");
 
   const handleChange = useCallback((key: string, value: any) => {
     setLiveFormState((prev) => ({ ...prev, [key]: value }));
@@ -71,10 +64,12 @@ export default function EditDrinkForm({}: Props) {
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLiveFormState((prev) => ({ ...prev, instructions: quillEditorContent }));
-    setGlobalDrinkForm(liveFormState);
+    const updatedFormState = { ...liveFormState, instructions: quillEditorContent };
+    setLiveFormState(updatedFormState);
+    setGlobalDrinkForm(updatedFormState);
+    setFormSubmitted(true);
   };
-  let quillEditorContent = "";
+
 
   return (
     <form className="w-full" onSubmit={handleFormSubmit}>
@@ -151,9 +146,9 @@ export default function EditDrinkForm({}: Props) {
         </div>
         <div className="pageTitle">Instructions</div>
         <Editor
-          initialContent={liveFormState.instructions}
+          initialContent={globalDrinkForm.instructions}
           onChangeHandler={(content) => {
-            quillEditorContent = content;
+            setQuillEditorContent(content);
           }}
         />
       </div>

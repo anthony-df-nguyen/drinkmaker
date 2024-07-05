@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { InstructionFormat } from "../models";
 import { modules, formats } from "./modules";
 import { useQuill } from "react-quilljs";
@@ -11,6 +11,18 @@ interface EditorProps {
   onChangeHandler: (value: string) => void;
 }
 
+// Patch to add passive event listeners
+const addPassiveEventListener = () => {
+  const originalAddEventListener = EventTarget.prototype.addEventListener;
+  EventTarget.prototype.addEventListener = function (type, listener, options) {
+    const passiveOptions = options || {};
+    if (typeof passiveOptions === "object" && passiveOptions !== null) {
+      passiveOptions.passive = true;
+    }
+    originalAddEventListener.call(this, type, listener, passiveOptions);
+  };
+};
+
 const Editor: React.FC<EditorProps> = ({ initialContent, onChangeHandler }) => {
   const { quill, quillRef } = useQuill({
     modules: modules,
@@ -18,16 +30,20 @@ const Editor: React.FC<EditorProps> = ({ initialContent, onChangeHandler }) => {
   });
 
   const [length, setLength] = useState<number>(0);
-
+  const hasMounted = useRef(false);
   const limit = 5000;
 
   useEffect(() => {
+    addPassiveEventListener();
+  }, []);
+
+  useEffect(() => {
     if (quill) {
-      if (initialContent) {
-        // Parse the initialContent HTML string and set it to the Quill editor
+      if (!hasMounted.current && initialContent) {
         quill.setContents(JSON.parse(initialContent));
         const initialLength = quill.getLength();
         setLength(initialLength);
+        hasMounted.current = true;
       }
       quill.on("text-change", () => {
         const len = quill.getLength();
@@ -42,10 +58,18 @@ const Editor: React.FC<EditorProps> = ({ initialContent, onChangeHandler }) => {
     }
   }, [quill, onChangeHandler, initialContent]);
 
+  useEffect(() => {
+    if (quill && initialContent) {
+      quill.setContents(JSON.parse(initialContent));
+      const initialLength = quill.getLength();
+      setLength(initialLength);
+    }
+  }, [quill, initialContent]);
+
   return (
     <div>
       <div id="editQuill" className="relative bg-white">
-        <div className="w-auto"  >
+        <div className="w-auto">
           <div ref={quillRef} />
         </div>
       </div>

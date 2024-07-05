@@ -23,12 +23,12 @@ export interface CreateDrinkFields {
 
 export interface MutableDrinkFields {
   name: string;
-  unique_name: string;
-  description: string;
-  picture: string;
-  upvotes: number;
-  downvotes: number;
-  published: boolean;
+  unique_name?: string;
+  description?: string;
+  picture?: string;
+  upvotes?: number;
+  downvotes?: number;
+  published?: boolean;
   drink_type: string;
 }
 
