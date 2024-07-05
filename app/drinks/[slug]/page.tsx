@@ -25,7 +25,7 @@ const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
 };
 
 const DrinkPageContent = () => {
-  const { globalDrinkForm, loading, error } = useGlobalDrinkForm();
+  const {loading, error } = useGlobalDrinkForm();
   const [edit, setEdit] = useState<boolean>(true);
 
   if (loading) return <MartiniLoader />;
