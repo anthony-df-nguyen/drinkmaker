@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { useGlobalDrinkForm } from "../context";
 import { useListIngredients } from "@/app/ingredients/context/ListIngredientsContext";
 import { drinkTypes } from "../../models";
-import { DrinkIngredientDetail } from "../drink_ingredients/models";
+import Card from "@/components/UI/Card";
 import { TagOption } from "@/components/MUIInputs/Tags";
 import { formatText } from "@/utils/formatText";
 import DebouncedTextInput from "@/components/MUIInputs/TextInput";
@@ -17,9 +17,10 @@ type Props = {
   setEdit: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function EditDrinkForm({setEdit}: Props) {
+export default function EditDrinkForm({ setEdit }: Props) {
   const { allIngredients } = useListIngredients();
-  const { globalDrinkForm, setGlobalDrinkForm, setFormSubmitted } = useGlobalDrinkForm();
+  const { globalDrinkForm, setGlobalDrinkForm, setFormSubmitted } =
+    useGlobalDrinkForm();
 
   const [liveFormState, setLiveFormState] = useState(globalDrinkForm);
   const findIngredientById = (id: string) =>
@@ -30,7 +31,9 @@ export default function EditDrinkForm({setEdit}: Props) {
       value: row.ingredient_id,
     }))
   );
-  const [quillEditorContent, setQuillEditorContent] = useState<string>(liveFormState.instructions ?? "");
+  const [quillEditorContent, setQuillEditorContent] = useState<string>(
+    liveFormState.instructions ?? ""
+  );
 
   const handleChange = useCallback((key: string, value: any) => {
     setLiveFormState((prev) => ({ ...prev, [key]: value }));
@@ -66,30 +69,32 @@ export default function EditDrinkForm({setEdit}: Props) {
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const updatedFormState = { ...liveFormState, instructions: quillEditorContent };
+    const updatedFormState = {
+      ...liveFormState,
+      instructions: quillEditorContent,
+    };
     setLiveFormState(updatedFormState);
     setGlobalDrinkForm(updatedFormState);
     setFormSubmitted(true);
   };
 
-
   return (
-    <form className="w-full" onSubmit={handleFormSubmit}>
-      <div className="grid gap-8">
+    <form onSubmit={handleFormSubmit}>
+      <Card className="grid gap-8">
         <div className="pageTitle">Drink Details</div>
         <DebouncedTextInput
           label="Name"
           value={liveFormState.name}
           onChange={(value) => handleChange("name", value || "")}
           required
-          variant="outlined"
+          variant="filled"
           delay={500}
         />
         <DebouncedTextInput
           label="Description"
           value={liveFormState.description}
           onChange={(value) => handleChange("description", value || "")}
-          variant="outlined"
+          variant="filled"
           delay={500}
           multiline
           minRows={3}
@@ -100,51 +105,62 @@ export default function EditDrinkForm({setEdit}: Props) {
           options={drinkTypes.filter((row) => row.value !== "all")}
           value={liveFormState.drink_type}
           onChange={(value) => handleChange("drink_type", value)}
+          variant="filled"
         />
+        {/* Step 1 Ingredients */}
         <h2 className="pageTitle">Ingredients</h2>
-        <div className="font-bold">Step 1: Add or remove ingredients</div>
-        <Tags
-          label="Ingredients"
-          options={allIngredients.map((row) => ({
-            label: formatText(row.name),
-            value: row.id,
-          }))}
-          defaultValue={selectedTags}
-          placeholder="Select ingredients"
-          onChange={handleTagsChange}
-        />
-        <div className="font-bold">Step 2: Manage Ingredient Details</div>
-        <div className="">
-          {liveFormState.ingredients.map((ingredient, index) => (
-            <div key={index}>
-              <span>
-                {selectedTags.find(
-                  (tag) => tag.value === ingredient.ingredient_id
-                )?.label || ""}
-              </span>
-              <div className="my-4 flex items-center gap-2">
-                <NumberInput
-                  label="Quantity"
-                  value={ingredient.quantity}
-                  onChange={(value) =>
-                    handleChangeUnitOrQuantity(value, index, "quantity")
-                  }
-                  required
-                  helperText="Enter a number"
-                  variant="outlined"
-                  min={0}
-                />
-                <CustomSelect
-                  label="Unit"
-                  value={ingredient.unit}
-                  onChange={(value) =>
-                    handleChangeUnitOrQuantity(value, index, "unit")
-                  }
-                  options={measuringUnits}
-                />
+        <div className="border p-4 rounded-lg">
+          <div className="font-semibold mb-8">
+            Step 1: Add or remove ingredients
+          </div>
+          <Tags
+            label="Ingredients"
+            options={allIngredients.map((row) => ({
+              label: formatText(row.name),
+              value: row.id,
+            }))}
+            defaultValue={selectedTags}
+            placeholder="Select ingredients"
+            onChange={handleTagsChange}
+          />
+        </div>
+
+        {/* Step 2 Ingredients */}
+        <div className="border p-4 rounded-lg">
+          <div className="font-semibold">Step 2: Manage Ingredient Details</div>
+          <div className="mt-4 lg:grid lg:grid-cols-3 gap-4">
+            {liveFormState.ingredients.map((ingredient, index) => (
+              <div key={index} className="">
+                <div className="font-md tracking-wide">
+                  {selectedTags.find(
+                    (tag) => tag.value === ingredient.ingredient_id
+                  )?.label || ""}
+                </div>
+                <div className="my-4 flex items-center gap-2">
+                  <NumberInput
+                    label="Quantity"
+                    value={ingredient.quantity}
+                    onChange={(value) =>
+                      handleChangeUnitOrQuantity(value, index, "quantity")
+                    }
+                    required
+                    helperText="Enter a number"
+                    variant="filled"
+                    min={0}
+                  />
+                  <CustomSelect
+                    label="Unit"
+                    value={ingredient.unit}
+                    onChange={(value) =>
+                      handleChangeUnitOrQuantity(value, index, "unit")
+                    }
+                    options={measuringUnits}
+                    variant="filled"
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
         <div className="pageTitle">Instructions</div>
         <Editor
@@ -153,9 +169,9 @@ export default function EditDrinkForm({setEdit}: Props) {
             setQuillEditorContent(content);
           }}
         />
-      </div>
+      </Card>
       <div className="flex gap-2 justify-end mt-4">
-      <Button
+        <Button
           label="Cancel"
           disabled={false}
           type="button"

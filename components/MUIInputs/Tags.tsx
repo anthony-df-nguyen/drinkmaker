@@ -57,9 +57,9 @@ const Tags: React.FC<TagProps> = ({
         isOptionEqualToValue={(option, value) => option.value === value.value}
         filterSelectedOptions
         onChange={onTagChange}
-        size="small"
+        size="medium"
         renderInput={(params) => (
-          <TextField {...params} label={label} placeholder={placeholder} />
+          <TextField {...params} label={label} placeholder={placeholder} variant="standard" />
         )}
       />
     </Stack>

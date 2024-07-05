@@ -15,40 +15,6 @@ type DebouncedTextInputProps<T extends string | number> = {
   type?: "text" | "number";
 } & Omit<TextFieldProps, "onChange" | "value">; // Omit the existing onChange and value from TextFieldProps
 
-const MyTextInput = styled(TextField)<TextFieldProps>(({ theme }) => ({
-  "& .MuiFilledInput-root": {
-    backgroundColor: "white",
-    "&:hover": {
-      backgroundColor: "white",
-    },
-    "&.Mui-focused": {
-      backgroundColor: "white",
-    },
-  },
-  "& .MuiFilledInput-input": {
-    // padding: theme.spacing(2),
-  },
-  "& .MuiInputLabel-filled": {
-    color: "#059669", // Default label color
-  },
-  "& .MuiInputLabel-filled.Mui-focused": {
-    color: "green", // Label color when focused
-  },
-  "& .MuiOutlinedInput-root": {
-    "&:hover fieldset": {
-      borderColor: "#059669", // Border color on hover
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: "#059669", // Border color when focused
-    },
-  },
-  // "& .MuiInputLabel-outlined": {
-  //   color: "black", // Default label color
-  // },
-  "& .MuiInputLabel-outlined.Mui-focused": {
-    color: "#059669", // Label color when focused
-  },
-}));
 
 const DebouncedTextInput = <T extends string | number>({
   value,
@@ -100,7 +66,7 @@ const DebouncedTextInput = <T extends string | number>({
   }, [value]);
 
   return (
-    <MyTextInput
+    <TextField
       value={inputValue}
       onChange={handleInputChange}
       onFocus={handleFocus}

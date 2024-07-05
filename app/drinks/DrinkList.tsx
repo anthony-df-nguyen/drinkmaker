@@ -66,8 +66,8 @@ const DrinkList: React.FC = () => {
             <Link key={drink.unique_name} href={`/drinks/${drink.unique_name}`}>
               <Card className={"w-full h-full"}>
                 <div className="flex flex-col gap-2 justify-start h-full">
-                  <div className="text-base">{drink.name}</div>
-                  <div className="text-sm font-light flex-1">{drink.description}</div>
+                  <div className="text-base text-gray-900">{drink.name}</div>
+                  <div className="text-sm font-light text-gray-500 flex-1">{drink.description}</div>
                   <div>
                     <Badge label={drink.drink_type} color={color} />
                   </div>

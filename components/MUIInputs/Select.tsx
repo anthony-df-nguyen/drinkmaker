@@ -10,41 +10,6 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-const MySelect = styled(Select)<SelectProps>(({ theme }) => ({
-  "& .MuiOutlinedInput-root": {
-    "& fieldset": {
-      borderColor: "", // Default border color
-    },
-    "&:hover fieldset": {
-      borderColor: "#059669", // Border color on hover
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: "#059669", // Border color when focused
-    },
-  },
-  "& .MuiSelect-select": {
-    backgroundColor: "none",
-    "&:hover": {
-      backgroundColor: "none", // Background color on hover
-    },
-    "&.Mui-focused": {
-      backgroundColor: "none", // Background color when focused
-    },
-  },
-  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderColor: "#059669", // Border color when focused
-  },
-}));
-
-const MyFormControl = styled(FormControl)(({ theme }) => ({
-  "& .MuiInputLabel-root": {
-    color: "#059669", // Default label color
-  },
-  "& .MuiInputLabel-root.Mui-focused": {
-    color: "#059669", // Label color when focused
-  },
-}));
-
 type CustomSelectProps = {
   label: string;
   options: { value: string; label: string }[];
@@ -52,6 +17,7 @@ type CustomSelectProps = {
   onChange: (value: string) => void;
   required?: boolean;
   error?: string;
+  variant?: "outlined" | "standard" | "filled";
 };
 
 const CustomSelect: React.FC<CustomSelectProps> = ({
@@ -60,7 +26,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   value,
   onChange,
   required,
-  error,
+  error,variant
 }) => {
   const [currentValue, setCurrentValue] = useState<string>(value);
 
@@ -71,22 +37,22 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   };
 
   return (
-    <MyFormControl
-      variant="outlined"
+    <FormControl
+      variant={variant || "outlined"}
       fullWidth
       required={required}
       error={Boolean(error)}
     >
       <InputLabel>{label}</InputLabel>
-      <MySelect value={currentValue} onChange={handleChange} label={label} size="small">
+      <Select value={currentValue} onChange={handleChange} label={label} size="small">
         {options.map((option) => (
           <MenuItem key={option.value} value={option.value}>
             {option.label}
           </MenuItem>
         ))}
-      </MySelect>
+      </Select>
       {error && <FormHelperText>{error}</FormHelperText>}
-    </MyFormControl>
+    </FormControl>
   );
 };
 

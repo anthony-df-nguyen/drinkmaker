@@ -34,38 +34,6 @@ type NumberInputProps = {
     max?: number;
 } & Omit<TextFieldProps, "onChange" | "value">;
 
-const MyTextInput = styled(TextField)<TextFieldProps>(({ theme }) => ({
-    "& .MuiFilledInput-root": {
-        backgroundColor: "white",
-        "&:hover": {
-            backgroundColor: "white",
-        },
-        "&.Mui-focused": {
-            backgroundColor: "white",
-        },
-    },
-    "& .MuiFilledInput-input": {
-        // padding: theme.spacing(2),
-    },
-    "& .MuiInputLabel-filled": {
-        color: "#059669", // Default label color
-    },
-    "& .MuiInputLabel-filled.Mui-focused": {
-        color: "green", // Label color when focused
-    },
-    "& .MuiOutlinedInput-root": {
-        "&:hover fieldset": {
-            borderColor: "#059669", // Border color on hover
-        },
-        "&.Mui-focused fieldset": {
-            borderColor: "#059669", // Border color when focused
-        },
-    },
-    "& .MuiInputLabel-outlined.Mui-focused": {
-        color: "#059669", // Label color when focused
-    },
-}));
-
 /**
  * A custom number input component.
  * @param value - The current value of the input.
@@ -155,7 +123,7 @@ const NumberInput = ({
     }, [value]);
 
     return (
-        <MyTextInput
+        <TextField
             value={inputValue}
             onChange={handleInputChange}
             onFocus={handleFocus}
