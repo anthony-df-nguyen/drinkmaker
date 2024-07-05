@@ -42,7 +42,7 @@ const IngredientList: React.FC = () => {
 
   return (
     <div className="mt-4">
-      <div className="mt-8 grid gap-2 max-h-[65vh] overflow-y-scroll">
+      <div className="mt-8 grid gap-2 max-h-[65vh] overflow-y-scroll no-scrollbar">
         {ingredients.map((ingredient) => (
           <Card key={ingredient.name}>
             <div className="flex items-center gap-2 justify-between w-full">

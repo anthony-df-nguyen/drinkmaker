@@ -59,7 +59,7 @@ const DrinkList: React.FC = () => {
         </div>
       </div>
       {/* Grid/Results */}
-      <div className="grid gap-4 xl:grid-cols-1 max-h-[55vh] overflow-y-scroll">
+      <div className="grid gap-4 xl:grid-cols-1 max-h-[55vh] overflow-y-scroll no-scrollbar">
         {drinksList.map((drink) => {
           const color = drinkTypeColors[drink.drink_type];
           return (
