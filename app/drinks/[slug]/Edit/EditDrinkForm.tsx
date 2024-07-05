@@ -13,9 +13,11 @@ import Button from "@/components/UI/Button";
 import Editor from "../instructions/editor/Editor";
 import { measuringUnits } from "../drink_ingredients/utils";
 
-type Props = {};
+type Props = {
+  setEdit: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
-export default function EditDrinkForm({}: Props) {
+export default function EditDrinkForm({setEdit}: Props) {
   const { allIngredients } = useListIngredients();
   const { globalDrinkForm, setGlobalDrinkForm, setFormSubmitted } = useGlobalDrinkForm();
 
@@ -153,6 +155,13 @@ export default function EditDrinkForm({}: Props) {
         />
       </div>
       <div className="flex gap-2 justify-end mt-4">
+      <Button
+          label="Cancel"
+          disabled={false}
+          type="button"
+          variant="cancel"
+          onClick={() => setEdit(false)}
+        />
         <Button
           label="Submit"
           disabled={false}

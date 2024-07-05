@@ -11,17 +11,7 @@ interface EditorProps {
   onChangeHandler: (value: string) => void;
 }
 
-// Patch to add passive event listeners
-const addPassiveEventListener = () => {
-  const originalAddEventListener = EventTarget.prototype.addEventListener;
-  EventTarget.prototype.addEventListener = function (type, listener, options) {
-    const passiveOptions = options || {};
-    if (typeof passiveOptions === "object" && passiveOptions !== null) {
-      passiveOptions.passive = true;
-    }
-    originalAddEventListener.call(this, type, listener, passiveOptions);
-  };
-};
+
 
 const Editor: React.FC<EditorProps> = ({ initialContent, onChangeHandler }) => {
   const { quill, quillRef } = useQuill({
@@ -32,10 +22,6 @@ const Editor: React.FC<EditorProps> = ({ initialContent, onChangeHandler }) => {
   const [length, setLength] = useState<number>(0);
   const hasMounted = useRef(false);
   const limit = 5000;
-
-  useEffect(() => {
-    addPassiveEventListener();
-  }, []);
 
   useEffect(() => {
     if (quill) {
