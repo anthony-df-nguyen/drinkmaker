@@ -15,9 +15,7 @@ const DrinkList: React.FC = () => {
   const { drinksList, setDrinksList, count, setCount } = useListDrinks();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, handleSearchTermChange] = useState<string>("");
-  const [selectDrinkType, setSelectDrinkType] = useState<string>(
-    "all"
-  );
+  const [selectDrinkType, setSelectDrinkType] = useState<string>("all");
   const onPageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
@@ -60,7 +58,7 @@ const DrinkList: React.FC = () => {
         </div>
       </div>
       {/* Grid/Results */}
-      <div className="grid gap-4 xl:grid-cols-1 max-h-[55vh] overflow-y-scroll no-scrollbar">
+      <div className="grid gap-4 xl:grid-cols-3 max-h-[55vh] overflow-y-scroll no-scrollbar">
         {drinksList.map((drink) => {
           const color = drinkTypeColors[drink.drink_type];
           return (
@@ -68,8 +66,12 @@ const DrinkList: React.FC = () => {
               <Card className={"w-full h-full"}>
                 <div className="flex flex-col gap-2 justify-start h-full">
                   <div className="text-base text-gray-900">{drink.name}</div>
-                  <div className="text-sm italic font-light text-gray-500">By: {drink.profiles.username ?? "Unknown Creator"}</div>
-                  <div className="text-sm font-light text-gray-700 flex-1">{drink.description}</div>
+                  <div className="text-sm italic font-light text-gray-500">
+                    By: {drink.profiles.username ?? "Unknown Creator"}
+                  </div>
+                  <div className="text-sm font-light text-gray-700 flex-1">
+                    {drink.description}
+                  </div>
                   <div>
                     <Badge label={drink.drink_type} color={color} />
                   </div>

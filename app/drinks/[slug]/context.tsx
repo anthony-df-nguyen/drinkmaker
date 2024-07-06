@@ -31,6 +31,8 @@ export type GlobalDrinkForm = {
   description: string;
   ingredients: DrinkIngredientDetail[];
   instructions: string | null;
+  created_by_user_id: string;
+  created_by_user: string;
 };
 
 interface DrinkFormContextProps {
@@ -58,6 +60,8 @@ export const DrinkFormProvider: React.FC<{
     description: "",
     ingredients: [],
     instructions: null,
+    created_by_user_id: "",
+    created_by_user: "",
   });
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -88,6 +92,8 @@ export const DrinkFormProvider: React.FC<{
           : [],
         instructions: instructions?.instructions ?? null,
         drink_type: basic.drink_type,
+        created_by_user_id: basic.created_by,
+        created_by_user: basic.profiles?.username ?? "Unknown",
       };
 
       setGlobalDrinkForm(newForm);

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useGlobalDrinkForm, DrinkFormProvider } from "./context";
+import { AuthenticatedProvider } from "@/context/Authenticated";
 import { drinkTypeColors } from "../models";
 import Badge from "@/components/UI/Badge";
 import DrinkInstructions from "./instructions/DrinkInstructions";
@@ -15,13 +16,15 @@ const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
   const { slug } = params;
 
   return (
-    <Navigation>
-      <ListIngredientsProvider>
-        <DrinkFormProvider slug={slug}>
-          <DrinkPageContent />
-        </DrinkFormProvider>
-      </ListIngredientsProvider>
-    </Navigation>
+    <AuthenticatedProvider>
+      <Navigation>
+        <ListIngredientsProvider>
+          <DrinkFormProvider slug={slug}>
+            <DrinkPageContent />
+          </DrinkFormProvider>
+        </ListIngredientsProvider>
+      </Navigation>
+    </AuthenticatedProvider>
   );
 };
 
@@ -43,15 +46,26 @@ const DrinkPageContent: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="pageTitle">{globalDrinkForm.name} </div>
               </div>
+              <div className="text-sm mt-2 italic">
+                By: {globalDrinkForm.created_by_user}
+              </div>
               <div className="text-sm mt-2">{globalDrinkForm.description}</div>
-              <div className="mt-2"><Badge
-                label={globalDrinkForm?.drink_type ?? "other"}
-                color={drinkTypeColors[globalDrinkForm?.drink_type ?? "other"]}
-              /></div>
+              <div className="mt-2">
+                <Badge
+                  label={globalDrinkForm?.drink_type ?? "other"}
+                  color={
+                    drinkTypeColors[globalDrinkForm?.drink_type ?? "other"]
+                  }
+                />
+              </div>
             </div>
             {/* Actions */}
             <div>
-              <DrinkActionOptions setEdit={setEdit} drink={globalDrinkForm} />
+              <DrinkActionOptions
+                setEdit={setEdit}
+                drink={globalDrinkForm}
+                drinkCreator={globalDrinkForm.created_by_user_id}
+              />
             </div>
           </div>
         )}

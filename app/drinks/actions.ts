@@ -3,6 +3,7 @@ import { createSupabaseServerComponentClient } from "@/utils/supabase/server-cli
 import { DrinkSchema, CreateDrinkFields, MutableDrinkFields } from "./models";
 import { getUserSession } from "@/context/Authenticated";
 import { sanitizeInput } from "@/utils/sanitizeInput";
+import getUserSessionOnServer from "@/utils/supabase/getUserSessionServer";
 
 const pg = createSupabaseServerComponentClient();
 
@@ -45,7 +46,8 @@ const getNextFriendlyNumber = (
 };
 
 const createDrink = async (formData: CreateDrinkFields) => {
-  const authenticated = await getUserSession();
+  const authenticated = await getUserSessionOnServer();
+  console.log('authenticated: ', authenticated);
   if (authenticated) {
     const existingDrinks = await getExistingDrinksWithName(formData.name);
     const friendlyNumber = getNextFriendlyNumber(existingDrinks, formData.name);
@@ -165,10 +167,13 @@ const queryDrinks = async (
 const getDrinkByID = async (slug: string): Promise<DrinkSchema> => {
   const { data, error } = await pg
     .from("drinks")
-    .select("*")
+    .select(`
+      *,
+      profiles ( username )
+    `)
     .eq("unique_name", slug)
     .single();
-
+    console.log(data)
   if (error) {
     console.error(`Error querying for unique_name ${slug}`, error);
     throw new Error(`Error querying for unique_name: ${error.message}`);
