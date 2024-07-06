@@ -66,14 +66,14 @@ export const EditIngredient: React.FC<Props> = ({ ingredient }) => {
         value={formatText(form.name || "")}
         onChange={(value: string) => handleChange("name", value)}
         required
-        variant="outlined"
+        variant="standard"
       />
       <DebouncedTextInput
         label="Image URL"
         value={form.image ?? ""}
         onChange={(value: string) => handleChange("image", value || "")}
         multiline
-        variant="outlined"
+        variant="standard"
       />
       <div className="flex items-center justify-end">
         <Button label="Update" type="submit" variant="primary" />

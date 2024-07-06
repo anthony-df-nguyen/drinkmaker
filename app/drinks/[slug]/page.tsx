@@ -43,15 +43,15 @@ const DrinkPageContent: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="pageTitle">{globalDrinkForm.name} </div>
               </div>
-              <div className="text-sm">{globalDrinkForm.description}</div>
-              <Badge
+              <div className="text-sm mt-2">{globalDrinkForm.description}</div>
+              <div className="mt-2"><Badge
                 label={globalDrinkForm?.drink_type ?? "other"}
                 color={drinkTypeColors[globalDrinkForm?.drink_type ?? "other"]}
-              />
+              /></div>
             </div>
             {/* Actions */}
             <div>
-              <DrinkActionOptions setEdit={setEdit} />
+              <DrinkActionOptions setEdit={setEdit} drink={globalDrinkForm} />
             </div>
           </div>
         )}

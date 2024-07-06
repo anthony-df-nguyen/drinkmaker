@@ -35,8 +35,6 @@ export const ListIngredientsProvider: React.FC<
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      console.debug("Fetching ingredients...from context");
-
       try {
         const [ingredientsData, allIngredientData, countData] = await Promise.all([
           queryIngredients(1, 10),

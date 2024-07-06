@@ -46,7 +46,7 @@ const DrinkList: React.FC = () => {
             onChange={(e) => handleSearchTermChange(e)}
             placeholder="Drink Name"
             delay={500}
-            variant="outlined"
+            variant="standard"
           />
         </div>
         <div className="lg:w-[200px]">
@@ -55,6 +55,7 @@ const DrinkList: React.FC = () => {
             options={drinkTypes}
             value={selectDrinkType}
             onChange={(e) => setSelectDrinkType(e)}
+            variant="standard"
           />
         </div>
       </div>
@@ -67,7 +68,8 @@ const DrinkList: React.FC = () => {
               <Card className={"w-full h-full"}>
                 <div className="flex flex-col gap-2 justify-start h-full">
                   <div className="text-base text-gray-900">{drink.name}</div>
-                  <div className="text-sm font-light text-gray-500 flex-1">{drink.description}</div>
+                  <div className="text-sm italic font-light text-gray-500">By: {drink.profiles.username ?? "Unknown Creator"}</div>
+                  <div className="text-sm font-light text-gray-700 flex-1">{drink.description}</div>
                   <div>
                     <Badge label={drink.drink_type} color={color} />
                   </div>

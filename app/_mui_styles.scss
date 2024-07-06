@@ -15,3 +15,10 @@
         border-color: #059669 !important;
     }
 }
+
+.MuiInput-root {
+
+    &::after {
+        border-bottom: 2px solid #059669 !important;
+    }
+}

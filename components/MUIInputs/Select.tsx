@@ -18,6 +18,7 @@ type CustomSelectProps = {
   required?: boolean;
   error?: string;
   variant?: "outlined" | "standard" | "filled";
+  size?: "small" | "medium";
 };
 
 const CustomSelect: React.FC<CustomSelectProps> = ({
@@ -26,7 +27,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   value,
   onChange,
   required,
-  error,variant
+  error,
+  variant,
+  size = "medium",
 }) => {
   const [currentValue, setCurrentValue] = useState<string>(value);
 
@@ -44,7 +47,12 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       error={Boolean(error)}
     >
       <InputLabel>{label}</InputLabel>
-      <Select value={currentValue} onChange={handleChange} label={label} size="small">
+      <Select
+        value={currentValue}
+        onChange={handleChange}
+        label={label}
+        size={size}
+      >
         {options.map((option) => (
           <MenuItem key={option.value} value={option.value}>
             {option.label}

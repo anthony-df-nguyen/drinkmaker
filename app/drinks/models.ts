@@ -11,6 +11,9 @@ export interface DrinkSchema {
   downvotes: number;
   published: boolean;
   drink_type: string;
+  profiles: {
+    username: string | null;
+  }
 }
 
 export interface CreateDrinkFields {

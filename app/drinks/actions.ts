@@ -1,7 +1,7 @@
 "use server";
 import { createSupabaseServerComponentClient } from "@/utils/supabase/server-client";
 import { DrinkSchema, CreateDrinkFields, MutableDrinkFields } from "./models";
-import getUserSession from "@/utils/supabase/isUserAuthed";
+import { getUserSession } from "@/context/Authenticated";
 import { sanitizeInput } from "@/utils/sanitizeInput";
 
 const pg = createSupabaseServerComponentClient();
@@ -53,10 +53,15 @@ const createDrink = async (formData: CreateDrinkFields) => {
       friendlyNumber === 1
         ? sanitizeInput(formData.name)
         : `${sanitizeInput(formData.name)}_${friendlyNumber}`;
-    formData.unique_name = newUniqueName;
+    const postDrink = {
+      ...formData,
+      created_by: authenticated.id,
+      unique_name : newUniqueName,
+    };
+    
 
     try {
-      const { data, error } = await pg.from("drinks").insert([formData]);
+      const { data, error } = await pg.from("drinks").insert(postDrink);
       if (error) {
         throw new Error(error.message || "Drink could not be created");
       }
@@ -109,56 +114,52 @@ const queryDrinks = async (
   searchName?: string,
   drinkType?: string
 ): Promise<{
-  data: DrinkSchema[];
+  data: (DrinkSchema & { username: string })[];
   totalCount: number;
 }> => {
-  // Count query to get total number of drinks matching the criteria
-  let countQuery = pg
-    .schema("public")
-    .from("drinks")
-    .select("*", { count: "exact", head: true });
+  // Calculate the range for pagination
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
 
-  if (searchName) {
-    countQuery = countQuery.ilike("name", `%${searchName}%`);
-  }
-
-  if (drinkType && drinkType !== "all") {
-    countQuery = countQuery.eq("drink_type", drinkType);
-  }
-
-  const countResult = await countQuery;
-
-  if (countResult.error) {
-    console.error("Error getting total count:", countResult.error);
-    throw new Error(`Error getting total count: ${countResult.error.message}`);
-  }
-  const totalCount = countResult.count ?? 0;
-
-  // Main query to fetch drinks with pagination
+  // Construct the query for getting drinks with profiles
   let query = pg
-    .from("drinks")
-    .select("*")
-    .order("name", { ascending: true })
-    .range((page - 1) * limit, page * limit - 1);
+    .from('drinks')
+    .select(`
+      *,
+      profiles ( username )
+    `)
+    .order('name', { ascending: true })
+    .range(from, to);
 
+  // Add filters to the query
   if (searchName) {
-    query = query.ilike("name", `%${searchName}%`);
+    query = query.ilike('name', `%${searchName}%`);
   }
 
-  if (drinkType && drinkType !== "all") {
-    query = query.eq("drink_type", drinkType);
+  if (drinkType && drinkType !== 'all') {
+    query = query.eq('drink_type', drinkType);
   }
 
-  const { data, error } = await query;
+  // Execute the query
+  const { data, error, count } = await query;
+
   if (error) {
-    console.error("Error querying drinks:", error);
+    console.error('Error querying drinks:', error);
     throw new Error(`Error querying drinks: ${error.message}`);
-  } else {
-    return {
-      data,
-      totalCount,
-    };
   }
+
+  // Transform the data to include the username
+  const drinksWithUsername = data.map((drink: any) => ({
+    ...drink,
+    username: drink.profiles?.username || 'Unknown',
+  }));
+
+  const totalCount = count ?? 0;
+
+  return {
+    data: drinksWithUsername,
+    totalCount,
+  };
 };
 
 const getDrinkByID = async (slug: string): Promise<DrinkSchema> => {

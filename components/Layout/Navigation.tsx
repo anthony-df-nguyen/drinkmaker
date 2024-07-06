@@ -11,7 +11,7 @@ import {
   TransitionChild,
 } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import Profile from "./Profile";
+import ProfileMenu from "./ProfileMenu";
 import { usePathname } from "next/navigation";
 
 interface Props {
@@ -187,7 +187,7 @@ export default function Navigation({ children }: Props) {
                 <div className="relative flex flex-1"></div>
                 <div className="flex items-center gap-x-4 lg:gap-x-6">
                   {/* Profile Dropdown here */}
-                  <Profile />
+                  <ProfileMenu />
                 </div>
               </div>
             </div>

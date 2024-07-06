@@ -1,4 +1,4 @@
-import { TextField, TextFieldProps, FormHelperText } from "@mui/material";
+import { TextField, TextFieldProps, FormControl, FormHelperText } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import useDebounce from "@/hooks/useDebounce";
@@ -11,6 +11,7 @@ type DebouncedTextInputProps<T extends string | number> = {
   helperText?: string;
   errorText?: string;
   error?: boolean;
+  // size? : "small" | "medium" ;
 } & Omit<TextFieldProps, "onChange" | "value">;
 
 const DebouncedTextInput = <T extends string | number>({
@@ -51,19 +52,23 @@ const DebouncedTextInput = <T extends string | number>({
   }, [value]);
 
   return (
-    <TextField
-      value={inputValue}
-      onChange={handleInputChange}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-      type="text"
-      variant="filled"
-      fullWidth
-      error={error}
-      helperText={error ? errorText : helperText}
-      size="small"
-      {...props}
-    />
+    <div>
+      {" "}
+      <TextField
+        value={inputValue}
+        onChange={handleInputChange}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        type="text"
+        variant="filled"
+        fullWidth
+        error={error}
+        helperText={error ? errorText : helperText}
+        // size={size}
+        {...props}
+      />
+     
+    </div>
   );
 };
 

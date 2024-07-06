@@ -1,14 +1,15 @@
 "use client";
-import { DrinkSchema } from "../models";
+import { GlobalDrinkForm } from "../[slug]/context";
 import { useAuthenticatedContext } from "@/context/Authenticated";
 import { formatText } from "@/utils/formatText";
 import { enqueueSnackbar } from "notistack";
 import { deleteDrink } from "../actions";
 import { useModal } from "@/context/ModalContext";
-import { setTimeout } from "timers";
+import MartiniLoader from "@/components/UI/Loading";
+import Button from "@/components/UI/Button";
 
 interface Props {
-  drink: DrinkSchema;
+  drink: GlobalDrinkForm;
   afterDelete: () => void;
 }
 
@@ -22,16 +23,21 @@ export const DeleteForm: React.FC<Props> = ({ drink, afterDelete }) => {
    */
   const handleDelete = async (e: React.FormEvent) => {
     e.preventDefault();
+    hideModal();
+
     if (user?.id) {
       try {
         await deleteDrink(drink.id);
-        enqueueSnackbar("Ingredient deleted successfully", {
+        enqueueSnackbar("Deleted", {
           variant: "success",
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center",
+          }
         });
-        hideModal();
         setTimeout(() => {
-          afterDelete();
-        }, 3000);
+          afterDelete()
+        }, 2000);
       } catch (error) {
         enqueueSnackbar("Cannot delete ingredient", {
           variant: "error",
@@ -53,12 +59,7 @@ export const DeleteForm: React.FC<Props> = ({ drink, afterDelete }) => {
         <span className="font-bold">{formatText(drink.name)}?</span>
       </div>
       <div className="flex items-center justify-end">
-        <button
-          type="submit"
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        >
-          Delete
-        </button>
+        <Button type="submit" label="Delete" variant="delete" />
       </div>
     </form>
   );

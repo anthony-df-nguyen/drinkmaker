@@ -1,36 +1,81 @@
 "use client";
-import React, { createContext, useContext, useState, ReactNode, useEffect, useMemo } from "react";
-import { createSupabaseBrowserClient } from "@/utils/supabase/browser-client";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 import { User } from "@supabase/supabase-js";
+import { createSupabaseBrowserClient } from "@/utils/supabase/browser-client";
+
+export type FinalUserObject = User & { username: string };
 
 interface AuthenticatedContextProps {
-  session: boolean;
-  user: User | null;
-  setSession: (session: boolean) => void;
-  setUser: (user: User | null) => void;
+  user: FinalUserObject | null;
+  setUser: (user: FinalUserObject | null) => void;
 }
 
-const supabase = createSupabaseBrowserClient();
+const pg = createSupabaseBrowserClient();
 
 // Create the context with a default value
-const AuthenticatedContext = createContext<AuthenticatedContextProps | undefined>(undefined);
+const AuthenticatedContext = createContext<
+  AuthenticatedContextProps | undefined
+>(undefined);
 
 interface AuthenticatedProviderProps {
   children: ReactNode;
 }
 
-export const AuthenticatedProvider: React.FC<AuthenticatedProviderProps> = ({ children }) => {
-  const [session, setSession] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(null);
+export const getUserName = async (userId: string): Promise<string> => {
+  const { data, error } = await pg
+    .from("profiles")
+    .select("username")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data.username;
+};
+
+export const getUserSession = async (): Promise<FinalUserObject | null> => {
+  try {
+    const {
+      data: { user },
+      error: authError,
+    } = await pg.auth.getUser();
+
+    if (authError) {
+      throw new Error(authError.message);
+    }
+
+    if (!user) {
+      return null;
+    }
+
+    const username = await getUserName(user.id);
+    return { ...user, username } as FinalUserObject;
+  } catch (error) {
+    console.error("Error getting user session:", error);
+    return null;
+  }
+};
+
+export const AuthenticatedProvider: React.FC<AuthenticatedProviderProps> = ({
+  children,
+}) => {
+  const [user, setUser] = useState<FinalUserObject | null>(null);
 
   const checkAuth = async () => {
-    const { data, error } = await supabase.auth.getUser();
-    if (error) {
-      setSession(false);
+    try {
+      const user = await getUserSession();
+      setUser(user);
+    } catch (error) {
       setUser(null);
-    } else {
-      setSession(true);
-      setUser(data.user);
+      console.error("Error checking authentication: ", error);
     }
   };
 
@@ -39,7 +84,7 @@ export const AuthenticatedProvider: React.FC<AuthenticatedProviderProps> = ({ ch
   }, []);
 
   return (
-    <AuthenticatedContext.Provider value={{ session, user, setSession, setUser }}>
+    <AuthenticatedContext.Provider value={{ user, setUser }}>
       {children}
     </AuthenticatedContext.Provider>
   );
@@ -49,7 +94,9 @@ export const AuthenticatedProvider: React.FC<AuthenticatedProviderProps> = ({ ch
 export const useAuthenticatedContext = (): AuthenticatedContextProps => {
   const context = useContext(AuthenticatedContext);
   if (!context) {
-    throw new Error("useAuthenticatedContext must be used within an AuthenticatedProvider");
+    throw new Error(
+      "useAuthenticatedContext must be used within an AuthenticatedProvider"
+    );
   }
   return context;
 };

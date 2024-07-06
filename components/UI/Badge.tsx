@@ -10,7 +10,7 @@ const Badge: React.FC<BadgeProps> = ({ label, color, ...props }) => {
   return (
     <span
       className={classNames(
-        "inline-flex items-center rounded-md px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10",
+        "inline-flex items-center rounded-md px-2 py-1 text-xs  text-gray-600 ring-1 ring-inset ring-gray-500/10",
         color
       )}
     >

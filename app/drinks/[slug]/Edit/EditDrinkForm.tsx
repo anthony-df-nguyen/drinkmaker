@@ -80,24 +80,30 @@ export default function EditDrinkForm({ setEdit }: Props) {
 
   return (
     <form onSubmit={handleFormSubmit}>
-      <Card className="grid gap-8">
-        <div className="pageTitle">Drink Details</div>
+      <Card className="grid p-2 lg:p-8 gap-4 lg:gap-8">
+        <div className="text-lg text-emerald-600 font-bold">Drink Details</div>
         <DebouncedTextInput
           label="Name"
           value={liveFormState.name}
           onChange={(value) => handleChange("name", value || "")}
           required
-          variant="filled"
+          variant="outlined"
+          errorText="Name is required"
+          error={!liveFormState.name}
           delay={500}
+          size="small"
         />
         <DebouncedTextInput
           label="Description"
           value={liveFormState.description}
           onChange={(value) => handleChange("description", value || "")}
-          variant="filled"
+          variant="outlined"
+          errorText="Description is too long"
+          error={liveFormState.description.length > 250}
           delay={500}
           multiline
           minRows={3}
+          size="small"
         />
         <CustomSelect
           label="Drink Type"
@@ -105,12 +111,13 @@ export default function EditDrinkForm({ setEdit }: Props) {
           options={drinkTypes.filter((row) => row.value !== "all")}
           value={liveFormState.drink_type}
           onChange={(value) => handleChange("drink_type", value)}
-          variant="filled"
+          variant="outlined"
+          size="small"
         />
         {/* Ingredients */}
-        <h2 className="pageTitle">Ingredients</h2>
-        <div className="border p-8 rounded-lg">
-          <div className="font-semibold mb-8">
+        <h2 className="text-lg text-emerald-600 font-bold">Ingredients</h2>
+        <div className="">
+          <div className="font-semibold text-sm mb-4">
             Step 1: Add or remove ingredients
           </div>
           <Tags
@@ -123,13 +130,13 @@ export default function EditDrinkForm({ setEdit }: Props) {
             placeholder="Select ingredients"
             onChange={handleTagsChange}
           />
-          <div className="font-semibold mt-8">
+          <div className="font-semibold text-sm mt-8">
             Step 2: Manage Ingredient Details
           </div>
-          <div className="mt-4 lg:grid lg:grid-cols-3 gap-4">
+          <div className="mt-4 lg:grid lg:grid-cols-3">
             {liveFormState.ingredients.map((ingredient, index) => (
-              <div key={index} className="">
-                <div className="font-md tracking-wide">
+              <div key={index} className="px-2 lg:px-4">
+                <div className="text-sm text-gray-700">
                   {selectedTags.find(
                     (tag) => tag.value === ingredient.ingredient_id
                   )?.label || ""}
@@ -143,7 +150,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
                     }
                     required
                     helperText="Enter a number"
-                    variant="filled"
+                    variant="outlined"
                     min={0}
                   />
                   <CustomSelect
@@ -153,7 +160,8 @@ export default function EditDrinkForm({ setEdit }: Props) {
                       handleChangeUnitOrQuantity(value, index, "unit")
                     }
                     options={measuringUnits}
-                    variant="filled"
+                    variant="outlined"
+                    size="small"
                   />
                 </div>
               </div>
@@ -161,7 +169,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
           </div>
         </div>
 
-        <div className="pageTitle">Instructions</div>
+        <div className="text-lg text-emerald-600 font-bold">Instructions</div>
         <Editor
           initialContent={globalDrinkForm.instructions}
           onChangeHandler={(content) => {

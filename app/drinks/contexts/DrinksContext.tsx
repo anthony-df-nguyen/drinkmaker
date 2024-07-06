@@ -29,7 +29,6 @@ import React, {
   
     useEffect(() => {
       const fetchInitialData = async () => {
-        console.log("Initial fetch of drinks on mount");
         try {
           const [drinksData, totalCount] = await Promise.all([
             queryDrinks(1, 10, undefined, undefined),
