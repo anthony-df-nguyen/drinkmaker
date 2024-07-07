@@ -36,7 +36,7 @@ const DrinkPageContent: React.FC = () => {
 
   return (
     <main>
-      <div className="grid gap-8 max-w-[1200px] w-full mx-auto border p-4 sm:p-8 rounded-md shadow bg-white  dark:bg-stone-950 dark:border-stone-900">
+      <div className="grid gap-8 max-w-[860px] w-full mx-auto border p-4 sm:p-8 rounded-md shadow-sm bg-white  dark:bg-stone-950 dark:border-stone-900">
         {/* Read Only */}
         {!edit && (
           <div className="flex items-start gap-2">

@@ -55,7 +55,7 @@ const ReadView: React.FC = ({}) => {
               >
                 <span className="sr-only">Previous</span>-
               </button>
-              <div className="relative -ml-px inline-flex items-center text-sm  bg-white dark:bg-stone-950 px-2 py-2 text-gray-600 dark:text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-stone-800 dark:ring-1 hover:bg-gray-50 focus:z-10">
+              <div className="relative -ml-px inline-flex items-center text-sm  bg-white dark:bg-black px-2 py-2 text-gray-600 dark:text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-stone-800 dark:ring-1 hover:bg-gray-50 focus:z-10">
                 {multiplier} Servings
               </div>
               <button

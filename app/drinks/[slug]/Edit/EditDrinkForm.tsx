@@ -80,7 +80,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
 
   return (
     <form onSubmit={handleFormSubmit}>
-      <div className="grid p-2 lg:p-8 gap-4 lg:gap-8">
+      <div className="grid p-2 gap-4 lg:gap-8">
         <div className="text-lg text-emerald-600 font-bold">Drink Details</div>
         <DebouncedTextInput
           label="Name"

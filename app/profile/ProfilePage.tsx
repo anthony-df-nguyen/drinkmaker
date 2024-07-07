@@ -1,10 +1,15 @@
 import { PaperClipIcon } from "@heroicons/react/20/solid";
+import DisplayName from "./DisplayName";
 import { useAuthenticatedContext } from "@/context/Authenticated";
+import React from "react";
 
 export default function ProfilePage() {
   const { user } = useAuthenticatedContext();
-  const items = [
-    { name: "Display Name", value: user?.username },
+  const items: {
+    name: string;
+    value: string | undefined | React.ReactNode
+  }[] = [
+    { name: "Display Name", value: <DisplayName /> },
     { name: "Email", value: user?.email },
     { name: "Authenticated With", value: user?.app_metadata.provider },
     {

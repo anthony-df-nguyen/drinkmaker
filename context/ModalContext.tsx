@@ -84,7 +84,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
       {children}
       {modalContent && (
         <div className="fixed inset-0 bg-black  bg-opacity-70 dark:bg-opacity-80 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-black dark:ring-1 dark:ring-stone-500 p-8 rounded-lg shadow-lg relative">
+          <div className="bg-white dark:bg-black dark:ring-1 dark:ring-stone-700 p-8 rounded-lg shadow-lg relative">
             {modalContent}
             <div
               onClick={hideModal}
