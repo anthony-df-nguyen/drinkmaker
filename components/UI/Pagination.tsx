@@ -50,14 +50,14 @@ const Pagination: React.FC<PaginationProps> = ({
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+          className="relative inline-flex items-center rounded-md bg-white dark:bg-stone-950 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-400 ring-1 dark:ring-0 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
         >
           Previous
         </button>
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+          className="relative ml-3 inline-flex items-center rounded-md bg-white dark:bg-stone-950 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-400 ring-1 dark:ring-0 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
         >
           Next
         </button>

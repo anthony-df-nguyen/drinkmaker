@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { User } from "@supabase/supabase-js";
 import { createSupabaseBrowserClient } from "@/utils/supabase/browser-client";
+import { useTheme } from "next-themes";
 
 export type FinalUserObject = User & { username: string };
 

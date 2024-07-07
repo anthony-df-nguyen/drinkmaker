@@ -16,24 +16,24 @@ export default function ProfilePage() {
     { name: "User ID", value: user?.id },
   ];
   return (
-    <div className="overflow-hidden bg-white shadow rounded-lg max-w-[800px] mx-auto">
-      <div className="px-4 py-4 sm:px-6 flex items-center gap-2">
-        <h3 className="text-base font-semibold leading-7 text-gray-900">
-          User Information
+    <div className="overflow-hidden  shadow rounded-lg max-w-[800px] mx-auto">
+      <div className="px-4 py-4 sm:px-6 flex items-center gap-2 bg-white  dark:bg-stone-950">
+        <h3 className="text-base font-semibold leading-7 text-gray-900 dark:text-white">
+          My Profile
         </h3>
       </div>
-      <div className="border-t border-gray-100">
-        <dl className="divide-y divide-gray-100">
+      <div className="border-t bg-white dark:bg-stone-900 border-gray-100 dark:border-black">
+        <dl className="divide-y bg-white dark:bg-stone-900 divide-gray-100 dark:divide-black">
           {items.map((item) => {
             return (
               <div
                 key={item.name}
-                className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
               >
-                <dt className="text-sm font-medium text-gray-900">
+                <dt className="text-sm font-medium text-gray-900 dark:text-white">
                   {item.name}
                 </dt>
-                <dd className="mt-1 text-sm font-medium leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                <dd className="text-sm font-light leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
                   {item.value}
                 </dd>
               </div>

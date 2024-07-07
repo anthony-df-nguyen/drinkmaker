@@ -32,7 +32,7 @@ const DrinkInstructions: React.FC = () => {
     <div className="w-full grid gap-4">
       <div className="flex justify-between w-full">
         <div className="grid items-center gap-4">
-          <div className="pageTitle mb-2">Instructions</div>
+          <div className="text-xl mb-2">Instructions</div>
         </div>
       </div>{" "}
       <ViewOnlyQuill initialContent={firstLoadContent} />

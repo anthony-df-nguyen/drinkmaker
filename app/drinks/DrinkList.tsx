@@ -44,7 +44,8 @@ const DrinkList: React.FC = () => {
             onChange={(e) => handleSearchTermChange(e)}
             placeholder="Drink Name"
             delay={500}
-            variant="standard"
+            variant="outlined"
+            size="small"
           />
         </div>
         <div className="lg:w-[200px]">
@@ -53,23 +54,24 @@ const DrinkList: React.FC = () => {
             options={drinkTypes}
             value={selectDrinkType}
             onChange={(e) => setSelectDrinkType(e)}
-            variant="standard"
+            variant="outlined"
+            size="small"
           />
         </div>
       </div>
       {/* Grid/Results */}
-      <div className="grid gap-4 xl:grid-cols-3 max-h-[55vh] overflow-y-scroll no-scrollbar">
+      <div className="grid gap-4 xl:grid-cols-1 max-h-[55vh] overflow-y-scroll no-scrollbar">
         {drinksList.map((drink) => {
           const color = drinkTypeColors[drink.drink_type];
           return (
             <Link key={drink.unique_name} href={`/drinks/${drink.unique_name}`}>
-              <Card className={"w-full h-full"}>
+              <Card className="w-full h-full">
                 <div className="flex flex-col gap-2 justify-start h-full">
-                  <div className="text-base text-gray-900">{drink.name}</div>
+                  <div className="text-base text-gray-900 dark:text-gray-400">{drink.name}</div>
                   <div className="text-sm italic font-light text-gray-500">
                     By: {drink.profiles.username ?? "Unknown Creator"}
                   </div>
-                  <div className="text-sm font-light text-gray-700 flex-1">
+                  <div className="text-sm font-light text-gray-700 dark:text-gray-400 flex-1">
                     {drink.description}
                   </div>
                   <div>

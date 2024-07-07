@@ -11,6 +11,7 @@ import {
   TransitionChild,
 } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import ThemeToggle from "./ThemeToggle";
 import ProfileMenu from "./ProfileMenu";
 import { usePathname } from "next/navigation";
 
@@ -30,6 +31,7 @@ export default function Navigation({ children }: Props) {
         }}
       >
         <div>
+          {/* Side Nav */}
           <Transition show={sidebarOpen}>
             <Dialog
               className="relative z-50 lg:hidden"
@@ -43,7 +45,7 @@ export default function Navigation({ children }: Props) {
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
               >
-                <div className="fixed inset-0 bg-gray-900/80" />
+                <div className="fixed inset-0 bg-stone-900/90" />
               </TransitionChild>
 
               <div className="fixed inset-0 flex">
@@ -79,7 +81,7 @@ export default function Navigation({ children }: Props) {
                       </div>
                     </TransitionChild>
                     {/* Sidebar component, swap this element with another sidebar if you like */}
-                    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-emerald-600 px-6 pb-4">
+                    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-emerald-600 dark:bg-black px-6 pb-4">
                       <div className="flex h-16 shrink-0 items-center">
                         <img
                           className="h-8 w-auto"
@@ -109,6 +111,7 @@ export default function Navigation({ children }: Props) {
                             </ul>
                           </li>
                         </ul>
+                        <div className="flex items-center gap-2 justify-center mb-4"> <div className="text-white dark:text-gray-400 font-semibold">Theme: </div><ThemeToggle /></div>
                       </nav>
                     </div>
                   </DialogPanel>
@@ -117,45 +120,12 @@ export default function Navigation({ children }: Props) {
             </Dialog>
           </Transition>
 
-          {/* Static sidebar for desktop */}
-          {/* <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-            <div className=" flex grow flex-col gap-y-5 overflow-y-auto bg-emerald-600 px-6 pb-4">
-              <div className="flex h-16 shrink-0 items-center">
-                <img
-                  className="h-8 w-auto"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=white"
-                  alt="Your Company"
-                />
-              </div>
-              <nav className="flex flex-1 flex-col">
-                <ul role="list" className="flex flex-1 flex-col gap-y-7">
-                  <li>
-                    <ul role="list" className="-mx-2 space-y-1">
-                      {links.map((item) => (
-                        <li key={item.name}>
-                          <Link
-                            href={item.href}
-                            className={classNames(
-                              "text-white group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
-                            )}
-                          >
-                            {item.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
-                </ul>
-              </nav>
-            </div>
-          </div> */}
-
           {/* Top header bar */}
           <div className="">
-            <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+            <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 dark:border-stone-900 bg-white dark:bg-black px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
               <button
                 type="button"
-                className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
+                className="-m-2.5 p-2.5 text-gray-700 dark:text-white lg:hidden"
                 onClick={() => setSidebarOpen(true)}
               >
                 <span className="sr-only">Open sidebar</span>
@@ -166,27 +136,32 @@ export default function Navigation({ children }: Props) {
                 className="h-6 w-px bg-gray-900/10 lg:hidden"
                 aria-hidden="true"
               />
-              <div className="h-16 shrink-0 items-center hidden lg:flex text-xl font-bold wider text-emerald-600">
+              <div className="h-16 shrink-0 items-center hidden lg:flex text-xl font-bold wider text-emerald-600 tracking-widest">
                 DRINKMAKER
-                {/* <img
-                  className="h-8 w-auto"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=red"
-                  alt="Your Company"
-                /> */}
               </div>
               {/* Links */}
               <div className="ml-8 hidden lg:flex gap-8">
                 {links.map((row) => (
-                  <Link key={row.name} href={row.href} className={classNames("text-base", pathname === row.href ? "font-semibold text-emerald-600" : "font-light text-slate-600")}>
+                  <Link
+                    key={row.name}
+                    href={row.href}
+                    className={classNames(
+                      "text-base",
+                      pathname === row.href
+                        ? "font-semibold text-emerald-600"
+                        : "font-light text-slate-600 dark:text-gray-400"
+                    )}
+                  >
                     {row.name}
                   </Link>
                 ))}
               </div>
 
-              <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+              <div className="flex flex-1 gap-x-4 self-stretch  items-center">
                 <div className="relative flex flex-1"></div>
-                <div className="flex items-center gap-x-4 lg:gap-x-6">
-                  {/* Profile Dropdown here */}
+         
+                <div className="flex items-center gap-x-4 ">
+                  <div className="mt-[5px] hidden sm:block"><ThemeToggle /></div>
                   <ProfileMenu />
                 </div>
               </div>

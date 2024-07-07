@@ -1,0 +1,55 @@
+/* Quill Stuff */
+.noBorder {
+    @apply border-none
+  }
+  
+  #viewOnlyQuill {
+    @apply text-sm
+  }
+  
+  #editQuill {
+    .ql-editor {
+      @apply h-[300px] lg:h-[300px] dark:bg-stone-900
+    }
+    .ql-toolbar {
+      @apply dark:bg-stone-950 dark:border-none
+    }
+    .ql-container {
+      @apply dark:border-none
+    }
+    .ql-active, .ql-stroke, svg {
+      @apply dark:text-emerald-600
+    }
+  }
+  .ql-editor li  {
+    margin-left: -2em !important;
+  }
+  
+  .hide-ql-container {
+    display: none;
+  }
+  
+  .controls {
+    display   : flex;
+    border    : 1px solid #ccc;
+    border-top: 0;
+    padding   : 10px;
+  }
+  
+  .controls-right {
+    margin-left: auto;
+  }
+  
+  .state {
+    margin     : 10px 0;
+    font-family: monospace;
+  }
+  
+  .state-title {
+    color         : #999;
+    text-transform: uppercase;
+  }
+  
+  .ql-tooltip {
+    z-index: 999 !important;
+  }

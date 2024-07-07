@@ -80,7 +80,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
 
   return (
     <form onSubmit={handleFormSubmit}>
-      <Card className="grid p-2 lg:p-8 gap-4 lg:gap-8">
+      <div className="grid p-2 lg:p-8 gap-4 lg:gap-8">
         <div className="text-lg text-emerald-600 font-bold">Drink Details</div>
         <DebouncedTextInput
           label="Name"
@@ -130,13 +130,15 @@ export default function EditDrinkForm({ setEdit }: Props) {
             placeholder="Select ingredients"
             onChange={handleTagsChange}
           />
-          <div className="font-semibold text-sm mt-8">
-            Step 2: Manage Ingredient Details
-          </div>
-          <div className="mt-4 lg:grid lg:grid-cols-3">
+          {selectedTags.length > 0 && (
+            <div className="font-semibold text-sm mt-8">
+              Step 2: Manage Ingredient Details
+            </div>
+          )}
+          <div className="mt-4 lg:grid lg:grid-cols-2">
             {liveFormState.ingredients.map((ingredient, index) => (
               <div key={index} className="px-2 lg:px-4">
-                <div className="text-sm text-gray-700">
+                <div className="text-sm text-gray-700 dark:text-gray-400">
                   {selectedTags.find(
                     (tag) => tag.value === ingredient.ingredient_id
                   )?.label || ""}
@@ -149,7 +151,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
                       handleChangeUnitOrQuantity(value, index, "quantity")
                     }
                     required
-                    helperText="Enter a number"
+                    //helperText="Enter a number"
                     variant="outlined"
                     min={0}
                   />
@@ -176,7 +178,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
             setQuillEditorContent(content);
           }}
         />
-      </Card>
+      </div>
       <div className="flex gap-2 justify-end mt-4">
         <Button
           label="Cancel"

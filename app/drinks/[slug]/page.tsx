@@ -31,20 +31,19 @@ const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
 const DrinkPageContent: React.FC = () => {
   const { globalDrinkForm, loading, error } = useGlobalDrinkForm();
   const [edit, setEdit] = useState<boolean>(false);
-
   if (loading) return <MartiniLoader />;
   if (error) return <div>Error: {error}</div>;
 
   return (
     <main>
-      <div className="grid gap-8 max-w-[1200px] w-full mx-auto">
+      <div className="grid gap-8 max-w-[1200px] w-full mx-auto border p-4 sm:p-8 rounded-md shadow bg-white  dark:bg-stone-950 dark:border-stone-900">
         {/* Read Only */}
         {!edit && (
           <div className="flex items-start gap-2">
             {/* Content */}
             <div className="w-full">
               <div className="flex items-center justify-between">
-                <div className="pageTitle">{globalDrinkForm.name} </div>
+                <div className="text-2xl font-bold text-emerald-600 ">{globalDrinkForm.name} </div>
               </div>
               <div className="text-sm mt-2 italic">
                 By: {globalDrinkForm.created_by_user}

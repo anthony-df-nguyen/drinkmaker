@@ -84,6 +84,7 @@ const CreateForm = () => {
           errorText="Too many characters"
           required
           variant="outlined"
+          size="small"
         />
         <Select
           label="Drink Type"
@@ -91,6 +92,7 @@ const CreateForm = () => {
           options={drinkTypes.filter((row) => row.value !== "all")}
           value={form.drink_type}
           onChange={(value: string) => handleChange("drink_type", value)}
+          size="small"
         />
         <DebouncedTextInput
           label="Description"
@@ -102,6 +104,7 @@ const CreateForm = () => {
           delay={50}
           minRows={3}
           variant="outlined"
+          size="small"
         />
       </div>
 

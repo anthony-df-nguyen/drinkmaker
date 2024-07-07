@@ -44,12 +44,12 @@ const ViewOnlyQuill: React.FC<EditorProps> = ({ initialContent }) => {
   }, [quill, initialContent]);
 
   return (
-    <Card className="">
+    <div className="dark:bg-black border dark:border-0 rounded-md p-2 sm:p-4">
       <div className="w-auto" id="viewOnlyQuill">
         {!initialContent && <div>No instructions written.</div>}
         <div ref={quillRef} />
       </div>
-    </Card>
+    </div>
   );
 };
 

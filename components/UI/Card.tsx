@@ -36,7 +36,7 @@ export default function Card({ children, className = "", onClick }: Props) {
     <div
       onClick={onClick}
       className={classNames(
-        "relative rounded-md bg-white p-4 shadow focus-visible:outline-offset-0",
+        "relative rounded-md bg-white dark:bg-stone-900 p-4 shadow-sm focus-visible:outline-offset-0",
         className
       )}
     >

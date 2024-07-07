@@ -11,9 +11,9 @@ type ButtonProps = {
 
 const variantClasses = {
   primary: "bg-emerald-600 hover:bg-emerald-500 focus-visible:outline-emerald-600",
-  cancel: "bg-gray-600 hover:bg-gray-500 focus-visible:outline-gray-600",
+  cancel: "bg-gray-600 dark:bg-stone-900 hover:bg-gray-500 focus-visible:outline-gray-600",
   delete: "bg-red-600 hover:bg-red-500 focus-visible:outline-red-600",
-  info: "bg-gray-400 focus-visible:outline-gray-300 hover:bg-gray-400",
+  info: "bg-gray-400 dark:bg-stone-600 focus-visible:outline-gray-300 hover:bg-gray-400",
 };
 
 const Button: React.FC<ButtonProps> = ({ label, onClick, disabled, type, variant }) => {

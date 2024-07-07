@@ -59,7 +59,7 @@ const Tags: React.FC<TagProps> = ({
         onChange={onTagChange}
         size="medium"
         renderInput={(params) => (
-          <TextField {...params} label={label} placeholder={placeholder} variant="standard" />
+          <TextField {...params} label={label} placeholder={placeholder} variant="outlined" size="small" />
         )}
       />
     </Stack>

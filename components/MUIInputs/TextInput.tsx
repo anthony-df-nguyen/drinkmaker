@@ -52,7 +52,7 @@ const DebouncedTextInput = <T extends string | number>({
   }, [value]);
 
   return (
-    <div>
+    <div className="dark:text-gray-300">
       {" "}
       <TextField
         value={inputValue}

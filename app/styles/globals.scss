@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "./mui_styles.scss";
+@import "./quill_styles.scss";
+
+:root {
+  --foreground-rgb      : 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb  : 255, 255, 255;
+  font-size             : 14px;
+}
+
+// @media (prefers-color-scheme: dark) {
+//   :root {
+//     --foreground-rgb      : 255, 255, 255;
+//     --background-start-rgb: 0, 0, 0;
+//     --background-end-rgb  : 0, 0, 0;
+//   }
+// }
+
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width   : none;
+    /* Firefox */
+  }
+}
+
+.no-scroll {
+  overflow: hidden;
+}
+
+.pageTitle {
+  @apply text-2xl font-semibold text-emerald-600
+}
+
+/* Input Text Counter */
+.inputLimit {
+  @apply text-xs;
+}
+
+
+
+// Martini Loading
+.martini-loader {
+  @apply flex justify-center items-center w-screen h-screen fixed top-0 left-0 bg-white/40 dark:bg-stone-900/40 z-[9999]
+}
+
+.loader-content {
+  text-align: center;
+}
