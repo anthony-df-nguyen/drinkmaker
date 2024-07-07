@@ -24,7 +24,7 @@ export default function RootLayout({
         <script src="https://accounts.google.com/gsi/client" async></script>
       </head>
 
-      <body className="h-full bg-gray-100 dark:bg-black dark:text-gray-400">
+      <body className="h-full bg-gray-100 dark:bg-stone-900 dark:text-gray-400">
         <AuthenticatedProvider>
           <ModalProvider>
             <ThemeProvider attribute="class">{children}</ThemeProvider>

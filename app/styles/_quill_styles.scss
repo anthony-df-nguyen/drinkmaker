@@ -4,15 +4,15 @@
   }
   
   #viewOnlyQuill {
-    @apply text-sm
+    @apply text-sm dark:text-gray-300
   }
   
   #editQuill {
     .ql-editor {
-      @apply h-[300px] lg:h-[300px] dark:bg-stone-900
+      @apply h-[300px] lg:h-[300px] dark:bg-stone-700
     }
     .ql-toolbar {
-      @apply dark:bg-stone-950 dark:border-none
+      @apply dark:bg-stone-900 dark:border-none 
     }
     .ql-container {
       @apply dark:border-none

@@ -56,7 +56,7 @@ const CreateForm = () => {
     try {
       await createDrink({ ...form });
       hideModal();
-      router.push(`/drinks/${form.unique_name}`);
+      router.push(`/drinks/${form.unique_name}?edit=true`);
     } catch (error: Error | any) {
       console.error(error.message);
       enqueueSnackbar(error.message, {
@@ -83,7 +83,7 @@ const CreateForm = () => {
           error={form.name.length > maxNameLength}
           errorText="Too many characters"
           required
-          variant="outlined"
+          variant="filled"
           size="small"
         />
         <Select
@@ -93,6 +93,7 @@ const CreateForm = () => {
           value={form.drink_type}
           onChange={(value: string) => handleChange("drink_type", value)}
           size="small"
+          variant="filled"
         />
         <DebouncedTextInput
           label="Description"
@@ -103,7 +104,7 @@ const CreateForm = () => {
           multiline
           delay={50}
           minRows={3}
-          variant="outlined"
+          variant="filled"
           size="small"
         />
       </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Switch } from "@headlessui/react";
-import { MoonIcon, SunIcon } from "@heroicons/react/20/solid";
+import { MoonIcon, SunIcon } from "@heroicons/react/20/solid";;
 import { useTheme } from "next-themes";
 
 export default function ThemeToggle() {
@@ -22,7 +22,7 @@ export default function ThemeToggle() {
     <Switch
       checked={enabled}
       onChange={handleChange}
-      className="group relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-emerald-600 focus:ring-offset-2 data-[checked]:bg-stone-700"
+      className="group relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-stone-700 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-emerald-600 focus:ring-offset-2 data-[checked]:bg-stone-700"
     >
       <span className="sr-only">Use setting</span>
       <span className="pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white dark:bg-emerald-600 shadow ring-0 transition duration-200 ease-in-out group-data-[checked]:translate-x-5">
@@ -38,7 +38,7 @@ export default function ThemeToggle() {
           className="absolute inset-0 flex h-full w-full items-center justify-center opacity-0 transition-opacity duration-100 ease-out group-data-[checked]:opacity-100 group-data-[checked]:duration-200 group-data-[checked]:ease-in"
         >
           {/* On Toggle */}
-          <MoonIcon className="text-white" />
+          <MoonIcon className="text-gray-200" />
         </span>
       </span>
     </Switch>

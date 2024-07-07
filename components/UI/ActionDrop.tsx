@@ -28,7 +28,7 @@ export const CustomMenuItem: React.FC<MenuItemProps> = ({
         <a
           href={!disabled ? href : undefined}
           className={`group flex items-center px-4 py-2 text-sm text-gray-700 ${
-            active ? "bg-gray-100 dark:bg-stone-900 text-gray-900 dark:text-gray-400" : ""
+            active ? "bg-gray-100 dark:bg-stone-800 text-gray-900 dark:text-gray-400" : ""
           } ${disabled ? "cursor-not-allowed opacity-50" : ""}`}
         >
           <Icon
@@ -64,10 +64,10 @@ const ActionDrop: React.FC<ActionDropProps> = ({ label, children }) => {
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div>
-        <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white dark:bg-black px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-stone-800 hover:bg-gray-50">
+        <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white dark:bg-stone-900 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-stone-700 hover:bg-gray-50">
           <div className="flex items-center">
-            <div className="hidden sm:block text-gray-900 dark:text-gray-400">{label}</div>
-            <div className="h-5 w-5 text-gray-900 dark:text-gray-400">
+            <div className="hidden sm:block text-gray-900 dark:text-gray-300 mr-2">{label}</div>
+            <div className="h-5 w-5 text-gray-900 dark:text-gray-300">
               <EllipsisVerticalIcon />
             </div>
             {/* <ChevronDownIcon

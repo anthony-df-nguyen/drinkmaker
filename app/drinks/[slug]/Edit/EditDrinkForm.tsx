@@ -87,7 +87,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
           value={liveFormState.name}
           onChange={(value) => handleChange("name", value || "")}
           required
-          variant="outlined"
+          variant="filled"
           errorText="Name is required"
           error={!liveFormState.name}
           delay={500}
@@ -97,7 +97,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
           label="Description"
           value={liveFormState.description}
           onChange={(value) => handleChange("description", value || "")}
-          variant="outlined"
+          variant="filled"
           errorText="Description is too long"
           error={liveFormState.description.length > 250}
           delay={500}
@@ -111,7 +111,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
           options={drinkTypes.filter((row) => row.value !== "all")}
           value={liveFormState.drink_type}
           onChange={(value) => handleChange("drink_type", value)}
-          variant="outlined"
+          variant="filled"
           size="small"
         />
         {/* Ingredients */}
@@ -152,7 +152,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
                     }
                     required
                     //helperText="Enter a number"
-                    variant="outlined"
+                    variant="filled"
                     min={0}
                   />
                   <CustomSelect
@@ -162,7 +162,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
                       handleChangeUnitOrQuantity(value, index, "unit")
                     }
                     options={measuringUnits}
-                    variant="outlined"
+                    variant="filled"
                     size="small"
                   />
                 </div>

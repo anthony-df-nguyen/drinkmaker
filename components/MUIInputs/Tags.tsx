@@ -52,6 +52,9 @@ const Tags: React.FC<TagProps> = ({
         multiple
         id="tags-outlined"
         options={options}
+        selectOnFocus
+        clearOnBlur
+        handleHomeEndKeys
         getOptionLabel={(option) => option.label}
         value={selectedTags}
         isOptionEqualToValue={(option, value) => option.value === value.value}
@@ -59,7 +62,13 @@ const Tags: React.FC<TagProps> = ({
         onChange={onTagChange}
         size="medium"
         renderInput={(params) => (
-          <TextField {...params} label={label} placeholder={placeholder} variant="outlined" size="small" />
+          <TextField
+            {...params}
+            label={label}
+            placeholder={placeholder}
+            variant="outlined"
+            size="small"
+          />
         )}
       />
     </Stack>

@@ -1,5 +1,9 @@
 .MuiFilledInput-root {
-    background-color: #f1f1f1 !important;
+    @apply bg-gray-200 rounded-lg;
+
+    &::before {
+        @apply border-0
+    }
 }
 
 .MuiFilledInput-root::after {
@@ -26,22 +30,32 @@
 // Dark Theme
 .dark {
     .MuiFilledInput-root {
-        @apply bg-stone-900 text-gray-400
+        @apply bg-stone-700 text-white;
+
+        input {
+            @apply text-gray-200
+        }
     }
+
     .MuiFormLabel-root {
-        @apply text-gray-400 text-gray-400
+        @apply text-gray-200
     }
-    input, .MuiOutlinedInput-input {
-        @apply text-gray-400
+
+    input,
+    .MuiOutlinedInput-input {
+        @apply text-gray-200
     }
-    .MuiOutlinedInput-notchedOutline  {
-        @apply border-stone-900 
+
+    .MuiOutlinedInput-notchedOutline {
+        @apply border-stone-700
     }
+
     .MuiAutocomplete-root {
         .MuiChip-root {
-            @apply bg-stone-800 text-gray-400
+            @apply bg-stone-700 text-gray-300
         }
-        svg {
+
+        svg, path {
             @apply text-gray-400
         }
     }

@@ -41,7 +41,7 @@ const ReadView: React.FC = ({}) => {
     <div className="w-full">
       {/* Top Row */}
       <div className="flex items-center justify-between">
-        <div className="text-xl">Ingredients</div>
+        <div className="text-xl dark:text-gray-200">Ingredients</div>
 
         {/* Multipliers */}
         {data.length > 0 && (
@@ -51,17 +51,17 @@ const ReadView: React.FC = ({}) => {
                 type="button"
                 disabled={multiplier === 1}
                 onClick={() => changeMultiplier("down")}
-                className="relative inline-flex items-center rounded-l-md bg-white dark:bg-black px-4 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-stone-800 dark:ring-1 hover:bg-gray-50 focus:z-10"
+                className="relative inline-flex items-center rounded-l-md bg-white dark:bg-stone-900 px-4 py-2 text-gray-400 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-stone-700 dark:ring-1 hover:bg-gray-50 focus:z-10 "
               >
                 <span className="sr-only">Previous</span>-
               </button>
-              <div className="relative -ml-px inline-flex items-center text-sm  bg-white dark:bg-black px-2 py-2 text-gray-600 dark:text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-stone-800 dark:ring-1 hover:bg-gray-50 focus:z-10">
+              <div className="relative -ml-px inline-flex items-center text-sm  bg-white dark:bg-stone-900 px-2 py-2 text-gray-600 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-stone-700 dark:ring-1 hover:bg-gray-50 focus:z-10">
                 {multiplier} Servings
               </div>
               <button
                 type="button"
                 onClick={() => changeMultiplier("up")}
-                className="relative -ml-px inline-flex items-center rounded-r-md bg-white dark:bg-black px-4 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-stone-800 dark:ring-1 hover:bg-gray-50 focus:z-10"
+                className="relative -ml-px inline-flex items-center rounded-r-md bg-white dark:bg-stone-900 px-4 py-2 text-gray-400 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-stone-700 dark:ring-1 hover:bg-gray-50 focus:z-10"
               >
                 <span className="sr-only">Next</span>+
               </button>

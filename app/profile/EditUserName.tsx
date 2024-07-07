@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import DebouncedTextInput from "@/components/MUIInputs/TextInput";
 import Button from "@/components/UI/Button";
 import { updateUserName } from "./actions";
+import { enqueueSnackbar } from "notistack";
 
 interface EditUserNameFormProps {
   username: string | undefined;
@@ -17,8 +18,13 @@ const EditUserNameForm: React.FC<EditUserNameFormProps> = ({
     e.preventDefault();
     try {
       await updateUserName(userID, form);
+      enqueueSnackbar("Username updated successfully", { variant: "success" });
+      setTimeout(() => {
+        location.reload();
+      }, 1000);
     } catch (error) {
       console.error("Error updating username", error);
+      enqueueSnackbar("Error updating username", { variant: "error" });
     }
   };
 
