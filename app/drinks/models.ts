@@ -38,8 +38,8 @@ export interface MutableDrinkFields {
 export const drinkTypes = [
   { value: "all", label: "All" },
   { value: "cocktail", label: "Cocktail" },
-  { value: "coffee", label: "Coffee" },
-  { value: "juice", label: "Juice" },
+  // { value: "coffee", label: "Coffee" },
+  // { value: "juice", label: "Juice" },
   { value: "mocktail", label: "Mocktail" },
   { value: "shake", label: "Shake" },
   { value: "smoothie", label: "Smoothie" },
