@@ -1,9 +1,9 @@
 .MuiFilledInput-root {
-    @apply bg-gray-200 rounded-lg;
+    @apply bg-gray-200 rounded-md;
+}
 
-    &::before {
-        @apply border-0
-    }
+.MuiFilledInput-root::before {
+    border-bottom: none !important;
 }
 
 .MuiFilledInput-root::after {
