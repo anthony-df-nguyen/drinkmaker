@@ -36,8 +36,8 @@ const DrinkList: React.FC = () => {
   return (
     <div className="mt-4 grid gap-2">
       {/* Controls */}
-      <div className="flex flex-col lg:flex-row gap-4 mb-4">
-        <div className="w-full lg:w-[300px]">
+      <div className="flex flex-row gap-4 mb-4">
+        <div className="w-[240px] md:w-[300px]">
           <DebouncedTextInput
             label="Search for Drink"
             value={searchTerm}
@@ -48,7 +48,7 @@ const DrinkList: React.FC = () => {
             size="small"
           />
         </div>
-        <div className="lg:w-[200px]">
+        <div className="flex-1 sm:flex-none sm:w-[200px] max-w-[200px]">
           <CustomSelect
             label="Drink Type"
             options={drinkTypes}
@@ -66,7 +66,7 @@ const DrinkList: React.FC = () => {
         currentPage={currentPage}
         onPageChange={onPageChange}
       />
-      <div className="grid gap-4 xl:grid-cols-1 max-h-[60vh] overflow-y-scroll no-scrollbar">
+      <div className="grid gap-4 xl:grid-cols-1 ">
         {drinksList.map((drink) => {
           const color = drinkTypeColors[drink.drink_type];
           return (
@@ -74,10 +74,10 @@ const DrinkList: React.FC = () => {
               <Card className="w-full h-full">
                 <div className="flex flex-col gap-2 justify-start h-full">
                   <div className="text-base text-gray-900 dark:text-white">{drink.name}</div>
-                  <div className="text-sm italic font-light text-gray-500">
+                  <div className="text-xs italic font-light text-gray-500">
                     By: {drink.profiles.username ?? "Unknown Creator"}
                   </div>
-                  <div className="text-sm font-light text-gray-700 dark:text-gray-300 flex-1">
+                  <div className="text-xs font-light text-gray-700 dark:text-gray-300 flex-1">
                     {drink.description}
                   </div>
                   <div>
