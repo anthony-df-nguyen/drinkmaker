@@ -1,33 +1,23 @@
-import { createSupabaseServerClient } from "@/utils/supabase/server-client";
+import { createSupabaseServerActionClient } from "@/utils/supabase/server-client";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  console.log("This is from the route.ts file")
-  console.log(request.url)
-  const { searchParams, origin } = new URL(request.url);
+  const url = new URL(request.url);
+  const code = url.searchParams.get("code");
+  const next = url.searchParams.get("next") ?? "/";
 
-  
-  console.log('origin: ', origin);
-  const code = searchParams.get("code");
-
-  // if "next" is in param, use it in the redirect URL
-  const next = searchParams.get("next") ?? "/";
-  console.log('next: ', next);
+  // prevent open-redirects; only allow same-origin paths
+  const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/";
+  const redirectUrl = new URL(safeNext, url.origin);
 
   if (code) {
-    console.log('Code exists. Setting up supabase server client');
-    const supabase = createSupabaseServerClient();
-
+    const supabase = await createSupabaseServerActionClient(); // <-- await
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    console.log('error: ', error);
 
     if (!error) {
-      console.log('Successfully exchanged')
-      return NextResponse.redirect(`${origin}${next}`);
+      return NextResponse.redirect(redirectUrl);
     }
   }
 
-  // TODO: Create this page
-  // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-error`);
+  return NextResponse.redirect(new URL("/auth/auth-error", url.origin));
 }

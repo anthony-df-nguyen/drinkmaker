@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { createSupabaseReqResClient } from "./utils/supabase/server-client";
+import { createSupabaseMiddlewareClient } from "./utils/supabase/server-client";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  const supabase = createSupabaseReqResClient(request, response);
+  const supabase = createSupabaseMiddlewareClient(request, response);
 
   const {
     data: {user}

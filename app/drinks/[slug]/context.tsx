@@ -19,7 +19,7 @@ import {
   DrinkIngredientDetail,
   InsertDrinkIngredients,
 } from "./drink_ingredients/models";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 import { MutableDrinkFields } from "../models";
 import { enqueueSnackbar } from "notistack";
 
@@ -104,50 +104,49 @@ export const DrinkFormProvider: React.FC<{
     }
   };
 
-  const updateDatabase = async () => {
-    if (!formSubmitted) return;
-    setLoading(true);
-    try {
-      const { id, name, description, drink_type, ingredients, instructions } =
-        globalDrinkForm;
-
-      const basicDrinkPayload: MutableDrinkFields = {
-        name,
-        description,
-        drink_type,
-      };
-      await updateDrinkBasics(id, basicDrinkPayload);
-
-      const ingredientPayload: InsertDrinkIngredients = {
-        drink_id: id,
-        ingredient_details: ingredients,
-      };
-      await upsertDrinkIngredients(ingredientPayload);
-
-      await upsertDrinkInstruction(id, instructions);
-      setLoading(false);
-      enqueueSnackbar("Drink successfully updated", { variant: "success" });
-
-      setTimeout(() => {
-        router.push(`/`);
-      }, 1000);
-    } catch (error) {
-      console.error("Failed to update the database: ", error);
-      enqueueSnackbar("There was an error updating the drink", {
-        variant: "error",
-      });
-    } finally {
-      setFormSubmitted(false);
-    }
-  };
-
   useEffect(() => {
     fetchGlobalDrinkForm(slug);
   }, [slug]);
 
   useEffect(() => {
+    const updateDatabase = async () => {
+      if (!formSubmitted) return;
+      setLoading(true);
+      try {
+        const { id, name, description, drink_type, ingredients, instructions } =
+          globalDrinkForm;
+
+        const basicDrinkPayload: MutableDrinkFields = {
+          name,
+          description,
+          drink_type,
+        };
+        await updateDrinkBasics(id, basicDrinkPayload);
+
+        const ingredientPayload: InsertDrinkIngredients = {
+          drink_id: id,
+          ingredient_details: ingredients,
+        };
+        await upsertDrinkIngredients(ingredientPayload);
+
+        await upsertDrinkInstruction(id, instructions);
+        setLoading(false);
+        enqueueSnackbar("Drink successfully updated", { variant: "success" });
+
+        setTimeout(() => {
+          router.push(`/`);
+        }, 1000);
+      } catch (error) {
+        console.error("Failed to update the database: ", error);
+        enqueueSnackbar("There was an error updating the drink", {
+          variant: "error",
+        });
+      } finally {
+        setFormSubmitted(false);
+      }
+    };
     updateDatabase();
-  }, [globalDrinkForm, formSubmitted]);
+  }, [globalDrinkForm, formSubmitted, router]);
 
   return (
     <DrinkFormContext.Provider

@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -18,9 +22,23 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
-    }
+      "@/*": [
+        "./*"
+      ]
+    },
+    "target": "ES2017"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "utils/auth/handleSignInWithGoogle.js", "components/Inputs/RichText/Editor.rsx", "app/drinks/forms/Instructions.jsx", "app/api/cron/route.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "utils/auth/handleSignInWithGoogle.js",
+    "components/Inputs/RichText/Editor.rsx",
+    "app/drinks/forms/Instructions.jsx",
+    "app/api/cron/route.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

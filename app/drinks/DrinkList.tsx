@@ -29,7 +29,7 @@ const DrinkList: React.FC = () => {
     } catch (error) {
       console.error("Error querying ingredients: ", error);
     }
-  }, [currentPage, searchTerm, selectDrinkType]);
+  }, [currentPage, searchTerm, selectDrinkType, setCount, setDrinksList]);
 
   const router = useRouter();
 
@@ -72,16 +72,19 @@ const DrinkList: React.FC = () => {
           return (
             <Link key={drink.unique_name} href={`/drinks/${drink.unique_name}`}>
               <Card className="w-full h-full">
-                <div className="flex flex-col gap-2 justify-start h-full">
-                  <div className="text-base text-gray-900 dark:text-white">{drink.name}</div>
-                  <div className="text-xs italic font-light text-gray-500">
-                    By: {drink.profiles.username ?? "Unknown Creator"}
+                <div className="flex flex-col gap-1 justify-start h-full">
+                  <div className="flex item-center gap-2 justify-between">
+                   
+                    <div className="text-base text-gray-900 dark:text-white">
+                      {drink.name}
+                    </div>
+                     <div className="text-xs h-1">
+                      <Badge label={drink.drink_type} color={color} />
+                    </div>
                   </div>
+
                   <div className="text-xs font-light text-gray-700 dark:text-gray-300 flex-1">
                     {drink.description}
-                  </div>
-                  <div>
-                    <Badge label={drink.drink_type} color={color} />
                   </div>
                 </div>
               </Card>
@@ -89,7 +92,6 @@ const DrinkList: React.FC = () => {
           );
         })}
       </div>
-     
     </div>
   );
 };

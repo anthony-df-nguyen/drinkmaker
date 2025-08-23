@@ -19,7 +19,7 @@ const CardTable = <T extends { [key: string]: any }>({
   data,
   breakpoint = "md", // Default breakpoint is medium,
   hideColumnsOnMobile = false,
-}: TableProps<T>): JSX.Element => {
+}: TableProps<T>): React.JSX.Element => {
   const isCardView = window.matchMedia(`(max-width: ${breakpoint})`).matches;
 
   return (

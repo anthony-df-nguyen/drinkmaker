@@ -1,113 +1,86 @@
 "use server";
-import { createSupabaseServerComponentClient } from "@/utils/supabase/server-client";
+
+import { createSupabaseServerActionClient } from "@/utils/supabase/server-client";
 import { DrinkSchema, CreateDrinkFields, MutableDrinkFields } from "./models";
-import { getUserSession } from "@/context/Authenticated";
 import { sanitizeInput } from "@/utils/sanitizeInput";
 import getUserSessionOnServer from "@/utils/supabase/getUserSessionServer";
 
-const pg = createSupabaseServerComponentClient();
+// ── helpers (not exported) ────────────────────────────────────────────────────
 
 const getExistingDrinksWithName = async (name: string) => {
+  const pg = await createSupabaseServerActionClient();
   const sanitizedName = sanitizeInput(name);
   const { data, error } = await pg
     .from("drinks")
     .select("unique_name")
     .ilike("unique_name", `${sanitizedName}%`);
 
-  if (error) {
-    throw new Error("Error fetching drinks with the same name");
-  }
-
-  return data;
+  if (error) throw new Error("Error fetching drinks with the same name");
+  return data as { unique_name: string }[];
 };
+
+const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const getNextFriendlyNumber = (
   existingDrinks: { unique_name: string }[],
   name: string
 ): number => {
-  const sanitizedName = sanitizeInput(name);
-  const numbers = existingDrinks
-    .map((drink) => {
-      const match = drink.unique_name.match(
-        new RegExp(`${sanitizedName}(_(\\d+))?$`)
-      );
-      return match ? (match[2] ? parseInt(match[2], 10) : 1) : 0;
+  const base = sanitizeInput(name);
+  const esc = escapeRegExp(base);
+  const rx = new RegExp(`^${esc}(?:_(\\d+))?$`);
+
+  const nums = existingDrinks
+    .map((d) => {
+      const m = d.unique_name.match(rx);
+      if (!m) return 0;
+      return m[1] ? parseInt(m[1], 10) : 1;
     })
-    .filter((number) => !isNaN(number))
+    .filter((n) => !Number.isNaN(n) && n > 0)
     .sort((a, b) => a - b);
 
-  for (let i = 1; i <= numbers.length; i++) {
-    if (i !== numbers[i - 1]) {
-      return i;
-    }
+  // find first gap in 1..n
+  for (let i = 1; i <= nums.length; i++) {
+    if (nums[i - 1] !== i) return i;
   }
-
-  return numbers.length + 1;
+  return nums.length + 1;
 };
 
-const createDrink = async (formData: CreateDrinkFields) => {
-  const authenticated = await getUserSessionOnServer();
-  console.log('authenticated: ', authenticated);
-  if (authenticated) {
-    const existingDrinks = await getExistingDrinksWithName(formData.name);
-    const friendlyNumber = getNextFriendlyNumber(existingDrinks, formData.name);
-    const newUniqueName =
-      friendlyNumber === 1
-        ? sanitizeInput(formData.name)
-        : `${sanitizeInput(formData.name)}_${friendlyNumber}`;
-    const postDrink = {
-      ...formData,
-      created_by: authenticated.id,
-      unique_name : newUniqueName,
-    };
-    
+// ── actions (exported) ───────────────────────────────────────────────────────
 
-    try {
-      const { data, error } = await pg.from("drinks").insert(postDrink);
-      if (error) {
-        throw new Error(error.message || "Drink could not be created");
-      }
-      return data;
-    } catch (error) {
-      console.error("Drink could not be created", error);
-      throw error;
-    }
-  } else {
-    throw new Error("User not authenticated");
-  }
+const createDrink = async (formData: CreateDrinkFields) => {
+  const user = await getUserSessionOnServer();
+  if (!user) throw new Error("User not authenticated");
+
+  const pg = await createSupabaseServerActionClient();
+
+  const existing = await getExistingDrinksWithName(formData.name);
+  const friendlyNumber = getNextFriendlyNumber(existing, formData.name);
+  const base = sanitizeInput(formData.name);
+  const unique_name = friendlyNumber === 1 ? base : `${base}_${friendlyNumber}`;
+
+  const postDrink = {
+    ...formData,
+    created_by: user.id, //
+    unique_name,
+  };
+
+  const { data, error } = await pg.from("drinks").insert(postDrink).select().single();
+  if (error) throw new Error(error.message || "Drink could not be created");
+  return data as DrinkSchema;
 };
 
 const deleteDrink = async (id: string) => {
-  console.log("Deleting drink with id", id);
-  try {
-    const { data, error } = await pg.from("drinks").delete().match({ id: id });
-    if (error) {
-      throw new Error(error.message || "Error deleting drink");
-    }
-    return data;
-  } catch (error) {
-    console.error("Drink could not be deleted", error);
-    throw error;
-  }
+  const pg = await createSupabaseServerActionClient();
+  const { data, error } = await pg.from("drinks").delete().eq("id", id).select().single();
+  if (error) throw new Error(error.message || "Error deleting drink");
+  return data as DrinkSchema;
 };
 
 const updateDrinkBasics = async (id: string, fields: MutableDrinkFields) => {
-  try {
-    const { data, error } = await pg
-      .schema("public")
-      .from("drinks")
-      .update(fields)
-      .match({ id: id });
-
-    if (error) {
-      console.error("Error updating drink", error);
-      throw new Error(error.message || "Error updating drink");
-    }
-    return data;
-  } catch (error) {
-    console.error("Drink could not be updated", error);
-    throw error;
-  }
+  const pg = await createSupabaseServerActionClient();
+  const { data, error } = await pg.from("drinks").update(fields).eq("id", id).select().single();
+  if (error) throw new Error(error.message || "Error updating drink");
+  return data as DrinkSchema;
 };
 
 const queryDrinks = async (
@@ -116,76 +89,58 @@ const queryDrinks = async (
   searchName?: string,
   drinkType?: string
 ): Promise<{
-  data: (DrinkSchema & { username: string })[];
+  data: (DrinkSchema & { username: string | null })[];
   totalCount: number;
 }> => {
-  // Calculate the range for pagination
+  const pg = await createSupabaseServerActionClient();
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
-  // Construct the query for getting drinks with profiles
+  // If you have multiple FKs to profiles, disambiguate like:
+  // profiles!drinks_created_by_user_id_fkey ( username )
   let query = pg
-    .from('drinks')
-    .select(`
+    .from("drinks")
+    .select(
+      `
       *,
       profiles ( username )
-    `)
-    .order('name', { ascending: true })
+    `,
+      { count: "exact" } // <-- ensures `count` is populated
+    )
+    .order("name", { ascending: true })
     .range(from, to);
 
-  // Add filters to the query
-  if (searchName) {
-    query = query.ilike('name', `%${searchName}%`);
-  }
+  if (searchName) query = query.ilike("name", `%${searchName}%`);
+  if (drinkType && drinkType !== "all") query = query.eq("drink_type", drinkType);
 
-  if (drinkType && drinkType !== 'all') {
-    query = query.eq('drink_type', drinkType);
-  }
-
-  // Execute the query
   const { data, error, count } = await query;
+  if (error) throw new Error(`Error querying drinks: ${error.message}`);
 
-  if (error) {
-    console.error('Error querying drinks:', error);
-    throw new Error(`Error querying drinks: ${error.message}`);
-  }
-
-  // Transform the data to include the username
-  const drinksWithUsername = data.map((drink: any) => ({
-    ...drink,
-    username: drink.profiles?.username || 'Unknown',
+  const withUser = (data ?? []).map((d: any) => ({
+    ...(d as DrinkSchema),
+    username: d.profiles?.username ?? null,
   }));
 
-  const totalCount = count ?? 0;
-
-  return {
-    data: drinksWithUsername,
-    totalCount,
-  };
+  return { data: withUser, totalCount: count ?? 0 };
 };
 
-const getDrinkByID = async (slug: string): Promise<DrinkSchema> => {
+const getDrinkByID = async (slug: string): Promise<DrinkSchema & { username: string | null }> => {
+  const pg = await createSupabaseServerActionClient();
   const { data, error } = await pg
     .from("drinks")
-    .select(`
+    .select(
+      `
       *,
       profiles ( username )
-    `)
+    `
+    )
     .eq("unique_name", slug)
     .single();
-    console.log(data)
-  if (error) {
-    console.error(`Error querying for unique_name ${slug}`, error);
-    throw new Error(`Error querying for unique_name: ${error.message}`);
-  } else {
-    return data;
-  }
+
+  if (error) throw new Error(`Error querying for unique_name: ${error.message}`);
+
+  const drink = data as any;
+  return { ...(drink as DrinkSchema), username: drink?.profiles?.username ?? null };
 };
 
-export {
-  createDrink,
-  deleteDrink,
-  updateDrinkBasics,
-  queryDrinks,
-  getDrinkByID,
-};
+export { createDrink, deleteDrink, updateDrinkBasics, queryDrinks, getDrinkByID };

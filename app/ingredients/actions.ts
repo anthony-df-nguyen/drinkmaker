@@ -1,132 +1,113 @@
 "use server";
-import { IngredientsSchema, MutableIngredientFields, CreateIngredientFields } from "@/app/ingredients/models";
-import { createSupabaseServerClient } from "@/utils/supabase/server-client";
 
-const pg = createSupabaseServerClient();
+import {
+  IngredientsSchema,
+  MutableIngredientFields,
+  CreateIngredientFields,
+} from "@/app/ingredients/models";
+import { createSupabaseServerActionClient } from "@/utils/supabase/server-client";
 
-/**
- * Creates a new ingredient in the database.
- *
- * @param formData - The data for the new ingredient.
- * @returns A promise that resolves to the created ingredient data.
- * @throws If there is an error creating the ingredient.
- */
+// optional helper (must be called inside actions)
+async function getPg() {
+  return await createSupabaseServerActionClient();
+}
+
+/** Create */
 const createIngredient = async (formData: CreateIngredientFields) => {
+  const pg = await getPg();
   try {
-    const { data, error } = await pg.from("ingredients").insert([formData]);
-    if (error) {
-      throw new Error(error.message || "Error creating ingredient");
-    }
-    return data;
+    const { data, error } = await pg.from("ingredients").insert([formData]).select();
+    if (error) throw new Error(error.message || "Error creating ingredient");
+    return data as IngredientsSchema[];
   } catch (error) {
     console.error("Ingredient could not be created", error);
     throw error;
   }
 };
 
-/**
- * Retrieves a paginated list of ingredients from the database.
- *
- * @param page - The page number of the results to retrieve.
- * @param limit - The maximum number of results per page.
- * @returns A promise that resolves to an array of IngredientsSchema objects.
- * @throws If there is an error querying the ingredients.
- */
-const queryIngredients = async (page: number, limit: number): Promise<IngredientsSchema[]> => {
+/** List paginated */
+const queryIngredients = async (
+  page: number,
+  limit: number
+): Promise<IngredientsSchema[]> => {
+  const pg = await getPg();
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
   const { data, error } = await pg
     .from("ingredients")
     .select("*")
     .order("name", { ascending: true })
-    .range((page - 1) * limit, page * limit - 1)
-    .limit(limit);
+    .range(from, to); // .limit(limit) not needed when using .range
 
   if (error) {
-    console.error("Error checking existence:", error);
+    console.error("Error querying ingredients:", error);
     throw new Error(`Error querying ingredients: ${error.message}`);
-  } else {
-    return data;
   }
+  return (data ?? []) as IngredientsSchema[];
 };
 
+/** List all (id + name) */
 const queryAllIngredients = async (): Promise<IngredientsSchema[]> => {
+  const pg = await getPg();
   const { data, error } = await pg
     .from("ingredients")
     .select("id, name")
-    .order("name", { ascending: true })
+    .order("name", { ascending: true });
 
   if (error) {
-    console.error("Error checking existence:", error);
+    console.error("Error querying ingredients:", error);
     throw new Error(`Error querying ingredients: ${error.message}`);
-  } else {
-    return data;
   }
+  return (data ?? []) as IngredientsSchema[];
 };
 
-/**
- * Searches for ingredients in the database based on a search term.
- *
- * @param term - The search term to match against ingredient names.
- * @returns A promise that resolves to an array of IngredientsSchema objects matching the search term.
- * @throws If there is an error querying the ingredients.
- */
+/** Search by term */
 const searchForIngredient = async (term: string): Promise<IngredientsSchema[]> => {
-  console.log(term)
+  const pg = await getPg();
   const { data, error } = await pg
     .from("ingredients")
     .select("*")
     .ilike("name", `%${term}%`);
 
   if (error) {
-    console.error("Error checking existence:", error);
+    console.error("Error searching ingredients:", error);
     throw new Error(`Error querying ingredients: ${error.message}`);
-  } else {
-    return data;
   }
+  return (data ?? []) as IngredientsSchema[];
 };
 
-/**
- * Updates an existing ingredient in the database.
- *
- * @param id - The ID of the ingredient to update.
- * @param fields - The fields to update in the ingredient.
- * @returns A promise that resolves to the updated ingredient data.
- * @throws If there is an error updating the ingredient.
- */
+/** Update */
 const updateIngredient = async (id: string, fields: MutableIngredientFields) => {
+  const pg = await getPg();
   try {
-    const { data, error } = await pg
-      .from("ingredients")
-      .update(fields)
-      .match({ id: id });
-
-    if (error) {
-      throw new Error(error.message || "Error updating ingredient");
-    }
-    return data;
+    const { data, error } = await pg.from("ingredients").update(fields).eq("id", id).select();
+    if (error) throw new Error(error.message || "Error updating ingredient");
+    return data as IngredientsSchema[];
   } catch (error) {
     console.error("Ingredient could not be updated", error);
     throw error;
   }
-}
+};
 
-/**
- * Deletes an ingredient from the database.
- *
- * @param id - The ID of the ingredient to delete.
- * @returns A promise that resolves to the deleted ingredient data.
- * @throws If there is an error deleting the ingredient.
- */
-const deleteIngredient = async (id: string) => {  
+/** Delete */
+const deleteIngredient = async (id: string) => {
+  const pg = await getPg();
   try {
-    const { data, error } = await pg.from("ingredients").delete().match({ id: id });
-    if (error) {
-      throw new Error(error.message || "Error deleting ingredient");
-    }
-    return data;
+    const { data, error } = await pg.from("ingredients").delete().eq("id", id).select();
+    if (error) throw new Error(error.message || "Error deleting ingredient");
+    return data as IngredientsSchema[];
   } catch (error) {
     console.error("Ingredient could not be deleted", error);
     throw error;
   }
-}
+};
 
-export { createIngredient, queryIngredients, queryAllIngredients, searchForIngredient, updateIngredient, deleteIngredient };
+export {
+  createIngredient,
+  queryIngredients,
+  queryAllIngredients,
+  searchForIngredient,
+  updateIngredient,
+  deleteIngredient,
+};

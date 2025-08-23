@@ -96,7 +96,7 @@ const SearchCreate: React.FC = () => {
           });
       }
     }
-  }, []);
+  }, [setCount,setIngredients]);
 
   /**
    * Handles the form submission.

@@ -1,60 +1,59 @@
-import { type NextRequest, type NextResponse } from "next/server";
+// utils/supabase/server-client.ts
 import { cookies } from "next/headers";
-import { deleteCookie, getCookie, setCookie } from "cookies-next";
+import { NextRequest, NextResponse } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
-// server component can only get cookies and not set them, hence the "component" check
-// Used in server actions and route handlers
-export function createSupabaseServerClient(component: boolean = false) {
-  cookies().getAll();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return getCookie(name, { cookies });
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          if (component) return;
-          setCookie(name, value, { cookies, ...options });
-        },
-        remove(name: string, options: CookieOptions) {
-          if (component) return;
-          deleteCookie(name, { cookies, ...options });
-        },
+const URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+/** Use this INSIDE a Server Action or Route Handler (read/write cookies). */
+export async function createSupabaseServerActionClient() {
+  const cookieStore = await cookies(); // allowed & mutable here
+  return createServerClient(URL, KEY, {
+    cookies: {
+      get(name: string) {
+        return cookieStore.get(name)?.value;
       },
-    }
-  );
+      set(name: string, value: string, options: CookieOptions) {
+        cookieStore.set({ name, value, ...options });
+      },
+      remove(name: string, options: CookieOptions) {
+        cookieStore.set({ name, value: "", ...options, maxAge: 0 });
+      },
+    },
+  });
 }
 
-// Used in server components
-export function createSupabaseServerComponentClient() {
-  cookies().getAll();
-  return createSupabaseServerClient(true);
+/** Use this INSIDE a Server Component render (read-only). */
+export async function createSupabaseServerComponentClient() {
+  const cookieStore = await cookies(); // read-only in RSC
+  return createServerClient(URL, KEY, {
+    cookies: {
+      get(name: string) {
+        return cookieStore.get(name)?.value;
+      },
+      set() {}, // no-ops: cannot mutate cookies in Server Components
+      remove() {},
+    },
+  });
 }
 
-// Used in middleware
-export function createSupabaseReqResClient(
+/** Use this INSIDE middleware, return the mutated `res` from the caller. */
+export function createSupabaseMiddlewareClient(
   req: NextRequest,
   res: NextResponse
 ) {
-  cookies().getAll();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return getCookie(name, { req, res });
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          setCookie(name, value, { req, res, ...options });
-        },
-        remove(name: string, options: CookieOptions) {
-          setCookie(name, "", { req, res, ...options });
-        },
+  return createServerClient(URL, KEY, {
+    cookies: {
+      get(name: string) {
+        return req.cookies.get(name)?.value;
       },
-    }
-  );
+      set(name: string, value: string, options: CookieOptions) {
+        res.cookies.set({ name, value, ...options });
+      },
+      remove(name: string, options: CookieOptions) {
+        res.cookies.set({ name, value: "", ...options, maxAge: 0 });
+      },
+    },
+  });
 }

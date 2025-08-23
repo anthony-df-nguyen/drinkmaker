@@ -1,7 +1,7 @@
 "use server";
-import { createSupabaseServerClient } from "./server-client";
+import { createSupabaseServerActionClient } from "./server-client";
 
-const pg = createSupabaseServerClient();
+
 /**
  * Checks if a value exists in a specific column of a table in the Supabase database.
  * @param table - The name of the table to check.
@@ -15,6 +15,7 @@ const checkExisting = async (
   column: string,
   value: string
 ): Promise<boolean> => {
+  const pg = await createSupabaseServerActionClient();
   try {
     const { data, error } = await pg
       .from(table)

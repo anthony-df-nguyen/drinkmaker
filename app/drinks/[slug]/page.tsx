@@ -1,6 +1,8 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
+
 import { useGlobalDrinkForm, DrinkFormProvider } from "./context";
 import {
   AuthenticatedProvider,
@@ -16,9 +18,9 @@ import EditDrinkForm from "./Edit/EditDrinkForm";
 import { ListIngredientsProvider } from "@/app/ingredients/context/ListIngredientsContext";
 import DrinkActionOptions from "./DrinkActionOptions";
 
-
-const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
-  const { slug } = params;
+export default function Page() {
+  // ✅ Read route pieces with client hooks
+  const { slug } = useParams<{ slug: string }>();
   const search = useSearchParams();
   const editURL = search.get("edit");
 
@@ -33,17 +35,16 @@ const Page: React.FC<{ params: { slug: string } }> = ({ params }) => {
       </Navigation>
     </AuthenticatedProvider>
   );
-};
+}
 
 interface DrinkPageContentProps {
   editURL: string | null;
 }
-const DrinkPageContent: React.FC<DrinkPageContentProps> = ({
-  editURL,
-}) => {
+const DrinkPageContent: React.FC<DrinkPageContentProps> = ({ editURL }) => {
   const { user } = useAuthenticatedContext();
   const { globalDrinkForm, loading, error } = useGlobalDrinkForm();
-  const [edit, setEdit] = useState<boolean>(false);
+
+  const [edit, setEdit] = useState(false);
   useEffect(() => {
     if (
       editURL === "true" &&
@@ -52,16 +53,15 @@ const DrinkPageContent: React.FC<DrinkPageContentProps> = ({
       setEdit(true);
     }
   }, [editURL, user, globalDrinkForm]);
+
   if (loading) return <MartiniLoader />;
   if (error) return <div>Error: {error}</div>;
 
   return (
     <main>
-      <div className="grid gap-8 max-w-[860px] w-full mx-auto border p-4 sm:p-8 rounded-md shadow-sm bg-white  dark:bg-stone-800 dark:border-0">
-        {/* Read Only */}
+      <div className="grid gap-8 max-w-[860px] w-full mx-auto border p-4 sm:p-8 rounded-md shadow-sm bg-white dark:bg-stone-800 dark:border-0">
         {!edit && (
           <div className="flex items-start gap-2">
-            {/* Content */}
             <div className="w-full">
               <div className="flex items-center justify-between">
                 <div className="text-2xl font-bold text-emerald-600 dark:text-white ">
@@ -77,13 +77,11 @@ const DrinkPageContent: React.FC<DrinkPageContentProps> = ({
               <div className="mt-2">
                 <Badge
                   label={globalDrinkForm?.drink_type ?? "other"}
-                  color={
-                    drinkTypeColors[globalDrinkForm?.drink_type ?? "other"]
-                  }
+                  color={drinkTypeColors[globalDrinkForm?.drink_type ?? "other"]}
                 />
               </div>
             </div>
-            {/* Actions */}
+
             <div>
               <DrinkActionOptions
                 setEdit={setEdit}
@@ -93,13 +91,12 @@ const DrinkPageContent: React.FC<DrinkPageContentProps> = ({
             </div>
           </div>
         )}
+
         {!edit && <DrinkIngredients />}
         {!edit && <DrinkInstructions />}
-        {/* Edit */}
+
         {edit && <EditDrinkForm setEdit={setEdit} />}
       </div>
     </main>
   );
 };
-
-export default Page;

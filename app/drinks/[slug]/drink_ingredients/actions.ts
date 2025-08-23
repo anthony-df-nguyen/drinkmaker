@@ -1,17 +1,17 @@
 "use server";
-import { createSupabaseServerComponentClient } from "@/utils/supabase/server-client";
+
+import { createSupabaseServerActionClient } from "@/utils/supabase/server-client";
 import { InsertDrinkIngredients, DrinkIngredientSchema } from "./models";
-import { sanitizeInput } from "@/utils/sanitizeInput";
 
-const pg = createSupabaseServerComponentClient();
-
+/** Upsert ingredients for a drink (add/update + remove missing ones). */
 const upsertDrinkIngredients = async (
   drinkDetails: InsertDrinkIngredients
 ): Promise<void> => {
+  const pg = await createSupabaseServerActionClient(); // ✅ create inside action
   const { drink_id, ingredient_details } = drinkDetails;
 
-  // Fetch current ingredient IDs for the specified drink
-  const { data: currentIngredients, error: fetchError } = await pg
+  // 1) Fetch current ingredient rows for this drink
+  const { data: currentIngredients = [], error: fetchError } = await pg
     .from("drink_ingredients")
     .select("ingredient_id, quantity, unit")
     .eq("drink_id", drink_id);
@@ -20,61 +20,62 @@ const upsertDrinkIngredients = async (
     throw new Error(`Error fetching current ingredients: ${fetchError.message}`);
   }
 
-  const currentIngredientMap = new Map(currentIngredients.map((row) => [row.ingredient_id, row]));
-  const newIngredientMap = new Map(ingredient_details.map((detail) => [detail.ingredient_id, detail]));
-
-  // Determine ingredients to delete
-  const ingredientIdsToDelete = Array.from(currentIngredientMap.keys()).filter(
-    (id) => !newIngredientMap.has(id)
+  const currentMap = new Map(
+    currentIngredients?.map((row) => [row.ingredient_id, row])
+  );
+  const nextMap = new Map(
+    ingredient_details.map((d) => [d.ingredient_id, d])
   );
 
-  // Determine ingredients to update or insert
-  const ingredientsToUpsert = Array.from(newIngredientMap.values()).map((detail) => ({
-    drink_id,
-    ingredient_id: detail.ingredient_id,
-    quantity: detail.quantity,
-    unit: detail.unit,
-  }));
+  // 2) Determine rows to delete (present before, missing now)
+  const ingredientIdsToDelete = Array.from(currentMap.keys()).filter(
+    (id) => !nextMap.has(id)
+  );
 
-  // Delete ingredients that are not in the new list
   if (ingredientIdsToDelete.length > 0) {
-    const { error: deleteError } = await pg
+    const { error: delErr } = await pg
       .from("drink_ingredients")
       .delete()
       .eq("drink_id", drink_id)
       .in("ingredient_id", ingredientIdsToDelete);
-
-    if (deleteError) {
-      throw new Error(`Error deleting old ingredients: ${deleteError.message}`);
+    if (delErr) {
+      throw new Error(`Error deleting old ingredients: ${delErr.message}`);
     }
   }
 
-  // Upsert new and updated ingredients
-  if (ingredientsToUpsert.length > 0) {
-    const { error: upsertError } = await pg
-      .from("drink_ingredients")
-      .upsert(ingredientsToUpsert, { onConflict: "drink_id, ingredient_id" });
+  // 3) Upsert all provided rows (covers insert + update)
+  const upsertRows = ingredient_details.map((d) => ({
+    drink_id,
+    ingredient_id: d.ingredient_id,
+    quantity: d.quantity,
+    unit: d.unit,
+  }));
 
-    if (upsertError) {
-      throw new Error(`Error upserting ingredients: ${upsertError.message}`);
+  if (upsertRows.length > 0) {
+    const { error: upsertErr } = await pg
+      .from("drink_ingredients")
+      .upsert(upsertRows, { onConflict: "drink_id, ingredient_id" }); // composite key
+    if (upsertErr) {
+      throw new Error(`Error upserting ingredients: ${upsertErr.message}`);
     }
   }
 };
 
-
+/** Get all ingredient rows for a drink. */
 const getDrinkIngredients = async (
   drink_id: string
 ): Promise<DrinkIngredientSchema[] | null> => {
+  const pg = await createSupabaseServerActionClient(); // ✅ create inside action
   const { data, error } = await pg
     .from("drink_ingredients")
     .select("*")
-    .eq("drink_id", drink_id);
+    .eq("drink_id", drink_id)
+    .order("ingredient_id", { ascending: true });
 
   if (error) {
     throw new Error(`Error getting data: ${error.message}`);
   }
-
-  return data.length > 0 ? data : null;
+  return (data && data.length > 0) ? (data as DrinkIngredientSchema[]) : null;
 };
 
 export { upsertDrinkIngredients, getDrinkIngredients };

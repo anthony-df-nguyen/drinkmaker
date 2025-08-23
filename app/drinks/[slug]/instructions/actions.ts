@@ -1,45 +1,46 @@
 "use server";
-import { createSupabaseServerComponentClient } from "@/utils/supabase/server-client";
-import { DrinkInstructionSchema, InstructionFormat } from "./models";
 
+import { createSupabaseServerActionClient } from "@/utils/supabase/server-client";
+import { InstructionFormat } from "./models";
 
-const pg = createSupabaseServerComponentClient();
-
+/** Read a drink's instructions (null if none). */
 const getDrinkInstructionByID = async (
   drink_id: string
 ): Promise<{ instructions: InstructionFormat } | null> => {
+  const pg = await createSupabaseServerActionClient();
+
+  // maybeSingle(): returns null (no error) when no row exists
   const { data, error } = await pg
     .from("drink_instructions")
     .select("instructions")
     .eq("drink_id", drink_id)
-    .single();
+    .maybeSingle();
 
   if (error) {
-    console.error(`Error querying instructions`, error);
+    console.error("Error querying instructions:", error);
     return null;
-  } else {
-    return data ? data : null;
   }
+  return data as { instructions: InstructionFormat } | null;
 };
 
+/** Insert or update a drink's instructions (by drink_id). */
 const upsertDrinkInstruction = async (
   drink_id: string,
-  instructions: InstructionFormat,
+  instructions: InstructionFormat
 ): Promise<void> => {
-  const { data, error } = await pg
+  const pg = await createSupabaseServerActionClient();
+
+  const { error } = await pg
     .from("drink_instructions")
-    .upsert([{ drink_id: drink_id, instructions: instructions }], {
-      onConflict: "drink_id",
-    });
+    .upsert(
+      [{ drink_id, instructions }],
+      { onConflict: "drink_id" }
+    );
 
   if (error) {
     console.error("Error upserting instruction:", error);
     throw new Error(`Error upserting instruction: ${error.message}`);
-  } else {
-    console.log("Upsert successful:", data);
   }
 };
-
-
 
 export { getDrinkInstructionByID, upsertDrinkInstruction };
