@@ -40,14 +40,10 @@ export default function Navigation({ children }: Props) {
                 <span className="sr-only">Open sidebar</span>
                 <Bars3Icon className="h-6 w-6" aria-hidden="true" />
               </button>
-              {/* Separator */}
-              <div
-                className="h-6 w-px bg-gray-900/10 lg:hidden"
-                aria-hidden="true"
-              />
-              <div className="h-16 shrink-0 items-center hidden lg:flex text-xl font-bold wider text-emerald-600 tracking-widest">
+
+              <Link href="/" className="lg:h-16 shrink-0 items-center  lg:flex text-xl font-bold wider text-emerald-600 tracking-widest">
                 DRINKMAKER
-              </div>
+              </Link>
               {/* Links */}
               <div className="ml-8 hidden lg:flex gap-8">
                 {links.map((row) => (

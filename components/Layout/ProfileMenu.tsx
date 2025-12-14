@@ -20,6 +20,7 @@ type Props = {};
 
 export default function Profile({}: Props) {
   const { user } = useAuthenticatedContext();
+  console.log('user: ', user);
 
   return (
     <>
@@ -36,7 +37,7 @@ export default function Profile({}: Props) {
             <span className="sr-only">Open user menu</span>
             {user && (
               <img
-                className="h-8 w-8 rounded-full bg-gray-50 hidden sm:block"
+                className="h-8 w-8 rounded-full bg-gray-50 block"
                 src={user.user_metadata.avatar_url}
                 alt=""
               />
@@ -48,7 +49,7 @@ export default function Profile({}: Props) {
               >
                 {user ? (
                   <div className="text-left">
-                    <div className="text-md">{user.username}</div>
+                    <div className="hidden md:block text-md">{user.username}</div>
                     <div className="hidden md:block text-xs font-light">
                       {user.email}
                     </div>
@@ -58,7 +59,7 @@ export default function Profile({}: Props) {
                 )}
               </span>
               <ChevronDownIcon
-                className="ml-2 h-5 w-5 text-gray-400"
+                className="hidden sm:block ml-2 h-5 w-5 text-gray-400"
                 aria-hidden="true"
               />
             </span>

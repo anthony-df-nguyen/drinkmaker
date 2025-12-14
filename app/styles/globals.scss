@@ -1,8 +1,9 @@
+@use "./mui_styles";
+@use "./quill_styles";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import "./mui_styles.scss";
-@import "./quill_styles.scss";
+
 
 :root {
   --foreground-rgb      : 0, 0, 0;

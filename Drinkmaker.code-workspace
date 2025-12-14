@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../drinkmaker_pg"
+		}
+	],
+	"settings": {}
+}
