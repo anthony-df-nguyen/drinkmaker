@@ -6,12 +6,18 @@ import { MoonIcon, SunIcon } from "@heroicons/react/20/solid";;
 import { useTheme } from "next-themes";
 
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, systemTheme } = useTheme();
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    setEnabled(theme === "dark");
-  }, [theme]);
+    if (theme === "system") {
+      systemTheme === "light" && setEnabled(false)
+      systemTheme === "dark" && setEnabled(true)
+    } else {
+      theme === "light" && setEnabled(false)
+      theme === "dark" && setEnabled(true)
+    }
+  }, [theme,systemTheme]);
 
   const handleChange = () => {
     setEnabled(!enabled);

@@ -27,7 +27,7 @@ export default function RootLayout({
       <body className="h-full bg-gray-100 dark:bg-stone-900 dark:text-gray-400">
         <AuthenticatedProvider>
           <ModalProvider>
-            <ThemeProvider attribute="class">{children}</ThemeProvider>
+            <ThemeProvider attribute="class" >{children}</ThemeProvider>
           </ModalProvider>
         </AuthenticatedProvider>
       </body>
