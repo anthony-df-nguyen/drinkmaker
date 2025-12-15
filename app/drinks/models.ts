@@ -28,7 +28,7 @@ export interface MutableDrinkFields {
   name: string;
   unique_name?: string;
   description?: string;
-  picture?: string;
+  picture: string | null;
   upvotes?: number;
   downvotes?: number;
   published?: boolean;

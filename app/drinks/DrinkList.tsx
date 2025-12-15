@@ -203,18 +203,31 @@ const DrinkList: React.FC = () => {
           return (
             <Link key={drink.unique_name} href={`/drinks/${drink.unique_name}`}>
               <Card className="w-full h-full">
-                <div className="flex flex-col gap-1 justify-start h-full">
-                  <div className="flex item-center gap-2 justify-between">
-                    <div className="text-base text-gray-900 dark:text-white">
-                      {drink.name}
+                <div className="flex flex-row gap-4 justify-between h-full">
+                  {/* Image */}
+                  {drink.picture && (
+                    <div className="w-24 h-24 overflow-hidden rounded-md bg-gray-100">
+                      <img
+                        src={drink.picture}
+                        alt={drink.name}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    <div className="text-xs h-1">
-                      <Badge label={drink.drink_type} color={color} />
+                  )}
+                  {/* Name block */}
+                  <div className="flex-1">
+                    <div className="flex-col item-center gap-2 justify-between">
+                      <div className="text-base text-gray-900 dark:text-white">
+                        {drink.name}
+                      </div>
+                      <div className="text-xs font-light text-gray-700 dark:text-gray-300 flex-1">
+                        {drink.description}
+                      </div>
                     </div>
                   </div>
-
-                  <div className="text-xs font-light text-gray-700 dark:text-gray-300 flex-1">
-                    {drink.description}
+                  {/* Badge */}
+                  <div className="text-xs h-1">
+                    <Badge label={drink.drink_type} color={color} />
                   </div>
                 </div>
               </Card>

@@ -77,22 +77,34 @@ const DrinkPageContent: React.FC<DrinkPageContentProps> = ({ editURL }) => {
               <div className="mt-2">
                 <Badge
                   label={globalDrinkForm?.drink_type ?? "other"}
-                  color={drinkTypeColors[globalDrinkForm?.drink_type ?? "other"]}
+                  color={
+                    drinkTypeColors[globalDrinkForm?.drink_type ?? "other"]
+                  }
                 />
               </div>
             </div>
 
-            {user?.id === globalDrinkForm?.created_by_user_id && <div>
-              <DrinkActionOptions
-                setEdit={setEdit}
-                drink={globalDrinkForm}
-                drinkCreator={globalDrinkForm.created_by_user_id}
-              />
-            </div>}
-            
+            {user?.id === globalDrinkForm?.created_by_user_id && (
+              <div>
+                <DrinkActionOptions
+                  setEdit={setEdit}
+                  drink={globalDrinkForm}
+                  drinkCreator={globalDrinkForm.created_by_user_id}
+                />
+              </div>
+            )}
           </div>
         )}
 
+        {!edit && globalDrinkForm.picture && (
+          <div className="w-full max-h-[400px] lg:max-w-sm h-auto lg:max-h-sm overflow-hidden rounded-md bg-gray-100">
+            <img
+              src={globalDrinkForm.picture}
+              alt={globalDrinkForm.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
         {!edit && <DrinkIngredients />}
         {!edit && <DrinkInstructions />}
 

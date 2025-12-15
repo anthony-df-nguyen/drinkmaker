@@ -20,7 +20,6 @@ type Props = {};
 
 export default function Profile({}: Props) {
   const { user } = useAuthenticatedContext();
-  console.log('user: ', user);
 
   return (
     <>

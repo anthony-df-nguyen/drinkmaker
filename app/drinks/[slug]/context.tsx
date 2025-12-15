@@ -33,6 +33,7 @@ export type GlobalDrinkForm = {
   instructions: string | null;
   created_by_user_id: string;
   created_by_user: string;
+  picture: string | null;
 };
 
 interface DrinkFormContextProps {
@@ -62,11 +63,13 @@ export const DrinkFormProvider: React.FC<{
     instructions: null,
     created_by_user_id: "",
     created_by_user: "",
+    picture: null,
   });
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   const router = useRouter();
+  console.debug("globalDrinkForm: ", globalDrinkForm);
 
   const fetchGlobalDrinkForm = async (slug: string) => {
     setLoading(true);
@@ -94,6 +97,7 @@ export const DrinkFormProvider: React.FC<{
         drink_type: basic.drink_type,
         created_by_user_id: basic.created_by,
         created_by_user: basic.profiles?.username ?? "Unknown",
+        picture: basic.picture,
       };
 
       setGlobalDrinkForm(newForm);
@@ -113,13 +117,21 @@ export const DrinkFormProvider: React.FC<{
       if (!formSubmitted) return;
       setLoading(true);
       try {
-        const { id, name, description, drink_type, ingredients, instructions } =
-          globalDrinkForm;
+        const {
+          id,
+          name,
+          description,
+          drink_type,
+          ingredients,
+          instructions,
+          picture,
+        } = globalDrinkForm;
 
         const basicDrinkPayload: MutableDrinkFields = {
           name,
           description,
           drink_type,
+          picture,
         };
         await updateDrinkBasics(id, basicDrinkPayload);
 

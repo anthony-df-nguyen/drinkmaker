@@ -23,6 +23,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
     useGlobalDrinkForm();
 
   const [liveFormState, setLiveFormState] = useState(globalDrinkForm);
+  console.log('liveFormState: ', liveFormState);
   const findIngredientById = (id: string) =>
     allIngredients.find((ingredient) => ingredient.id === id);
   const [selectedTags, setSelectedTags] = useState<TagOption[]>(() =>
@@ -112,6 +113,17 @@ export default function EditDrinkForm({ setEdit }: Props) {
           value={liveFormState.drink_type}
           onChange={(value) => handleChange("drink_type", value)}
           variant="filled"
+          size="small"
+        />
+         <DebouncedTextInput
+          label="Image URL"
+          value={liveFormState.picture ?? ""}
+          onChange={(value) => handleChange("picture", value || "")}
+          variant="filled"
+          errorText="Description is too long"
+          delay={500}
+          multiline
+          minRows={3}
           size="small"
         />
         {/* Ingredients */}
