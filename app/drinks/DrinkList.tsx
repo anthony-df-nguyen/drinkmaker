@@ -37,7 +37,12 @@ const DrinkList: React.FC = () => {
     const fetchDrinks = async () => {
       try {
         setIsLoading(true);
-        const data = await queryDrinks(1, PAGE_SIZE, searchTerm, selectDrinkType);
+        const data = await queryDrinks(
+          1,
+          PAGE_SIZE,
+          searchTerm,
+          selectDrinkType
+        );
         if (cancelled) return;
 
         setDrinksList(data.data);
@@ -68,7 +73,13 @@ const DrinkList: React.FC = () => {
     try {
       setIsLoading(true);
       const nextPage = page + 1;
-      const data = await queryDrinks(nextPage, PAGE_SIZE, searchTerm, selectDrinkType, false);
+      const data = await queryDrinks(
+        nextPage,
+        PAGE_SIZE,
+        searchTerm,
+        selectDrinkType,
+        false
+      );
 
       if (data.data.length === 0) {
         setHasMore(false);
@@ -92,7 +103,16 @@ const DrinkList: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [PAGE_SIZE, hasMore, isLoading, page, searchTerm, selectDrinkType, setDrinksList, setCount]);
+  }, [
+    PAGE_SIZE,
+    hasMore,
+    isLoading,
+    page,
+    searchTerm,
+    selectDrinkType,
+    setDrinksList,
+    setCount,
+  ]);
 
   const lastDrinkElementRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -139,7 +159,7 @@ const DrinkList: React.FC = () => {
       </div>
 
       {/* Grid/Results */}
-      <div className="grid gap-4 xl:grid-cols-1 ">
+      <div className="grid gap-4 xl:grid-cols-1 max-h-[65vh] overflow-scroll">
         {drinksList.map((drink, index) => {
           const color = drinkTypeColors[drink.drink_type];
 
@@ -190,6 +210,10 @@ const DrinkList: React.FC = () => {
             </Link>
           );
         })}
+        {/* End of results indicator */}
+        {!hasMore && drinksList.length > 0 && (
+          <div className="text-center py-4 text-gray-500">This is the end</div>
+        )}
       </div>
 
       {/* Loading indicator */}
@@ -198,11 +222,10 @@ const DrinkList: React.FC = () => {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         </div>
       )}
-
-      {/* End of results indicator */}
-      {!hasMore && drinksList.length > 0 && (
-        <div className="text-center py-4 text-gray-500">
-          This is the end
+      {/* No drinks found */}
+      {!isLoading && drinksList.length === 0 && (
+        <div className="flex justify-center">
+          <div className="text-center text-gray-500">No drinks found</div>
         </div>
       )}
     </div>
