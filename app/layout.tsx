@@ -8,8 +8,8 @@ import "./styles/globals.scss";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Drink Maker",
-  description: "Make drinks quickly,",
+  title: "Drinkmaker",
+  description: "Drinkmaker - Create, share, and discover amazing cocktails with our easy-to-use recipe platform. Build your perfect drink with step-by-step instructions, ingredient lists, and professional tips. Browse thousands of cocktail recipes from beginners to experts."
 };
 
 export default function RootLayout({

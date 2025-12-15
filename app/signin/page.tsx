@@ -3,17 +3,19 @@ import SignInButton from "@/components/Layout/SignInButton";
 export default function SignInPage() {
   return (
     <>
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Sign In / Register
-          </h2>
-        </div>
-
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm grid gap-2">
-          {providers.map((provider) => (
-            <SignInButton key={provider} provider={provider} nextUrl="/" />
-          ))}
+      <div className=" flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-lg shadow p-8 w-full max-w-sm mx-auto">
+          <div className="mb-6 text-center text-3xl font-bold wider text-emerald-600 tracking-widest">
+            DRINKMAKER
+          </div>
+          <div className="text-center text-lg font-base tracking-tight text-gray-900">
+            Sign in to continue
+          </div>
+          <div className="mt-4 grid gap-4 grid-cols-1">
+            {providers.map((provider) => (
+              <SignInButton key={provider} provider={provider} nextUrl="/" />
+            ))}
+          </div>
         </div>
       </div>
     </>
