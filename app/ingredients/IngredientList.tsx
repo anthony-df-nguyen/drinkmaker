@@ -21,7 +21,6 @@ const IngredientList: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
-  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -29,9 +28,12 @@ const IngredientList: React.FC = () => {
   const isLoadingRef = useRef(false);
   const hasMoreRef = useRef(true);
   const modeRef = useRef(mode);
+  const lastUserScrollTsRef = useRef(0);
 
   const PAGE_SIZE = 10;
   const requestVersionRef = useRef(0);
+
+  const maybeLoadMoreRef = useRef<() => void>(() => {});
 
   const fetchIngredientsPage = useCallback(
     async (nextPage: number, mode: "replace" | "append") => {
@@ -54,19 +56,54 @@ const IngredientList: React.FC = () => {
           return merged;
         });
 
-        // If you have a total `count` from context, use it to determine hasMore.
-        // Otherwise fall back to whether we got a full page.
-        // const optimisticHasMore = data.length === PAGE_SIZE;
-        // setHasMore(count != null ? (mode === "replace" ? data.length < count : true) : optimisticHasMore);
+        const nextHasMore =
+          typeof count === "number" ? (mode === "replace" ? data.length < count : true) : data.length === PAGE_SIZE;
+        setHasMore(nextHasMore);
+        hasMoreRef.current = nextHasMore;
       } catch (error) {
         console.error("Error querying ingredients: ", error);
       } finally {
         isLoadingRef.current = false;
         setIsLoading(false);
+
+        // If the user is actively scrolling and still near the bottom after this page appended,
+        // trigger one more load so they don't have to scroll up/down to re-fire the observer.
+        const scrolledRecently = Date.now() - lastUserScrollTsRef.current < 1200;
+        const nearBottom =
+          window.innerHeight + window.scrollY >=
+          document.documentElement.scrollHeight - 300;
+
+        if (
+          scrolledRecently &&
+          modeRef.current === "browse" &&
+          hasMoreRef.current &&
+          !isLoadingRef.current &&
+          nearBottom
+        ) {
+          // Defer to let layout/scrollHeight settle
+          requestAnimationFrame(() => {
+            maybeLoadMoreRef.current();
+          });
+        }
       }
     },
     [count, setIngredients]
   );
+
+  const maybeLoadMore = useCallback(() => {
+    if (modeRef.current !== "browse") return;
+    if (isLoadingRef.current) return;
+    if (!hasMoreRef.current) return;
+
+    const nextPage = pageRef.current + 1;
+    pageRef.current = nextPage;
+    setPage(nextPage);
+    fetchIngredientsPage(nextPage, "append");
+  }, [fetchIngredientsPage]);
+
+  useEffect(() => {
+    maybeLoadMoreRef.current = maybeLoadMore;
+  }, [maybeLoadMore]);
 
   useEffect(() => {
     pageRef.current = page;
@@ -75,26 +112,14 @@ const IngredientList: React.FC = () => {
     modeRef.current = mode;
   }, [page, isLoading, hasMore, mode]);
 
-  const maybeLoadMore = useCallback(() => {
-    const rootEl = scrollContainerRef.current;
-    const sentinelEl = sentinelRef.current;
-    if (!rootEl || !sentinelEl) return;
+  useEffect(() => {
+    const onScroll = () => {
+      lastUserScrollTsRef.current = Date.now();
+    };
 
-    if (modeRef.current !== "browse") return;
-    if (isLoadingRef.current) return;
-    if (!hasMoreRef.current) return;
-
-    const rootRect = rootEl.getBoundingClientRect();
-    const sentinelRect = sentinelEl.getBoundingClientRect();
-
-    // If sentinel is within (or near) the viewport of the scroll container, load more.
-    if (sentinelRect.top <= rootRect.bottom + 200) {
-      const nextPage = pageRef.current + 1;
-      pageRef.current = nextPage;
-      setPage(nextPage);
-      fetchIngredientsPage(nextPage, "append");
-    }
-  }, [fetchIngredientsPage]);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     modeRef.current = mode;
@@ -105,19 +130,21 @@ const IngredientList: React.FC = () => {
       return;
     }
 
-    // Browse mode: hasMore is driven by total count
-    setHasMore(ingredients.length < count);
-
-    // If we just returned to browse (e.g., cleared search), reset paging to match page-1 data
+    // Returned to browse mode (e.g., cleared search)
     pageRef.current = 1;
     setPage(1);
+
+    // Re-enable infinite scroll
+    setHasMore(true);
+    hasMoreRef.current = true;
+
+    // Observer will resume loading pages as sentinel intersects
   }, [mode, count, ingredients.length]);
 
-  // Set up infinite scroll observer (uses the scrollable div as the root)
+  // Set up infinite scroll observer (uses the browser viewport as the root)
   useEffect(() => {
-    const rootEl = scrollContainerRef.current;
     const sentinelEl = sentinelRef.current;
-    if (!rootEl || !sentinelEl) return;
+    if (!sentinelEl) return;
 
     observerRef.current?.disconnect();
 
@@ -128,44 +155,20 @@ const IngredientList: React.FC = () => {
         maybeLoadMore();
       },
       {
-        root: rootEl,
+        root: null,
         rootMargin: "200px",
         threshold: 0,
       }
     );
 
     observerRef.current.observe(sentinelEl);
-
-    // Important: on mode changes (e.g., clear search), the sentinel may already be visible.
-    // This makes sure we load more without waiting for a new intersection event.
-    maybeLoadMore();
-
-    return () => {
-      observerRef.current?.disconnect();
-    };
-  }, [maybeLoadMore]);
-
-  // After items append (or loading completes), if we're still near the bottom,
-  // trigger the next page without requiring the sentinel to exit/re-enter.
-  useEffect(() => {
-    if (mode !== "browse") return;
-    if (isLoading) return;
-    if (!hasMore) return;
-
-    // Defer to the next frame so layout/scrollHeight is updated
-    const id = requestAnimationFrame(() => {
-      maybeLoadMore();
-    });
-
-    return () => cancelAnimationFrame(id);
-  }, [ingredients.length, isLoading, hasMore, mode, maybeLoadMore]);
+  }, [maybeLoadMore, ingredients.length]);
 
   return (
-    <div className="mt-4">
-      <div
-        ref={scrollContainerRef}
-        className="mt-8 grid gap-2 w-full max-h-[65vh] overflow-scroll "
-      >
+    <div style={{
+      marginTop: mode === "browse" ? "5.2em" : "8.5em",
+    }}>
+      <div className="mt-8 grid gap-2 w-full ">
         {ingredients.map((ingredient) => (
           <Card key={ingredient.name}>
             <div className="flex items-center gap-2 justify-between ">
