@@ -34,12 +34,12 @@ const DrinkActionOptions: React.FC<DrinkActionOptionsProps> = ({
   return (
     <ActionDrop label="Options">
       <div>
-        <CustomMenuItem icon={ShareIcon} onClick={() => {}} isLink={false}>
+        {/* <CustomMenuItem icon={ShareIcon} onClick={() => {}} isLink={false}>
           Share
         </CustomMenuItem>
         <CustomMenuItem icon={HeartIcon} onClick={() => {}} isLink={false}>
           Favorite
-        </CustomMenuItem>
+        </CustomMenuItem> */}
         {user?.id === drinkCreator && (
           <CustomMenuItem
             icon={PencilSquareIcon}

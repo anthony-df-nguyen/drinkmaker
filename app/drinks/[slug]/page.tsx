@@ -82,13 +82,14 @@ const DrinkPageContent: React.FC<DrinkPageContentProps> = ({ editURL }) => {
               </div>
             </div>
 
-            <div>
+            {user?.id === globalDrinkForm?.created_by_user_id && <div>
               <DrinkActionOptions
                 setEdit={setEdit}
                 drink={globalDrinkForm}
                 drinkCreator={globalDrinkForm.created_by_user_id}
               />
-            </div>
+            </div>}
+            
           </div>
         )}
 
