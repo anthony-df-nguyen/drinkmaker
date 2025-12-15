@@ -2,7 +2,7 @@
  * Represents a form for adding ingredients.
  * @returns {JSX.Element} The ingredient form component.
  */
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import TextInput from "@/components/MUIInputs/TextInput";
 import { useListIngredients } from "../context/ListIngredientsContext";
 import Button from "@/components/UI/Button";
@@ -10,19 +10,13 @@ import { sanitizeInput, validateInput } from "@/utils/sanitizeInput";
 import {
   createIngredient,
   searchForIngredient,
-  queryIngredients,
+  queryIngredientsWithCount,
 } from "@/app/ingredients/actions";
 import checkExisting from "@/utils/supabase/checkExisting";
 import { enqueueSnackbar } from "notistack";
 
 const SearchCreate: React.FC = () => {
-  const [formState, setFormState] = useState({
-    displayValue: "",
-    cleanValue: "",
-    enableSubmit: false,
-    errorMessage: "",
-  });
-  const { ingredients, setIngredients, count, setCount } = useListIngredients();
+  const { setIngredients, setCount, setMode, refreshBrowseFirstPage } = useListIngredients();
 
   /**
    * Displays a snackbar notification.
@@ -33,11 +27,15 @@ const SearchCreate: React.FC = () => {
     enqueueSnackbar(message, { variant });
   };
 
+  const requestIdRef = useRef(0);
+
   /**
    * Handles the input value for the ingredient name.
    * @param {string} val - The input value for the ingredient name.
    */
   const handleName = useCallback(async (val: string) => {
+    const requestId = ++requestIdRef.current;
+
     // Sanitize and validate the input
     const cleanString = sanitizeInput(val);
     const validString = validateInput(cleanString, { minLength: 3 });
@@ -45,11 +43,14 @@ const SearchCreate: React.FC = () => {
     // If the input is valid
     if (validString.isValid) {
       try {
+        setMode("search");
         // Search for the ingredient and update the list of displayed results
         const data = await searchForIngredient(cleanString);
+        if (requestIdRef.current !== requestId) return;
         console.log("data: ", data);
         setIngredients(data);
-        setCount(data.length);
+        // Do NOT setCount here: `count` represents total ingredients for pagination.
+        // The list component will treat this as filtered/search mode.
 
         // Check if the ingredient already exists
         const exists = await checkExisting("ingredients", "name", cleanString);
@@ -88,15 +89,21 @@ const SearchCreate: React.FC = () => {
       }));
       // If the input is empty, fetch all ingredients
       if (cleanString.length === 0) {
-        queryIngredients(1, 10)
-          .then((data) => setIngredients(data))
+        // Mark as browse and restore the canonical first page + total count.
+        setMode("browse");
+
+        refreshBrowseFirstPage()
+          .then(() => {
+            // Ensure the list isn't overwritten by any stale in-flight search response.
+            requestIdRef.current = requestId;
+          })
           .catch((error) => {
             console.error("Failed to fetch all ingredients:", error);
             displaySnackbar("Could not fetch ingredients", "error");
           });
       }
     }
-  }, [setCount,setIngredients]);
+  }, [refreshBrowseFirstPage, setCount, setIngredients, setMode]);
 
   /**
    * Handles the form submission.
@@ -118,6 +125,13 @@ const SearchCreate: React.FC = () => {
       }
     }
   };
+
+  const [formState, setFormState] = useState({
+    displayValue: "",
+    cleanValue: "",
+    enableSubmit: false,
+    errorMessage: "",
+  });
 
   return (
     <form className="mt-4" onSubmit={handleSubmit}>

@@ -16,7 +16,7 @@ import { useModal } from "@/context/ModalContext";
  */
 const IngredientList: React.FC = () => {
   const { showModal } = useModal();
-  const { ingredients, setIngredients, count } = useListIngredients();
+  const { ingredients, setIngredients, count, mode } = useListIngredients();
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -28,16 +28,23 @@ const IngredientList: React.FC = () => {
   const pageRef = useRef(1);
   const isLoadingRef = useRef(false);
   const hasMoreRef = useRef(true);
+  const modeRef = useRef(mode);
 
   const PAGE_SIZE = 10;
+  const requestVersionRef = useRef(0);
 
   const fetchIngredientsPage = useCallback(
     async (nextPage: number, mode: "replace" | "append") => {
       if (isLoadingRef.current) return;
       isLoadingRef.current = true;
       setIsLoading(true);
+      const reqVersion = ++requestVersionRef.current;
       try {
         const data = await queryIngredients(nextPage, PAGE_SIZE);
+
+        // If mode changed (e.g., search/clear) while this request was in-flight, ignore results.
+        if (requestVersionRef.current !== reqVersion) return;
+        if (modeRef.current !== "browse" && mode === "append") return;
 
         setIngredients((prev) => {
           if (mode === "replace") return data;
@@ -65,11 +72,46 @@ const IngredientList: React.FC = () => {
     pageRef.current = page;
     isLoadingRef.current = isLoading;
     hasMoreRef.current = hasMore;
-  }, [page, isLoading, hasMore]);
+    modeRef.current = mode;
+  }, [page, isLoading, hasMore, mode]);
+
+  const maybeLoadMore = useCallback(() => {
+    const rootEl = scrollContainerRef.current;
+    const sentinelEl = sentinelRef.current;
+    if (!rootEl || !sentinelEl) return;
+
+    if (modeRef.current !== "browse") return;
+    if (isLoadingRef.current) return;
+    if (!hasMoreRef.current) return;
+
+    const rootRect = rootEl.getBoundingClientRect();
+    const sentinelRect = sentinelEl.getBoundingClientRect();
+
+    // If sentinel is within (or near) the viewport of the scroll container, load more.
+    if (sentinelRect.top <= rootRect.bottom + 200) {
+      const nextPage = pageRef.current + 1;
+      pageRef.current = nextPage;
+      setPage(nextPage);
+      fetchIngredientsPage(nextPage, "append");
+    }
+  }, [fetchIngredientsPage]);
 
   useEffect(() => {
+    modeRef.current = mode;
+
+    if (mode === "search") {
+      // Disable infinite scroll while showing search results
+      setHasMore(false);
+      return;
+    }
+
+    // Browse mode: hasMore is driven by total count
     setHasMore(ingredients.length < count);
-  }, [count, ingredients.length]);
+
+    // If we just returned to browse (e.g., cleared search), reset paging to match page-1 data
+    pageRef.current = 1;
+    setPage(1);
+  }, [mode, count, ingredients.length]);
 
   // Set up infinite scroll observer (uses the scrollable div as the root)
   useEffect(() => {
@@ -83,38 +125,50 @@ const IngredientList: React.FC = () => {
       (entries) => {
         const entry = entries[0];
         if (!entry?.isIntersecting) return;
-        if (isLoadingRef.current) return;
-        if (!hasMoreRef.current) return;
-
-        const nextPage = pageRef.current + 1;
-        // update both ref + state so UI stays in sync
-        pageRef.current = nextPage;
-        setPage(nextPage);
-        fetchIngredientsPage(nextPage, "append");
+        maybeLoadMore();
       },
       {
         root: rootEl,
-        rootMargin: "200px", // start loading a bit before reaching the bottom
+        rootMargin: "200px",
         threshold: 0,
       }
     );
 
     observerRef.current.observe(sentinelEl);
 
+    // Important: on mode changes (e.g., clear search), the sentinel may already be visible.
+    // This makes sure we load more without waiting for a new intersection event.
+    maybeLoadMore();
+
     return () => {
       observerRef.current?.disconnect();
     };
-  }, [fetchIngredientsPage]);
+  }, [maybeLoadMore]);
+
+  // After items append (or loading completes), if we're still near the bottom,
+  // trigger the next page without requiring the sentinel to exit/re-enter.
+  useEffect(() => {
+    if (mode !== "browse") return;
+    if (isLoading) return;
+    if (!hasMore) return;
+
+    // Defer to the next frame so layout/scrollHeight is updated
+    const id = requestAnimationFrame(() => {
+      maybeLoadMore();
+    });
+
+    return () => cancelAnimationFrame(id);
+  }, [ingredients.length, isLoading, hasMore, mode, maybeLoadMore]);
 
   return (
     <div className="mt-4">
       <div
         ref={scrollContainerRef}
-        className="mt-8 grid gap-2 max-h-[65vh] overflow-y-scroll no-scrollbar"
+        className="mt-8 grid gap-2 w-full max-h-[65vh] overflow-scroll "
       >
         {ingredients.map((ingredient) => (
           <Card key={ingredient.name}>
-            <div className="flex items-center gap-2 justify-between w-full">
+            <div className="flex items-center gap-2 justify-between ">
               <div className="text-base">{formatText(ingredient.name)}</div>
               <div className="flex-1"></div>
               <div
