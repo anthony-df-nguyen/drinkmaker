@@ -136,25 +136,27 @@ const DrinkList: React.FC = () => {
   );
 
   return (
-    <div className="mt-4 grid gap-2">
+    <div className="grid">
       {/* Controls */}
-      <div className="flex-row gap-4 mb-4 flex items-center">
-        <div className="flex-1">
-          <DebouncedTextInput
-            label="Search for Drink"
-            focused
-            value={searchTerm}
-            onChange={(e) => handleSearchTermChange(e)}
-            placeholder="Drink Name"
-            delay={500}
-            variant="filled"
-            size="small"
-          />
-        </div>
-        <div className="text-base bg-emerald-600 rounded-md py-3 px-4 text-white">
-          <button onClick={() => showModal(<CreateForm />)}>+ Drink</button>
-        </div>
-        {/* <div className="flex-1 sm:flex-none sm:w-[200px] max-w-[200px]">
+      <div className="mt-16 fixed top-0 inset-x-0 z-30 bg-gray-100 px-4 py-4 box-border max-w-[860px] mx-auto">
+        {" "}
+        <div className="max-w-full flex-row gap-4 flex items-center justify-between">
+          <div className="flex-1 min-w-0">
+            <DebouncedTextInput
+              label="Search for Drink"
+              focused
+              value={searchTerm}
+              onChange={(e) => handleSearchTermChange(e)}
+              placeholder="Drink Name"
+              delay={500}
+              variant="filled"
+              size="small"
+            />
+          </div>
+          <div className="text-base bg-emerald-600 rounded-md py-3 px-4 text-white">
+            <button onClick={() => showModal(<CreateForm />)}>+ Drink</button>
+          </div>
+          {/* <div className="flex-1 sm:flex-none sm:w-[200px] max-w-[200px]">
           <CustomSelect
             label="Drink Type"
             options={drinkTypes}
@@ -164,10 +166,11 @@ const DrinkList: React.FC = () => {
             size="small"
           />
         </div> */}
+        </div>
       </div>
 
       {/* Grid/Results */}
-      <div className="grid gap-4 xl:grid-cols-1 max-h-[80vh] overflow-scroll">
+      <div className="mt-[6rem] grid gap-4 xl:grid-cols-1">
         {drinksList.map((drink, index) => {
           const color = drinkTypeColors[drink.drink_type];
 
