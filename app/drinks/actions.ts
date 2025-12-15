@@ -87,17 +87,18 @@ const queryDrinks = async (
   page: number,
   limit: number,
   searchName?: string,
-  drinkType?: string
+  drinkType?: string,
+  includeCount: boolean = true
 ): Promise<{
   data: (DrinkSchema & { username: string | null })[];
-  totalCount: number;
+  totalCount: number | null;
 }> => {
   const pg = await createSupabaseServerActionClient();
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
-  // If you have multiple FKs to profiles, disambiguate like:
-  // profiles!drinks_created_by_user_id_fkey ( username )
+  const trimmedSearch = searchName?.trim();
+
   let query = pg
     .from("drinks")
     .select(
@@ -105,23 +106,35 @@ const queryDrinks = async (
       *,
       profiles ( username )
     `,
-      { count: "exact" } // <-- ensures `count` is populated
+      includeCount ? { count: "exact" } : undefined
     )
+    // Deterministic ordering so pagination is stable
     .order("name", { ascending: true })
-    .range(from, to);
+    .order("id", { ascending: true });
 
-  if (searchName) query = query.ilike("name", `%${searchName}%`);
-  if (drinkType && drinkType !== "all") query = query.eq("drink_type", drinkType);
+  // Apply filters
+  if (trimmedSearch) {
+    query = query.ilike("name", `%${trimmedSearch}%`);
+  }
+  if (drinkType && drinkType !== "all") {
+    query = query.eq("drink_type", drinkType);
+  }
+
+  // Apply range (after filters)
+  query = query.range(from, to);
 
   const { data, error, count } = await query;
-  if (error) throw new Error(`Error querying drinks: ${error.message}`);
+  if (error) {
+    console.error("Supabase query error:", error);
+    throw new Error(`Error querying drinks: ${error.message}`);
+  }
 
   const withUser = (data ?? []).map((d: any) => ({
     ...(d as DrinkSchema),
     username: d.profiles?.username ?? null,
   }));
 
-  return { data: withUser, totalCount: count ?? 0 };
+  return { data: withUser, totalCount: includeCount ? (count ?? 0) : null };
 };
 
 const getDrinkByID = async (slug: string): Promise<DrinkSchema & { username: string | null }> => {

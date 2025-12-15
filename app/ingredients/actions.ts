@@ -47,6 +47,32 @@ const queryIngredients = async (
   return (data ?? []) as IngredientsSchema[];
 };
 
+/** List paginated (data + total count) */
+const queryIngredientsWithCount = async (
+  page: number,
+  limit: number
+): Promise<{ data: IngredientsSchema[]; totalCount: number }> => {
+  const pg = await getPg();
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
+  const { data, count, error } = await pg
+    .from("ingredients")
+    .select("*", { count: "exact" })
+    .order("name", { ascending: true })
+    .range(from, to);
+
+  if (error) {
+    console.error("Error querying ingredients:", error);
+    throw new Error(`Error querying ingredients: ${error.message}`);
+  }
+
+  return {
+    data: (data ?? []) as IngredientsSchema[],
+    totalCount: count ?? 0,
+  };
+};
+
 /** List all (id + name) */
 const queryAllIngredients = async (): Promise<IngredientsSchema[]> => {
   const pg = await getPg();
@@ -106,6 +132,7 @@ const deleteIngredient = async (id: string) => {
 export {
   createIngredient,
   queryIngredients,
+  queryIngredientsWithCount,
   queryAllIngredients,
   searchForIngredient,
   updateIngredient,

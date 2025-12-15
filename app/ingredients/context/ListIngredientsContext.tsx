@@ -4,18 +4,19 @@ import React, {
   useState,
   ReactNode,
   useEffect,
+  Dispatch,
+  SetStateAction,
 } from "react";
 import { IngredientsSchema } from "../models";
-import { queryIngredients, queryAllIngredients } from "../actions";
-import { getTotalCount } from "@/utils/supabase/getTotalCount";
+import { queryIngredientsWithCount, queryAllIngredients } from "../actions";
 
 interface ListIngredientsContextType {
   ingredients: IngredientsSchema[];
-  setIngredients: (newIngredients: IngredientsSchema[]) => void;
+  setIngredients: Dispatch<SetStateAction<IngredientsSchema[]>>;
   allIngredients: IngredientsSchema[];
-  setAllIngredients: (newIngredients: IngredientsSchema[]) => void;
+  setAllIngredients: Dispatch<SetStateAction<IngredientsSchema[]>>;
   count: number;
-  setCount: (newCount: number) => void;
+  setCount: Dispatch<SetStateAction<number>>;
 }
 
 const ListIngredientsContext = createContext<
@@ -36,16 +37,15 @@ export const ListIngredientsProvider: React.FC<
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [ingredientsData, allIngredientData, countData] = await Promise.all([
-          queryIngredients(1, 10),
-          queryAllIngredients(),
-          getTotalCount("ingredients")
-        ]);
+        const [{ data: ingredientsData, totalCount }, allIngredientData] =
+          await Promise.all([
+            queryIngredientsWithCount(1, 10),
+            queryAllIngredients(),
+          ]);
 
         setIngredients(ingredientsData);
         setAllIngredients(allIngredientData);
-        setCount(countData);
-
+        setCount(totalCount);
       } catch (error: any) {
         console.error("Error fetching initial data: ", error);
       }

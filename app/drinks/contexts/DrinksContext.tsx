@@ -1,21 +1,19 @@
 import React, {
-    createContext,
-    useContext,
-    useState,
-    ReactNode,
-    useEffect,
-    useMemo,
-  } from "react";
-  import { DrinkSchema } from "../models";
-  import { queryDrinks } from "../actions";
-  import { getTotalCount } from "@/utils/supabase/getTotalCount";
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useMemo,
+} from "react";
+
+import { DrinkSchema } from "../models";
   
-  interface ListDrinksContextType {
-    drinksList: DrinkSchema[];
-    setDrinksList: (newDrinkList: DrinkSchema[]) => void;
-    count: number;
-    setCount: (newCount: number) => void;
-  }
+interface ListDrinksContextType {
+  drinksList: DrinkSchema[];
+  setDrinksList: React.Dispatch<React.SetStateAction<DrinkSchema[]>>;
+  count: number;
+  setCount: React.Dispatch<React.SetStateAction<number>>;
+}
   
   const ListDrinksContext = createContext<ListDrinksContextType | undefined>(undefined);
   
@@ -27,23 +25,8 @@ import React, {
     const [drinksList, setDrinksList] = useState<DrinkSchema[]>([]);
     const [count, setCount] = useState<number>(0);
   
-    useEffect(() => {
-      const fetchInitialData = async () => {
-        try {
-          const [drinksData, totalCount] = await Promise.all([
-            queryDrinks(1, 10, undefined, undefined),
-            getTotalCount("drinks")
-          ]);
-  
-          setDrinksList(drinksData.data);
-          setCount(totalCount);
-        } catch (error: any) {
-          console.error("Error querying drinks: ", error);
-        }
-      };
-  
-      fetchInitialData();
-    }, []);
+    // Initial data fetch is now handled in the component
+    // No need to fetch initial data here since it's done in the component
   
     const contextValue = useMemo(
       () => ({
