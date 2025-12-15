@@ -168,13 +168,13 @@ const IngredientList: React.FC = () => {
     <div style={{
       marginTop: mode === "browse" ? "5.2em" : "8.5em",
     }}>
-      <div className="mt-8 grid gap-2 w-full ">
+      <div className="mt-8  grid gap-2 w-full ">
         {ingredients.map((ingredient) => (
           <Card key={ingredient.name}>
             <div className="flex items-center gap-2 justify-between ">
               <div className="text-base">{formatText(ingredient.name)}</div>
               <div className="flex-1"></div>
-              <div
+              {/* <div
                 className="text-gray-500 w-5 h-5 cursor-pointer"
                 onClick={() => showModal(<EditForm ingredient={ingredient} />)}
               >
@@ -187,7 +187,7 @@ const IngredientList: React.FC = () => {
                 }
               >
                 <TrashIcon />
-              </div>
+              </div> */}
             </div>
           </Card>
         ))}

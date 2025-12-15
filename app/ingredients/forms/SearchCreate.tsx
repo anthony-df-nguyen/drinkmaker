@@ -134,7 +134,7 @@ const SearchCreate: React.FC = () => {
   });
 
   return (
-    <form className="mt-16 fixed top-0 inset-x-0 z-30 bg-gray-100 px-4 py-4 box-border max-w-[860px] mx-auto" onSubmit={handleSubmit}>
+    <form className="mt-16 fixed top-0 inset-x-0 z-30 bg-gray-100 dark:bg-stone-900 px-4 lg:px-0 py-4 box-border max-w-[860px] mx-auto" onSubmit={handleSubmit}>
       <TextInput
           label="Name"
           onChange={handleName}

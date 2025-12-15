@@ -138,7 +138,7 @@ const DrinkList: React.FC = () => {
   return (
     <div className="grid">
       {/* Controls */}
-      <div className="mt-16 fixed top-0 inset-x-0 z-30 bg-gray-100 px-4 py-4 box-border max-w-[860px] mx-auto">
+      <div className="mt-16 fixed top-0 inset-x-0 z-30 bg-gray-100 dark:bg-stone-900 px-4 lg:px-0 py-4 box-border max-w-[860px] mx-auto">
         {" "}
         <div className="max-w-full flex-row gap-4 flex items-center justify-between">
           <div className="flex-1 min-w-0">
@@ -170,7 +170,7 @@ const DrinkList: React.FC = () => {
       </div>
 
       {/* Grid/Results */}
-      <div className="mt-[6rem] grid gap-4 xl:grid-cols-1">
+      <div className="mt-[6rem] lg:mt-[4rem] grid gap-4 xl:grid-cols-1">
         {drinksList.map((drink, index) => {
           const color = drinkTypeColors[drink.drink_type];
 
