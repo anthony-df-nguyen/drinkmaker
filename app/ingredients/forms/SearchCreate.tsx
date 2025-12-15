@@ -142,6 +142,7 @@ const SearchCreate: React.FC = () => {
           required
           variant="filled"
           size="small"
+          focused
           placeholder="Enter an ingredient name to search or create"
           value={formState.displayValue}
           error={formState.errorMessage ? true : false}

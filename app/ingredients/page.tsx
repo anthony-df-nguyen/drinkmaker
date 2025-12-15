@@ -9,8 +9,7 @@ const Page: React.FC = () => {
   return (
     <Navigation>
       <ListIngredientsProvider>
-        <div>
-          <div className="pageTitle">Ingredients</div>
+        <div className="max-w-[860px] mx-auto">
           <SearchCreate />
           <IngredientList />
         </div>

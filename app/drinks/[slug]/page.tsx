@@ -59,7 +59,7 @@ const DrinkPageContent: React.FC<DrinkPageContentProps> = ({ editURL }) => {
 
   return (
     <main>
-      <div className="grid gap-8 max-w-[860px] w-full mx-auto border p-4 sm:p-8 rounded-md shadow-sm bg-white dark:bg-stone-800 dark:border-0">
+      <div className="mt-4 grid gap-8 max-w-[860px] w-full mx-auto border p-4 sm:p-8 rounded-md shadow-sm bg-white dark:bg-stone-800 dark:border-0">
         {!edit && (
           <div className="flex items-start gap-2">
             <div className="w-full">

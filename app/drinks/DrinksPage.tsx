@@ -8,21 +8,7 @@ const CreateDrinkContainer: React.FC = () => {
   const { showModal } = useModal();
   return (
     <ListIngredientsProvider>
-      <div className="">
-        <div className="flex items-center justify-between">
-          <div className="pageTitle">Drinks</div>
-          <Button
-            onClick={() => showModal(<CreateForm />)}
-            label="+ Create Drink"
-            type="button"
-            variant="primary"
-          />
-        </div>
-
-        <div className="mt-4">
-          <DrinkList />
-        </div>
-      </div>
+      <DrinkList />
     </ListIngredientsProvider>
   );
 };

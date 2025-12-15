@@ -7,13 +7,17 @@ import Badge from "@/components/UI/Badge";
 import { queryDrinks } from "./actions";
 import { drinkTypeColors, drinkTypes } from "./models";
 import DebouncedTextInput from "@/components/MUIInputs/TextInput";
+import Button from "@/components/UI/Button";
 import CustomSelect from "@/components/MUIInputs/Select";
+import { useModal } from "@/context/ModalContext";
+import CreateForm from "./forms/CreateDrinkForm";
 
 const DrinkList: React.FC = () => {
   const { drinksList, setDrinksList, count, setCount } = useListDrinks();
   const [searchTerm, handleSearchTermChange] = useState<string>("");
   const [selectDrinkType, setSelectDrinkType] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(false);
+  const { showModal } = useModal();
 
   const PAGE_SIZE = 10;
 
@@ -134,10 +138,11 @@ const DrinkList: React.FC = () => {
   return (
     <div className="mt-4 grid gap-2">
       {/* Controls */}
-      <div className="flex flex-row gap-4 mb-4">
-        <div className="w-[240px] md:w-[300px]">
+      <div className="flex-row gap-4 mb-4 flex items-center">
+        <div className="flex-1">
           <DebouncedTextInput
             label="Search for Drink"
+            focused
             value={searchTerm}
             onChange={(e) => handleSearchTermChange(e)}
             placeholder="Drink Name"
@@ -146,7 +151,10 @@ const DrinkList: React.FC = () => {
             size="small"
           />
         </div>
-        <div className="flex-1 sm:flex-none sm:w-[200px] max-w-[200px]">
+        <div className="text-base bg-emerald-600 rounded-md py-3 px-4 text-white">
+          <button onClick={() => showModal(<CreateForm />)}>+ Drink</button>
+        </div>
+        {/* <div className="flex-1 sm:flex-none sm:w-[200px] max-w-[200px]">
           <CustomSelect
             label="Drink Type"
             options={drinkTypes}
@@ -155,11 +163,11 @@ const DrinkList: React.FC = () => {
             variant="filled"
             size="small"
           />
-        </div>
+        </div> */}
       </div>
 
       {/* Grid/Results */}
-      <div className="grid gap-4 xl:grid-cols-1 max-h-[65vh] overflow-scroll">
+      <div className="grid gap-4 xl:grid-cols-1 max-h-[80vh] overflow-scroll">
         {drinksList.map((drink, index) => {
           const color = drinkTypeColors[drink.drink_type];
 

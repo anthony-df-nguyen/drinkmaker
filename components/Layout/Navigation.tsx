@@ -5,7 +5,11 @@ import { links } from "./Links";
 import Link from "next/link";
 import { SnackbarProvider } from "notistack";
 import classNames from "@/utils/classNames";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  Bars3Icon,
+  XMarkIcon,
+  MagnifyingGlassIcon,PlusIcon
+} from "@heroicons/react/24/outline";
 import ThemeToggle from "./ThemeToggle";
 import ProfileMenu from "./ProfileMenu";
 import { usePathname } from "next/navigation";
@@ -27,7 +31,7 @@ export default function Navigation({ children }: Props) {
       >
         <div>
           {/* Side Nav */}
-          <SideNav sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
+          <SideNav sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
           {/* Top header bar */}
           <div className="">
@@ -41,7 +45,10 @@ export default function Navigation({ children }: Props) {
                 <Bars3Icon className="h-6 w-6" aria-hidden="true" />
               </button>
 
-              <Link href="/" className="lg:h-16 shrink-0 items-center  lg:flex text-xl font-bold wider text-emerald-600 tracking-widest">
+              <Link
+                href="/"
+                className="lg:h-16 shrink-0 items-center  lg:flex text-xl font-bold wider text-emerald-600 tracking-widest"
+              >
                 DRINKMAKER
               </Link>
               {/* Links */}
@@ -66,15 +73,20 @@ export default function Navigation({ children }: Props) {
                 <div className="relative flex flex-1"></div>
 
                 <div className="flex items-center gap-x-4 ">
+                    
                   <div className="mt-[5px] hidden sm:block">
                     <ThemeToggle />
+                   
                   </div>
+                 
+                 
+                 
                   <ProfileMenu />
                 </div>
               </div>
             </div>
 
-            <main className="py-8">
+            <main className="lg:py-8">
               <div className="px-4 sm:px-6 lg:px-8">{children}</div>
             </main>
           </div>

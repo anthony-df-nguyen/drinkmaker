@@ -8,9 +8,11 @@ export default function Home() {
   return (
     <main className="pageTitle">
       <Navigation>
-        <ListDrinksProvider>
-          <DrinksPage />
-        </ListDrinksProvider>
+        <div className="max-w-[860px] mx-auto">
+          <ListDrinksProvider>
+            <DrinksPage />
+          </ListDrinksProvider>
+        </div>
       </Navigation>
     </main>
   );
