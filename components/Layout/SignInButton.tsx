@@ -65,7 +65,7 @@ export default function SignInButton({ provider, nextUrl }: Props) {
       className="flex w-full items-center justify-center gap-3 rounded-md bg-white border px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs inset-ring inset-ring-gray-300 hover:bg-gray-50 focus-visible:inset-ring-transparent"
     >
       {/* {`Sign In with ${provider.toUpperCase()}`} */}
-      {svg[`${provider}`]}
+      {svg[provider as keyof typeof svg]}
       <span className="text-sm/6 font-semibold">{provider.toUpperCase()}</span>
     </button>
   );
