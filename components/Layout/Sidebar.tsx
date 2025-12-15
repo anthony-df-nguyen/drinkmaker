@@ -66,11 +66,14 @@ const SideBar: React.FC<SideBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
               {/* Sidebar component, swap this element with another sidebar if you like */}
               <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-emerald-600 dark:bg-black px-6 pb-4">
                 <div className="flex h-16 shrink-0 items-center">
-                  <img
+                  {/* <img
                     className="h-8 w-auto"
                     src="https://tailwindui.com/img/logos/mark.svg?color=white"
                     alt="Your Company"
-                  />{" "}
+                  />{" "} */}
+                  <div className="shrink-0 items-center  lg:flex text-xl font-bold wider text-white tracking-widest">
+                    DRINKMAKER
+                  </div>
                   <div className="flex-1"></div>
                   <ThemeToggle />
                 </div>
