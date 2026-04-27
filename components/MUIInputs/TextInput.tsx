@@ -65,6 +65,7 @@ const DebouncedTextInput = <T extends string | number>({
         error={error}
         helperText={error ? errorText : helperText}
         // size={size}
+        inputProps={{ style: { fontSize: "16px" } }}
         {...props}
       />
      
