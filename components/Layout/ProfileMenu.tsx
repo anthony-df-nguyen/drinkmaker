@@ -36,14 +36,14 @@ export default function Profile({}: Props) {
             <span className="sr-only">Open user menu</span>
             {user && (
               <img
-                className="h-8 w-8 rounded-full bg-gray-50 block"
+                className="h-8 w-8 rounded-full bg-surface-raised block"
                 src={user.user_metadata.avatar_url}
                 alt=""
               />
             )}
             <span className="flex items-center">
               <span
-                className="ml-4 text-sm font-semibold leading-6 text-gray-900 dark:text-white"
+                className="ml-4 text-sm font-semibold leading-6 text-foreground"
                 aria-hidden="true"
               >
                 {user ? (
@@ -58,7 +58,7 @@ export default function Profile({}: Props) {
                 )}
               </span>
               <ChevronDownIcon
-                className="hidden sm:block ml-2 h-5 w-5 text-gray-400"
+                className="hidden sm:block ml-2 h-5 w-5 text-subtle"
                 aria-hidden="true"
               />
             </span>
@@ -73,26 +73,26 @@ export default function Profile({}: Props) {
           >
             <MenuItems
               transition
-              className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white dark:bg-stone-900 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+              className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-border rounded-md bg-surface shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
             >
               <div className="py-1">
                 <MenuItem>
                   <Link
                     href="/profile"
-                    className="group flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-400 data-[focus]:bg-gray-100 dark:data-[focus]:bg-stone-800 data-[focus]:text-gray-900"
+                    className="group flex items-center px-4 py-2 text-sm text-muted data-[focus]:bg-surface-raised data-[focus]:text-foreground"
                   >
                     <UserCircleIcon
                       aria-hidden="true"
-                      className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                      className="mr-3 h-5 w-5 text-subtle group-hover:text-muted"
                     />
                     My Profile
                   </Link>
                 </MenuItem>
                 <MenuItem>
-                  <span className=" cursor-pointer group flex items-center px-4 py-2 text-sm text-gray-700  dark:text-gray-400 data-[focus]:bg-gray-100 dark:data-[focus]:bg-stone-800 data-[focus]:text-gray-900">
+                  <span className=" cursor-pointer group flex items-center px-4 py-2 text-sm text-muted data-[focus]:bg-surface-raised data-[focus]:text-foreground">
                     <PowerIcon
                       aria-hidden="true"
-                      className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                      className="mr-3 h-5 w-5 text-subtle group-hover:text-muted"
                     />
                     <SignOutButton />
                   </span>

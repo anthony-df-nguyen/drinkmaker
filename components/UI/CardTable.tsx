@@ -45,27 +45,27 @@ const CardTable = <T extends { [key: string]: any }>({
         <div className=" -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
             <div className="overflow-hidden ring-1 ring-black ring-opacity-5 rounded-md">
-              <table className="min-w-full divide-y divide-gray-300 dark:divide-black">
-                <thead className="bg-gray-100 dark:bg-stone-900">
+              <table className="min-w-full divide-y divide-border">
+                <thead className="bg-background">
                   <tr>
                     {columns.map((column) => (
                       <th
                         key={String(column.accessor)}
                         scope="col"
-                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-white sm:pl-6"
+                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-foreground sm:pl-6"
                       >
                         {column.header}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-300 dark:divide-stone-800 bg-white dark:bg-stone-700">
+                <tbody className="divide-y divide-border bg-surface">
                   {data.map((item, index) => (
                     <tr key={index}>
                       {columns.map((column) => (
                         <td
                           key={String(column.accessor)}
-                          className="whitespace-wrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-gray-300 sm:pl-6"
+                          className="whitespace-wrap py-4 pl-4 pr-3 text-sm font-medium text-foreground sm:pl-6"
                         >
                           {column.render
                             ? column.render(item, index)

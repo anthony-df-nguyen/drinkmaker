@@ -28,7 +28,7 @@ const SideBar: React.FC<SideBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-stone-900/90" />
+          <div className="fixed inset-0 bg-background/90" />
         </TransitionChild>
 
         <div className="fixed inset-0 flex">
@@ -64,7 +64,7 @@ const SideBar: React.FC<SideBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                 </div>
               </TransitionChild>
               {/* Sidebar component, swap this element with another sidebar if you like */}
-              <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-emerald-600 dark:bg-black px-6 pb-4">
+              <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-accent dark:bg-black px-6 pb-4">
                 <div className="flex h-16 shrink-0 items-center">
                   {/* <img
                     className="h-8 w-auto"

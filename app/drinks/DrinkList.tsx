@@ -138,7 +138,7 @@ const DrinkList: React.FC = () => {
   return (
     <div className="grid">
       {/* Controls */}
-      <div className="mt-16 fixed top-0 inset-x-0 z-30 bg-gray-100 dark:bg-stone-900 px-4 lg:px-0 py-4 box-border max-w-[860px] mx-auto">
+      <div className="mt-16 fixed top-0 inset-x-0 z-30 bg-background px-4 lg:px-0 py-4 box-border max-w-[860px] mx-auto">
         {" "}
         <div className="max-w-full flex-row gap-4 flex items-center justify-between">
           <div className="flex-1 min-w-0">
@@ -153,7 +153,7 @@ const DrinkList: React.FC = () => {
               size="small"
             />
           </div>
-          <div className="text-base bg-emerald-600 rounded-md py-3 px-4 text-white">
+          <div className="text-base bg-accent rounded-md py-3 px-4 text-accent-foreground">
             <button onClick={() => showModal(<CreateForm />)}>+ Drink</button>
           </div>
           {/* <div className="flex-1 sm:flex-none sm:w-[200px] max-w-[200px]">
@@ -182,7 +182,7 @@ const DrinkList: React.FC = () => {
                   <Card className="w-full h-full">
                     <div className="flex flex-col gap-1 justify-start h-full">
                       <div className="flex item-center gap-2 justify-between">
-                        <div className="text-base text-gray-900 dark:text-white">
+                        <div className="text-base text-foreground">
                           {drink.name}
                         </div>
                         <div className="text-xs h-1">
@@ -190,7 +190,7 @@ const DrinkList: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="text-xs font-light text-gray-700 dark:text-gray-300 flex-1">
+                      <div className="text-xs font-light text-muted flex-1">
                         {drink.description}
                       </div>
                     </div>
@@ -206,7 +206,7 @@ const DrinkList: React.FC = () => {
                 <div className="flex flex-row gap-4 justify-between h-full">
                   {/* Image */}
                   {drink.picture && (
-                    <div className="w-24 h-24 overflow-hidden rounded-md bg-gray-100">
+                    <div className="w-24 h-24 overflow-hidden rounded-md bg-surface-raised">
                       <img
                         src={drink.picture}
                         alt={drink.name}
@@ -217,10 +217,10 @@ const DrinkList: React.FC = () => {
                   {/* Name block */}
                   <div className="flex-1">
                     <div className="flex-col item-center gap-2 justify-between">
-                      <div className="text-base text-gray-900 dark:text-white">
+                      <div className="text-base text-foreground">
                         {drink.name}
                       </div>
-                      <div className="text-xs font-light text-gray-700 dark:text-gray-300 flex-1">
+                      <div className="text-xs font-light text-muted flex-1">
                         {drink.description}
                       </div>
                     </div>
@@ -236,7 +236,7 @@ const DrinkList: React.FC = () => {
         })}
         {/* End of results indicator */}
         {!hasMore && drinksList.length > 0 && (
-          <div className="text-center py-4 text-gray-500">This is the end</div>
+          <div className="text-center py-4 text-muted">This is the end</div>
         )}
       </div>
 
@@ -249,7 +249,7 @@ const DrinkList: React.FC = () => {
       {/* No drinks found */}
       {!isLoading && drinksList.length === 0 && (
         <div className="flex justify-center">
-          <div className="text-center text-gray-500">No drinks found</div>
+          <div className="text-center text-muted">No drinks found</div>
         </div>
       )}
     </div>

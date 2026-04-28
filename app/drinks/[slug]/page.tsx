@@ -59,19 +59,19 @@ const DrinkPageContent: React.FC<DrinkPageContentProps> = ({ editURL }) => {
 
   return (
     <main>
-      <div className="mt-4 grid gap-8 max-w-[860px] w-full mx-auto border p-4 sm:p-8 rounded-md shadow-sm bg-white dark:bg-stone-800 dark:border-0">
+      <div className="mt-4 grid gap-8 max-w-[860px] w-full mx-auto border border-border p-4 sm:p-8 rounded-md shadow-sm bg-surface">
         {!edit && (
           <div className="flex items-start gap-2">
             <div className="w-full">
               <div className="flex items-center justify-between">
-                <div className="text-2xl font-bold text-emerald-600 dark:text-white ">
+                <div className="text-2xl font-bold text-accent-text dark:text-foreground">
                   {globalDrinkForm.name}{" "}
                 </div>
               </div>
-              <div className="text-sm mt-2 italic dark:text-gray-500">
+              <div className="text-sm mt-2 italic text-muted">
                 By: {globalDrinkForm.created_by_user}
               </div>
-              <div className="text-sm mt-2 dark:text-gray-300">
+              <div className="text-sm mt-2 text-foreground">
                 {globalDrinkForm.description}
               </div>
               <div className="mt-2">
@@ -97,7 +97,7 @@ const DrinkPageContent: React.FC<DrinkPageContentProps> = ({ editURL }) => {
         )}
 
         {!edit && globalDrinkForm.picture && (
-          <div className="w-full max-h-[400px] lg:max-w-sm h-auto lg:max-h-sm overflow-hidden rounded-md bg-gray-100">
+          <div className="w-full max-h-[400px] lg:max-w-sm h-auto lg:max-h-sm overflow-hidden rounded-md bg-surface-raised">
             <img
               src={globalDrinkForm.picture}
               alt={globalDrinkForm.name}

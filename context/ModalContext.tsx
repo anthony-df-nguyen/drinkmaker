@@ -84,11 +84,11 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
       {children}
       {modalContent && (
         <div className="fixed inset-0 bg-black  bg-opacity-70 dark:bg-opacity-80 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-black dark:ring-1 dark:ring-stone-700 p-8 rounded-lg shadow-lg relative">
+          <div className="bg-surface ring-1 ring-border p-8 rounded-lg shadow-lg relative">
             {modalContent}
             <div
               onClick={hideModal}
-              className="h-6 w-6 absolute top-2 right-2 text-black hover:text-gray-700 cursor-pointer"
+              className="h-6 w-6 absolute top-2 right-2 text-foreground hover:text-muted cursor-pointer"
             >
               <XMarkIcon className="dark:text-white"/> 
             </div>

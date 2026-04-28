@@ -22,23 +22,23 @@ export default function ProfilePage() {
   ];
   return (
     <div className="overflow-hidden  shadow rounded-lg max-w-[800px] mx-auto">
-      <div className="px-4 py-4 sm:px-6 flex items-center gap-2 bg-white  dark:bg-stone-800">
-        <h3 className="text-base font-semibold leading-7 text-gray-900 dark:text-white">
+      <div className="px-4 py-4 sm:px-6 flex items-center gap-2 bg-surface">
+        <h3 className="text-base font-semibold leading-7 text-foreground">
           My Profile
         </h3>
       </div>
-      <div className="border-t bg-white dark:bg-stone-700 border-gray-100 dark:border-black">
-        <dl className="divide-y bg-white dark:bg-stone-700 divide-gray-100 dark:divide-stone-800">
+      <div className="border-t bg-surface border-border">
+        <dl className="divide-y bg-surface divide-border">
           {items.map((item) => {
             return (
               <div
                 key={item.name}
                 className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
               >
-                <dt className="text-sm font-medium text-gray-900 dark:text-white">
+                <dt className="text-sm font-medium text-foreground">
                   {item.name}
                 </dt>
-                <dd className="text-sm font-light leading-6 text-gray-700 dark:text-gray-300 sm:col-span-2 sm:mt-0">
+                <dd className="text-sm font-light leading-6 text-muted sm:col-span-2 sm:mt-0">
                   {item.value}
                 </dd>
               </div>

@@ -20,7 +20,7 @@ const DisplayName: React.FC = () => {
         }
       >
         <div className="h-5 w-5">
-          <PencilSquareIcon className="text-gray-600 dark:text-gray-400" />
+          <PencilSquareIcon className="text-muted" />
         </div>
         <div className="flex-1">{user?.username}</div>
       </div>

@@ -57,5 +57,5 @@ export const drinkTypeColors: {
   shake: "bg-pink-100",
   smoothie: "bg-red-100",
   tea: "bg-orange-100",
-  other: "bg-gray-100",
+  other: "bg-surface-raised",
 };

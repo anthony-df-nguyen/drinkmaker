@@ -62,7 +62,7 @@ export default function SignInButton({ provider, nextUrl }: Props) {
     <button
       onClick={handleLogin}
       // className="flex w-full justify-center rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
-      className="flex w-full items-center justify-center gap-3 rounded-md bg-white border px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs inset-ring inset-ring-gray-300 hover:bg-gray-50 focus-visible:inset-ring-transparent"
+      className="flex w-full items-center justify-center gap-3 rounded-md bg-surface border border-border px-3 py-2 text-sm font-semibold text-foreground shadow-xs hover:bg-surface-raised focus-visible:border-transparent"
     >
       {/* {`Sign In with ${provider.toUpperCase()}`} */}
       {svg[provider as keyof typeof svg]}

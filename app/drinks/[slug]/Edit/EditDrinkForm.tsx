@@ -82,7 +82,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
   return (
     <form onSubmit={handleFormSubmit}>
       <div className="grid p-2 gap-4 lg:gap-8">
-        <div className="text-lg text-emerald-600 font-bold">Drink Details</div>
+        <div className="text-lg text-accent-text font-bold">Drink Details</div>
         <DebouncedTextInput
           label="Name"
           value={liveFormState.name}
@@ -127,7 +127,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
           size="small"
         />
         {/* Ingredients */}
-        <h2 className="text-lg text-emerald-600 font-bold">Ingredients</h2>
+        <h2 className="text-lg text-accent-text font-bold">Ingredients</h2>
         <div className="">
           <div className="font-semibold text-sm mb-4">
             Step 1: Add or remove ingredients
@@ -150,7 +150,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
           <div className="mt-4 lg:grid lg:grid-cols-2">
             {liveFormState.ingredients.map((ingredient, index) => (
               <div key={index} className="px-2 lg:px-4">
-                <div className="text-sm text-gray-700 dark:text-gray-400">
+                <div className="text-sm text-muted">
                   {selectedTags.find(
                     (tag) => tag.value === ingredient.ingredient_id
                   )?.label || ""}
@@ -183,7 +183,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
           </div>
         </div>
 
-        <div className="text-lg text-emerald-600 font-bold">Instructions</div>
+        <div className="text-lg text-accent-text font-bold">Instructions</div>
         <Editor
           initialContent={globalDrinkForm.instructions}
           onChangeHandler={(content) => {

@@ -36,11 +36,11 @@ const Pagination: React.FC<PaginationProps> = ({
 
   return (
     <nav
-      className="flex items-center justify-between border-t border-gray-200 dark:border-0 py-3"
+      className="flex items-center justify-between border-t border-border py-3"
       aria-label="Pagination"
     >
       <div className="hidden sm:block">
-        <p className="text-sm text-gray-700 dark:text-gray-400">
+        <p className="text-sm text-muted">
           Showing <span className="font-medium">{startItem}</span> to{" "}
           <span className="font-medium">{endItem}</span> of{" "}
           <span className="font-medium">{totalItems}</span> results
@@ -50,14 +50,14 @@ const Pagination: React.FC<PaginationProps> = ({
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="relative inline-flex items-center rounded-md bg-white dark:bg-stone-950 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-400 ring-1 dark:ring-0 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+          className="relative inline-flex items-center rounded-md bg-surface px-3 py-2 text-sm font-semibold text-foreground ring-1 ring-inset ring-border hover:bg-surface-raised focus-visible:outline-offset-0"
         >
           Previous
         </button>
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="relative ml-3 inline-flex items-center rounded-md bg-white dark:bg-stone-950 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-400 ring-1 dark:ring-0 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+          className="relative ml-3 inline-flex items-center rounded-md bg-surface px-3 py-2 text-sm font-semibold text-foreground ring-1 ring-inset ring-border hover:bg-surface-raised focus-visible:outline-offset-0"
         >
           Next
         </button>
