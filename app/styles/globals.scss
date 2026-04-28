@@ -5,11 +5,86 @@
 @tailwind utilities;
 
 
+// ─── Design tokens ────────────────────────────────────────────────────────────
+// Values are space-separated RGB channels so Tailwind can apply opacity:
+//   bg-background/50  →  rgb(var(--color-background) / 0.5)
+// ──────────────────────────────────────────────────────────────────────────────
+
 :root {
+  font-size: 14px;
+
+  // Legacy (kept for any direct usages)
   --foreground-rgb      : 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb  : 255, 255, 255;
-  font-size             : 14px;
+
+  // ── Surfaces ────────────────────────────────────────────────────────────────
+  --color-background   : 248 250 252;   // slate-50   — page bg
+  --color-surface      : 255 255 255;   // white      — card / modal
+  --color-surface-raised: 241 245 249;  // slate-100  — input bg, hover row
+
+  // ── Borders ─────────────────────────────────────────────────────────────────
+  --color-border       : 226 232 240;   // slate-200
+  --color-border-strong: 203 213 225;   // slate-300
+
+  // ── Text ────────────────────────────────────────────────────────────────────
+  --color-foreground   : 15 23 42;      // slate-900  — primary text
+  --color-muted        : 100 116 139;   // slate-500  — labels, captions
+  --color-subtle       : 148 163 184;   // slate-400  — placeholders, hints
+
+  // ── Accent (emerald) ────────────────────────────────────────────────────────
+  --color-accent           : 5 150 105;   // emerald-600 — CTA bg
+  --color-accent-hover     : 4 120 87;    // emerald-700 — CTA hover
+  --color-accent-foreground: 255 255 255; // white       — text on accent bg
+  --color-accent-subtle    : 236 253 245; // emerald-50  — tinted badge bg
+  --color-accent-text      : 6 95 70;     // emerald-800 — colored text on light
+
+  // ── Drink category colors ───────────────────────────────────────────────────
+  // Spirits (amber/whiskey/rum)
+  --color-spirits        : 180 83 9;     // amber-700
+  --color-spirits-subtle : 254 243 199;  // amber-100
+
+  // Fruity / cocktails (rose)
+  --color-fruity         : 159 18 57;   // rose-800
+  --color-fruity-subtle  : 255 241 242; // rose-50
+
+  // Refreshing / light (sky)
+  --color-refreshing        : 7 89 133;    // sky-800
+  --color-refreshing-subtle : 240 249 255; // sky-50
+}
+
+// Dark mode — toggled by next-themes via class="dark" on <html>
+.dark {
+  // ── Surfaces ────────────────────────────────────────────────────────────────
+  --color-background   : 15 23 42;      // slate-900
+  --color-surface      : 30 41 59;      // slate-800
+  --color-surface-raised: 51 65 85;     // slate-700
+
+  // ── Borders ─────────────────────────────────────────────────────────────────
+  --color-border       : 51 65 85;      // slate-700
+  --color-border-strong: 71 85 105;     // slate-600
+
+  // ── Text ────────────────────────────────────────────────────────────────────
+  --color-foreground   : 241 245 249;   // slate-100
+  --color-muted        : 148 163 184;   // slate-400
+  --color-subtle       : 100 116 139;   // slate-500
+
+  // ── Accent (emerald — lighter for dark backgrounds) ──────────────────────────
+  --color-accent           : 52 211 153;  // emerald-400
+  --color-accent-hover     : 110 231 183; // emerald-300
+  --color-accent-foreground: 2 44 34;     // emerald-950 — dark text on light accent
+  --color-accent-subtle    : 2 44 34;     // emerald-950 — tinted badge bg
+  --color-accent-text      : 110 231 183; // emerald-300 — colored text on dark
+
+  // ── Drink category colors ───────────────────────────────────────────────────
+  --color-spirits        : 252 211 77;   // amber-300
+  --color-spirits-subtle : 69 26 3;      // amber-950
+
+  --color-fruity         : 253 164 175;  // rose-300
+  --color-fruity-subtle  : 78 5 18;      // rose-950
+
+  --color-refreshing        : 125 211 252; // sky-300
+  --color-refreshing-subtle : 8 47 73;     // sky-950
 }
 
 // @media (prefers-color-scheme: dark) {
