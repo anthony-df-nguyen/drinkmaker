@@ -2,12 +2,14 @@ export interface DrinkIngredientDetail {
   ingredient_id: string;
   quantity: number;
   unit: string;
+  role: string;
 }
 
 export interface DrinkIngredientViewData {
   name: string,
   quantity: number;
   unit: string;
+  role: string;
 }
 
 export type DrinkIngredientSchema = {

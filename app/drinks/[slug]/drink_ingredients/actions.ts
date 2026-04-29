@@ -13,7 +13,7 @@ const upsertDrinkIngredients = async (
   // 1) Fetch current ingredient rows for this drink
   const { data: currentIngredients = [], error: fetchError } = await pg
     .from("drink_ingredients")
-    .select("ingredient_id, quantity, unit")
+    .select("ingredient_id, quantity, unit, role")
     .eq("drink_id", drink_id);
 
   if (fetchError) {
@@ -49,6 +49,7 @@ const upsertDrinkIngredients = async (
     ingredient_id: d.ingredient_id,
     quantity: d.quantity,
     unit: d.unit,
+    role: d.role ?? null,
   }));
 
   if (upsertRows.length > 0) {

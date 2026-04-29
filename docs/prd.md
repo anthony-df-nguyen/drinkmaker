@@ -1,74 +1,436 @@
-# Drinkmaker PRD
 
-## Core Problem Statements
-Drinkmaker is a web app to help people create and share cocktails. The core reason it is being built is due to the following problems:
-- Viewing drink recipes online is annoying because people put way too much text content too push their brand or SEO. People looking to make drinks just need to get to the point of what the recipe is for drinks.
-- When getting to recipe, sometimes the unit of measurement isn't what I have ready. Sometimes I want ingredients in fluid ounces, sometimes i want them in ML. I don't want to do math.
-- When trying to make multiple servings of something, I have to do math to get the right amount of ingredients, and I don't want to do that math.
-- I often have a mix of alcohol and ingredients at home and want to know what I can make with those ingredients, or know if im just missing 1 or 2 ingredients away from making a great drink.
+# Product Requirements Document (PRD)
 
-## Requirements
+Product: Drinkmaker
+Version: V1 → V2 (Core Product)
+Author: Anthony Nguyen
 
-### Authentication
+Date: April 2026
 
-- A user shall be able to access the website without logging in
-- Users may login using their Google or Github accounts. In the future we can add more providers.
-- A user shall be able to log out of their account
+⸻
 
-### User Profile Feature
-- A user shall be able to see their profile and a picture if it exists. If not, then a monogram
-- A user shall be able to set their display name if the default that is set on login is not to their satisfaction
-- A user shall be able to see which provider they authenticated with, their email on file, what their user ID is, and when their account was created
+1. 🧠 Product Overview
 
-### Ingredients
-- Authenticated users shall be able to create an ingredient with just the name
-- The system shall automatically sanitize ingredient names so that users can't submit duplicate Ingredients. This serves as a site-wide collection of ingredients that users can select from when creating drink recipes.
-- The uniqueness of the ingredient name is critical because it will be used later for the reverse-drink finder where user select an ingredient to see what can be made with it.
-- Users shall be able to text search for ingredients
-- The system shall have infinite scroll for ingredients
+Drinkmaker is a mobile-first web app that enables users to:
 
-### Finding Drinks
-There will be a Drinks page
-- All users shall be able to see a list of all created drink recipes on the site
-- The system shall infinitely scroll
-- Users shall be able to text search for Drinks
-- Users shall be able to filter for drinks they've favorited
+* Quickly view drink recipes without unnecessary content
+* Scale and convert ingredient measurements instantly
+* Discover drinks based on available ingredients (reverse lookup)
+* Save ingredients they own (pantry) to enable repeat usage
 
-#### Viewing a Drinks
-All users can view any created drink
-- They shall be able to see the drink name, description, classification, image (if it exists), ingredients, quantities, and instructions
-- They shall be able to favorite/unfavorite a drink
+⸻
 
-### Creating Drinks
-Only authenticated users will be allowed to create drinks.
-- A user can create a drink and must provide a name for the drink
-- A user must classify the drink between cocktail, mocktail, coffee, juice, etc.
-- A user shall select which ingredients go into a drink, using the list of ingredients that is shared site wide
-- A user must specify how many of each ingredient is required along with the unit size like (oz, dashes, pieces, ml, etc.)
-- The system shall provide a diverse set of unit measurement (oz, dashes, pieces, ml, etc.)
-- A user can optionally put a drink description
-- A user can optionally put an image URL for the drink
-- A user can optionally enter in instructions with basic rich text formatting.
+2. 🎯 Core User Jobs
 
-### Editing Drinks
-Only the creator of a drink can modify a drink.
-- They shall be able to modify the name, description, classification, image URL, ingredients, ingredient quantities, and instructions
-- They shall be able to delete a drink
+Users come to Drinkmaker to:
 
-### Sharing Drinks
-A user shall be able to share a drink recipe through a URL.
+1. Find a drink quickly
+2. Execute a recipe without thinking (no math)
+3. Figure out what they can make with what they have
+4. Know what they’re missing to complete a drink
 
-### Reverse Drink Lookup (Not yet built in my app)
-- A user shall be able to select a combination of ingredients and see what kind of drinks can be made with those ingredients.
-- Drinks that a user has all ingredients for rank higher.
-- Drinks that are only missing a handful of ingredients still appear but rank lower. The UI will show the user what is missing to make that drink.
+⸻
 
-## Technical Requirements
+3. 🗺️ Core User Flows
 
-- This is a webapp that a user shall be able to visit on Chrome, Safari, Edge, Firefox
-- Assume majority of users will be on mobile devices like Android and iPhone
-- There will be a very small amount using this on ipad and desktop.
-- We use NextJS
-- We use Tailwind
-- We must support light and dark mode
-- Use supabase which manages our databases AND our user management/authentication.
+⸻
+
+🔍 Flow 1: Discover & View Drinks (Unauthenticated)
+
+Entry Points
+
+* Homepage
+* Direct URL (shared drink)
+* Search
+
+⸻
+
+Steps
+
+User lands on Drinks page
+→ Scrolls or searches
+→ Selects a drink
+→ Views drink details
+→ (Optional) adjusts servings / units
+→ (Optional) favorites (prompts login)
+
+⸻
+
+Functional Requirements
+
+Drinks List
+
+* Infinite scroll
+* Search by name
+* Basic filtering (future: favorites)
+
+⸻
+
+Drink Detail Page
+
+User can view:
+
+* Name
+* Description
+* Classification
+* Ingredients (with quantities + units)
+* Instructions
+* Image (optional)
+
+⸻
+
+Interactions
+
+1. Serving Scaling
+
+* User adjusts serving size
+* System recalculates all ingredient quantities instantly
+
+2. Unit Conversion
+
+* Toggle:
+    * oz ↔ ml
+* Only applies to convertible units
+
+⸻
+
+Success Criteria
+
+* User reaches recipe in <3 seconds
+* No manual math required
+
+⸻
+
+🍸 Flow 2: Create a Drink (Authenticated)
+
+Entry Point
+
+* “Create Drink” CTA
+
+⸻
+
+Steps
+
+User opens create form
+→ Enters drink name
+→ Selects classification
+→ Adds ingredients
+→ Sets quantities + units
+→ (Optional) sets ingredient role (required/optional/garnish)
+→ Adds description/image/instructions
+→ Submits
+→ Redirect to drink page
+
+⸻
+
+Functional Requirements
+
+Required Fields
+
+* Name
+* Classification
+* At least 1 ingredient
+
+⸻
+
+Ingredient Selection (CRITICAL FLOW)
+
+User types ingredient
+→ System shows autocomplete results
+→ User selects existing OR creates new
+
+⸻
+
+Ingredient Configuration
+
+For each ingredient:
+
+- ingredient_id
+- quantity
+- unit
+- role (default: required)
+
+Role options:
+
+* required
+* optional
+* garnish
+
+⸻
+
+Constraints
+
+* Ingredient must be selected (no raw free text)
+* Ingredient names are globally unique (normalized)
+
+⸻
+
+Success Criteria
+
+* <10 seconds to add first ingredient
+* No duplicate ingredient creation
+
+⸻
+
+🧪 Flow 3: Reverse Drink Lookup (Core Feature)
+
+Entry Point
+
+* “What can I make?” CTA
+
+⸻
+
+Steps
+
+User opens reverse lookup
+→ Selects ingredients
+→ Submits
+→ System returns ranked drink list
+→ User selects drink
+→ Views missing ingredients
+
+⸻
+
+Functional Requirements
+
+Ingredient Selection
+
+* Search + autocomplete
+* Multi-select
+* (Future) preload from pantry
+
+⸻
+
+Results Display
+
+Each drink shows:
+
+* Name
+* Match status:
+    * Can make now
+    * Missing ingredients
+* Missing ingredient list
+
+⸻
+
+Ranking Logic
+
+System calculates:
+
+required_matches
+optional_matches
+garnish_matches
+missing_required
+
+Ranking priority:
+
+1. No missing required ingredients
+2. Fewest missing required ingredients
+3. Highest match percentage
+4. Optional/garnish completeness
+
+⸻
+
+UX States
+
+Full Match
+
+“You can make this now”
+
+Partial Match
+
+“You’re missing: X, Y”
+
+⸻
+
+Success Criteria
+
+* Results returned in <500ms
+* User understands what they can make instantly
+
+⸻
+
+🧺 Flow 4: Pantry (Authenticated, Retention Feature)
+
+Entry Point
+
+* Pantry page
+* Reverse lookup prompt
+
+⸻
+
+Steps
+
+User adds ingredients to pantry
+→ Pantry is saved
+→ User runs reverse lookup
+→ System auto-uses pantry ingredients
+→ User sees personalized results
+
+⸻
+
+Functional Requirements
+
+* Add/remove ingredients
+* Persist per user
+* Auto-integrate with reverse lookup
+
+⸻
+
+UX Enhancements
+
+* “Based on your pantry”
+* Highlight drinks user can make immediately
+
+⸻
+
+Success Criteria
+
+* Increased repeat usage
+* Reduced input friction
+
+⸻
+
+❤️ Flow 5: Favorites
+
+Steps
+
+User clicks favorite on drink
+→ Drink saved
+→ User can filter/view favorites
+
+⸻
+
+Requirements
+
+* Toggle favorite
+* Persist per user
+
+⸻
+
+🔗 Flow 6: Sharing
+
+Steps
+
+User opens drink
+→ Shares URL
+→ Recipient lands on drink page
+
+⸻
+
+Requirements
+
+* Public, no auth required
+* SEO-friendly URLs
+
+⸻
+
+4. ⚙️ System Behavior
+
+⸻
+
+Ingredient System
+
+* Global ingredient list
+* Normalized names (lowercase, trimmed)
+* Prevent duplicates
+* Future: alias support
+
+⸻
+
+Units
+
+Supported:
+
+* oz
+* ml
+* dash
+* piece
+
+Rules:
+
+* Only convert compatible units
+* Leave non-convertible units unchanged
+
+⸻
+
+Ingredient Roles
+
+Stored per drink:
+
+required
+optional
+garnish
+
+Used in:
+
+* reverse lookup ranking
+* UI messaging
+
+⸻
+
+5. 📊 Analytics (Product-Focused)
+
+Track events:
+
+drink_viewed
+drink_created
+ingredient_selected
+reverse_lookup_started
+reverse_lookup_completed
+pantry_updated
+drink_favorited
+
+⸻
+
+6. ⚠️ Edge Cases
+
+* Duplicate ingredient creation → prevent via normalization
+* Unit mismatch → fallback to original unit
+* No reverse lookup results → show suggestions
+* Missing optional/garnish → do not block
+
+⸻
+
+7. 🗺️ Feature Breakdown (Build Order)
+
+Phase 1 (MVP)
+
+* Auth
+* Ingredient system (basic)
+* Drink CRUD
+* Drink viewing
+* Search
+
+⸻
+
+Phase 2 (Core Product)
+
+* Reverse lookup
+* Ingredient roles
+* Unit conversion
+* Serving scaling
+
+⸻
+
+Phase 3 (Retention + Growth)
+
+* Pantry
+* Favorites filtering
+* Sharing optimization
+
+⸻
+
+🔥 Final Product Definition
+
+Drinkmaker is:
+
+👉 A decision engine that helps users instantly determine what drinks they can make and how to make them with minimal effort.
+
+⸻
+
+If you want next step, I can:
+
+* convert this into Jira epics + AC in Gherkin format
+* map each flow to Next.js routes + API endpoints
+* or design your Supabase queries for reverse lookup (this is the hardest part technically)

@@ -1,143 +1,186 @@
-import { TextField, TextFieldProps, FormControl } from "@mui/material";
-import React, { useState, useEffect } from "react";
-import { styled } from "@mui/material/styles";
+// components/MUIInputs/NumberInput.tsx
+"use client";
+
+import * as React from "react";
+import { useState, useEffect } from "react";
+import { Input } from "@/components/UI/input";
+import { Label } from "@/components/UI/Label";
+import { cn } from "@/lib/utils";
 
 /**
  * Props for the NumberInput component.
+ * Mirrors TextInputProps but for numeric values.
  */
 type NumberInputProps = {
-    /**
-     * The current value of the input.
-     */
-    value: number;
-    /**
-     * Callback function that is called when the value of the input changes.
-     * @param value - The new value of the input.
-     */
-    onChange: (value: number) => void;
-    /**
-     * Callback function that is called when there is an error with the input.
-     * @param error - Indicates whether there is an error with the input.
-     */
-    handleError?: (error: boolean) => void;
-    /**
-     * Helper text to display below the input.
-     */
-    helperText?: string;
-    /**
-     * The minimum allowed value for the input.
-     */
-    min?: number;
-    /**
-     * The maximum allowed value for the input.
-     */
-    max?: number;
-} & Omit<TextFieldProps, "onChange" | "value">;
+  /**
+   * The current value of the input.
+   */
+  value: number;
+  /**
+   * Callback function that is called when the value of the input changes.
+   */
+  onChange: (value: number) => void;
+  /**
+   * Optional label for the input.
+   */
+  label?: string;
+  /**
+   * Helper text to display below the input.
+   */
+  helperText?: string;
+  /**
+   * Error text to display below the input.
+   */
+  errorText?: string;
+  /**
+   * Indicates if the input is in an error state.
+   */
+  error?: boolean;
+  /**
+   * The minimum allowed value for the input.
+   */
+  min?: number;
+  /**
+   * The maximum allowed value for the input.
+   */
+  max?: number;
+  /**
+   * CSS classes for the container.
+   */
+  className?: string;
+  /**
+   * CSS classes for the input element.
+   */
+  inputClassName?: string;
+  /**
+   * Whether the input is disabled.
+   */
+  disabled?: boolean;
+  /**
+   * Placeholder text.
+   */
+  placeholder?: string;
+  /**
+   * Whether the input is required.
+   */
+  required?: boolean;
+};
 
 /**
- * A custom number input component.
- * @param value - The current value of the input.
- * @param onChange - Callback function that is called when the value of the input changes.
- * @param handleError - Callback function that is called when there is an error with the input.
- * @param helperText - Helper text to display below the input.
- * @param min - The minimum allowed value for the input.
- * @param max - The maximum allowed value for the input.
- * @param props - Additional props for the TextField component.
- * @returns The NumberInput component.
+ * A custom number input component using the existing Input system.
  */
 const NumberInput = ({
-    value,
-    onChange,
-    handleError,
-    helperText,
-    min,
-    max,
-    ...props
+  value,
+  onChange,
+  label,
+  helperText,
+  errorText,
+  error,
+  min,
+  max,
+  className,
+  inputClassName,
+  disabled,
+  placeholder,
+  required,
 }: NumberInputProps) => {
-    const [inputValue, setInputValue] = useState<string>(value.toString());
-    const [isFocused, setIsFocused] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+  // Local state for the input field to handle typing without immediate validation jumps
+  const [inputValue, setInputValue] = useState<string>(value.toString());
+  const [internalError, setInternalError] = useState<string | null>(null);
 
+  // Sync local state with prop value changes
+  useEffect(() => {
+    setInputValue(value.toString());
+    setInternalError(null);
+  }, [value]);
+
+  /**
+   * Handles the change event for the input element.
+   */
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+
+    // Allow empty string or single dash for negative numbers
+    if (newValue === "" || newValue === "-") {
+      setInputValue(newValue);
+      setInternalError(null);
+      // Optionally clear error state from parent if needed, 
+      // but usually we wait for blur or valid input to clear errors.
+      return;
+    }
+
+    // Parse the input value
+    const numericValue = parseFloat(newValue);
+
+    // Check for valid number format
+    if (isNaN(numericValue)) {
+      // If it's not a valid number (and not empty/dash), show error
+      setInternalError("Invalid number");
+      setInputValue(newValue); // Keep what user typed so they can fix it
+      return;
+    }
+
+    // Check range constraints
+    if (min !== undefined && numericValue < min) {
+      setInternalError(`Value must be at least ${min}`);
+      setInputValue(newValue);
+      return;
+    }
     
+    if (max !== undefined && numericValue > max) {
+      setInternalError(`Value must be at most ${max}`);
+      setInputValue(newValue);
+      return;
+    }
 
-    /**
-     * Handles the change event for the input element.
-     * @param event - The change event object.
-     */
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = event.target.value;
+    // Valid input
+    setInternalError(null);
+    setInputValue(newValue);
+    onChange(numericValue);
+  };
 
-        // Clear the input if the value is empty or a dash
-        if (newValue === "" || newValue === "-") {
-            // Clear the error if the input is empty
-            setInputValue(newValue);
-            setError(null);
-            if (handleError) handleError(false);
-            return;
-        }
+  /**
+   * Handles blur event to reset invalid empty states
+   */
+  const handleBlur = () => {
+    if (inputValue === "" || inputValue === "-") {
+      // Reset to prop value if empty on blur
+      setInputValue(value.toString());
+      setInternalError(null);
+    }
+  };
 
-        // Parse the input value as a number
-        const numericValue = parseFloat(newValue);
+  // Determine final error state and text
+  const hasError = error || Boolean(internalError);
+  const displayErrorText = error ? errorText : internalError;
 
-        // Check if the input value is a valid number or a decimal point
-        if (!isNaN(numericValue) ||  newValue === ".") {
-            // Check if the input value is within the specified range
-            if (min !== undefined && numericValue < min) {
-                setError(`Value must be at least ${min}`);
-                if (handleError) handleError(true);
-            } else if (max !== undefined && numericValue > max) {
-                setError(`Value must be at most ${max}`);
-                if (handleError) handleError(true);
-            } else {
-                // Clear the error if the input value is valid
-                setError(null);
-                if (handleError) handleError(false);
-            }
-            setInputValue(newValue);
-            if (!isNaN(numericValue)) {
-                onChange(numericValue);
-            }
-        } else {
-            // Display an error if the input value is not a valid number
-            setInputValue("");
-            setError("Invalid number");
-            if (handleError) handleError(true);
-        }
-    };
-
-    const handleFocus = () => {
-        setIsFocused(true);
-    };
-
-    const handleBlur = () => {
-        setIsFocused(false);
-        if (inputValue === "" || inputValue === "-") {
-            setInputValue(value.toString());
-            setError(null);
-            if (handleError) handleError(false);
-        }
-    };
-
-    useEffect(() => {
-        setInputValue(value.toString());
-    }, [value]);
-
-    return (
-        <TextField
-            value={inputValue}
-            onChange={handleInputChange}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            type="text"
-            variant="filled"
-            fullWidth
-            error={Boolean(error)}
-            helperText={isFocused ? helperText : error}
-            inputProps={{ min, max }}
-            size="small"
-            {...props}
-        />
-    );
+  return (
+    <div className={cn("flex flex-col gap-1 w-full", className)}>
+      {label && (
+        <Label>
+          {label} {required && <span className="text-red-500">*</span>}
+        </Label>
+      )}
+      <Input
+        type="number" // Use text to handle formatting manually
+        value={inputValue}
+        onChange={handleInputChange}
+        onBlur={handleBlur}
+        aria-invalid={hasError || undefined}
+        disabled={disabled}
+        placeholder={placeholder}
+        className={inputClassName}
+        // Pass min/max as data attributes if needed for validation, 
+        // though we handle validation in JS above.
+        //inputProps={{ min, max }}
+      />
+      {(hasError ? displayErrorText : helperText) && (
+        <p className={cn("text-xs", hasError ? "text-red-500" : "text-muted")}>
+          {hasError ? displayErrorText : helperText}
+        </p>
+      )}
+    </div>
+  );
 };
 
 export default NumberInput;

@@ -91,6 +91,7 @@ export const DrinkFormProvider: React.FC<{
               drink_id: ingredient.drink_id,
               quantity: ingredient.quantity,
               unit: ingredient.unit,
+              role: ingredient.role,
             }))
           : [],
         instructions: instructions?.instructions ?? null,

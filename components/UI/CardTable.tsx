@@ -46,19 +46,7 @@ const CardTable = <T extends { [key: string]: any }>({
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
             <div className="overflow-hidden ring-1 ring-black ring-opacity-5 rounded-md">
               <table className="min-w-full divide-y divide-border">
-                {/* <thead className="bg-background">
-                  <tr>
-                    {columns.map((column) => (
-                      <th
-                        key={String(column.accessor)}
-                        scope="col"
-                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-foreground sm:pl-6"
-                      >
-                        {column.header}
-                      </th>
-                    ))}
-                  </tr>
-                </thead> */}
+                
                 <tbody className="divide-y divide-border bg-surface">
                   {data.map((item, index) => (
                     <tr key={index}>
@@ -71,6 +59,7 @@ const CardTable = <T extends { [key: string]: any }>({
                             ? column.render(item, index)
                             : item[column.accessor]}
                         </td>
+                        
                       ))}
                     </tr>
                   ))}

@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import { TagOption } from "@/components/MUIInputs/Tags";
 import { useGlobalDrinkForm } from "../context";
 import { InsertDrinkIngredients, DrinkIngredientViewData } from "./models";
-import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import { formatText } from "@/utils/formatText";
 import CardTable, { Column } from "@/components/UI/CardTable";
-import {Button} from "@/components/UI/Button";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { useListIngredients } from "@/app/ingredients/context/ListIngredientsContext";
 
@@ -23,6 +21,7 @@ const ReadView: React.FC = ({}) => {
     { header: "Ingredient", accessor: "name" },
     { header: "Quantity", accessor: "quantity" },
     { header: "Unit", accessor: "unit" },
+    { header: "Role", accessor: "role" },
   ];
 
   const data =
@@ -30,6 +29,7 @@ const ReadView: React.FC = ({}) => {
       name: findIngredientLabelByValue(ing.ingredient_id),
       quantity: ing.quantity * multiplier,
       unit: ing.unit,
+      role: ing.role,
     })) ?? [];
 
   const changeMultiplier = (direction: string) => {
