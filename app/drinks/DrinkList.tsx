@@ -2,28 +2,102 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useListDrinks } from "./contexts/DrinksContext";
 import Link from "next/link";
-import Card from "@/components/UI/Card";
 import Badge from "@/components/UI/Badge";
 import { queryDrinks } from "./actions";
-import { drinkTypeColors, drinkTypes } from "./models";
-import DebouncedTextInput from "@/components/MUIInputs/TextInput";
-import Button from "@/components/UI/Button";
-import CustomSelect from "@/components/MUIInputs/Select";
-import { useModal } from "@/context/ModalContext";
-import CreateForm from "./forms/CreateDrinkForm";
+import { drinkTypeColors, DrinkSchema } from "./models";
+import TextInput from "@/components/UI/input";
+import classNames from "@/utils/classNames";
+
+const PAGE_SIZE = 30;
+
+// Palette for the initial-letter thumbnail. Color is derived deterministically
+// from the first character of the drink name so it's stable across renders.
+const THUMBNAIL_COLORS = [
+  "bg-gradient-to-br from-amber-400 to-amber-700",
+  "bg-gradient-to-br from-blue-400 to-blue-700",
+  "bg-gradient-to-br from-emerald-400 to-emerald-700",
+  "bg-gradient-to-br from-rose-400 to-rose-600",
+  "bg-gradient-to-br from-violet-400 to-violet-700",
+  "bg-gradient-to-br from-cyan-400 to-cyan-700",
+  "bg-gradient-to-br from-orange-400 to-orange-600",
+  "bg-gradient-to-br from-teal-400 to-teal-700",
+];
+
+function thumbnailColor(name: string): string {
+  return THUMBNAIL_COLORS[name.charCodeAt(0) % THUMBNAIL_COLORS.length];
+}
+
+// ─── DrinkThumbnail ──────────────────────────────────────────────────────────
+
+interface DrinkThumbnailProps {
+  name: string;
+  picture?: string | null;
+}
+
+const DrinkThumbnail: React.FC<DrinkThumbnailProps> = ({ name, picture }) => {
+  if (picture) {
+    return (
+      <img
+        src={picture}
+        alt={name}
+        className="w-16 h-16 rounded object-cover flex-shrink-0"
+      />
+    );
+  }
+
+  return (
+    <div
+      className={classNames(
+        "w-16 h-16 rounded flex items-center justify-center flex-shrink-0",
+        thumbnailColor(name),
+      )}
+    >
+      <span className="text-white text-2xl font-semibold select-none">
+        {name.charAt(0).toUpperCase()}
+      </span>
+    </div>
+  );
+};
+
+// ─── DrinkCard ───────────────────────────────────────────────────────────────
+
+interface DrinkCardProps {
+  drink: DrinkSchema;
+}
+
+const DrinkCard: React.FC<DrinkCardProps> = ({ drink }) => {
+  const badgeColor = drinkTypeColors[drink.drink_type];
+
+  return (
+    <Link href={`/drinks/${drink.unique_name}`}>
+      <div className="p-4 bg-background flex flex-row gap-4 items-center hover:bg-surface-raised transition-colors">
+        <DrinkThumbnail name={drink.name} picture={drink.picture} />
+
+        <div className="flex-1 min-w-0">
+          <div className="font-serif text-base text-foreground truncate">
+            {drink.name}
+          </div>
+          {/* <div className="">
+            <Badge label={drink.drink_type} color={badgeColor} />
+          </div> */}
+          {drink.description && <div className="mt-1 text-xs font-light text-muted line-clamp-2 ">
+            {drink.description}
+          </div>}
+        </div>
+      </div>
+    </Link>
+  );
+};
+
+// ─── DrinkList ────────────────────────────────────────────────────────────────
 
 const DrinkList: React.FC = () => {
-  const { drinksList, setDrinksList, count, setCount } = useListDrinks();
-  const [searchTerm, handleSearchTermChange] = useState<string>("");
+  const { drinksList, setDrinksList, setCount } = useListDrinks();
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectDrinkType, setSelectDrinkType] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(false);
-  const { showModal } = useModal();
-
-  const PAGE_SIZE = 10;
-
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
-
   const observer = useRef<IntersectionObserver | null>(null);
 
   // Reset pagination when search or filter changes
@@ -34,7 +108,7 @@ const DrinkList: React.FC = () => {
     setPage(1);
   }, [searchTerm, selectDrinkType, setDrinksList, setCount]);
 
-  // Fetch drinks when search or filter changes
+  // Fetch first page when search or filter changes
   useEffect(() => {
     let cancelled = false;
 
@@ -45,7 +119,7 @@ const DrinkList: React.FC = () => {
           1,
           PAGE_SIZE,
           searchTerm,
-          selectDrinkType
+          selectDrinkType,
         );
         if (cancelled) return;
 
@@ -54,12 +128,11 @@ const DrinkList: React.FC = () => {
           setCount(data.totalCount);
           setHasMore(data.data.length < data.totalCount);
         } else {
-          // Fallback when count isn't available
           setHasMore(data.data.length === PAGE_SIZE);
         }
         setPage(1);
       } catch (error) {
-        console.error("Error querying drinks: ", error);
+        console.error("Error querying drinks:", error);
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -82,7 +155,7 @@ const DrinkList: React.FC = () => {
         PAGE_SIZE,
         searchTerm,
         selectDrinkType,
-        false
+        false,
       );
 
       if (data.data.length === 0) {
@@ -90,25 +163,20 @@ const DrinkList: React.FC = () => {
         return;
       }
 
-      // Merge and then update hasMore separately (avoid setState inside another setState updater)
       setDrinksList((prev) => [...prev, ...data.data]);
-
-      // When we don't request count, a short page means we're done
       setHasMore(data.data.length === PAGE_SIZE);
 
-      // Only update count if we actually have one
       if (typeof data.totalCount === "number") {
         setCount(data.totalCount);
       }
 
       setPage(nextPage);
     } catch (error) {
-      console.error("Error loading more drinks: ", error);
+      console.error("Error loading more drinks:", error);
     } finally {
       setIsLoading(false);
     }
   }, [
-    PAGE_SIZE,
     hasMore,
     isLoading,
     page,
@@ -118,135 +186,64 @@ const DrinkList: React.FC = () => {
     setCount,
   ]);
 
-  const lastDrinkElementRef = useCallback(
+  // Attach IntersectionObserver to the last list item to trigger infinite scroll
+  const lastDrinkRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (isLoading) return;
-
       if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver((entries) => {
-        if (entries[0]?.isIntersecting) {
-          loadMoreDrinks();
-        }
+        if (entries[0]?.isIntersecting) loadMoreDrinks();
       });
 
       if (node) observer.current.observe(node);
     },
-    [isLoading, loadMoreDrinks]
+    [isLoading, loadMoreDrinks],
   );
 
   return (
-    <div className="grid">
+    <div>
       {/* Controls */}
-      <div className="mt-16 fixed top-0 inset-x-0 z-30 bg-background px-4 lg:px-0 py-4 box-border max-w-[860px] mx-auto">
-        {" "}
+      <div className="top-0 inset-x-0 z-30 bg-surface px-4 lg:px-0 py-4 box-border max-w-[860px] mx-auto border-b-[1px] border-border">
         <div className="max-w-full flex-row gap-4 flex items-center justify-between">
           <div className="flex-1 min-w-0">
-            <DebouncedTextInput
-              label="Search for Drink"
-              focused
+            <TextInput
               value={searchTerm}
-              onChange={(e) => handleSearchTermChange(e)}
-              placeholder="Drink Name"
+              onChange={(e) => setSearchTerm(e)}
+              placeholder="Search drinks..."
               delay={500}
-              variant="filled"
-              size="small"
             />
           </div>
-          <div className="text-base bg-accent rounded-md py-3 px-4 text-accent-foreground">
-            <button onClick={() => showModal(<CreateForm />)}>+ Drink</button>
-          </div>
-          {/* <div className="flex-1 sm:flex-none sm:w-[200px] max-w-[200px]">
-          <CustomSelect
-            label="Drink Type"
-            options={drinkTypes}
-            value={selectDrinkType}
-            onChange={(e) => setSelectDrinkType(e)}
-            variant="filled"
-            size="small"
-          />
-        </div> */}
         </div>
       </div>
 
-      {/* Grid/Results */}
-      <div className="mt-[6rem] lg:mt-[4rem] grid gap-4 xl:grid-cols-1">
+      {/* Results */}
+      <div className="grid gap-0 divide-y-[1px] divide-border xl:grid-cols-1 max-h-[80vh] overflow-auto">
         {drinksList.map((drink, index) => {
-          const color = drinkTypeColors[drink.drink_type];
-
-          // Set ref on the last element to trigger infinite scroll
-          if (index === drinksList.length - 1) {
-            return (
-              <div key={drink.unique_name} ref={lastDrinkElementRef}>
-                <Link href={`/drinks/${drink.unique_name}`}>
-                  <Card className="w-full h-full">
-                    <div className="flex flex-col gap-1 justify-start h-full">
-                      <div className="flex item-center gap-2 justify-between">
-                        <div className="text-base text-foreground">
-                          {drink.name}
-                        </div>
-                        <div className="text-xs h-1">
-                          <Badge label={drink.drink_type} color={color} />
-                        </div>
-                      </div>
-
-                      <div className="text-xs font-light text-muted flex-1">
-                        {drink.description}
-                      </div>
-                    </div>
-                  </Card>
-                </Link>
-              </div>
-            );
-          }
-
+          const isLast = index === drinksList.length - 1;
           return (
-            <Link key={drink.unique_name} href={`/drinks/${drink.unique_name}`}>
-              <Card className="w-full h-full">
-                <div className="flex flex-row gap-4 justify-between h-full">
-                  {/* Image */}
-                  {drink.picture && (
-                    <div className="w-24 h-24 overflow-hidden rounded-md bg-surface-raised">
-                      <img
-                        src={drink.picture}
-                        alt={drink.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  {/* Name block */}
-                  <div className="flex-1">
-                    <div className="flex-col item-center gap-2 justify-between">
-                      <div className="text-base text-foreground">
-                        {drink.name}
-                      </div>
-                      <div className="text-xs font-light text-muted flex-1">
-                        {drink.description}
-                      </div>
-                    </div>
-                  </div>
-                  {/* Badge */}
-                  <div className="text-xs h-1">
-                    <Badge label={drink.drink_type} color={color} />
-                  </div>
-                </div>
-              </Card>
-            </Link>
+            <div
+              key={drink.unique_name}
+              ref={isLast ? lastDrinkRef : undefined}
+            >
+              <DrinkCard drink={drink} />
+            </div>
           );
         })}
-        {/* End of results indicator */}
+
         {!hasMore && drinksList.length > 0 && (
-          <div className="text-center py-4 text-muted">This is the end</div>
+          <div className="text-center py-4 text-muted text-base">
+            {`${drinksList.length} drinks total`}
+          </div>
         )}
       </div>
 
-      {/* Loading indicator */}
       {isLoading && (
         <div className="flex justify-center py-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent" />
         </div>
       )}
-      {/* No drinks found */}
+
       {!isLoading && drinksList.length === 0 && (
         <div className="flex justify-center">
           <div className="text-center text-muted">No drinks found</div>

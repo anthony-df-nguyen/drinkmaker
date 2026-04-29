@@ -3,7 +3,8 @@ import React, { useState, useCallback, useEffect } from "react";
 import { MutableIngredientFields, IngredientsSchema } from "../models";
 import { useAuthenticatedContext } from "@/context/Authenticated";
 import { sanitizeInput } from "@/utils/sanitizeInput";
-import DebouncedTextInput from "@/components/MUIInputs/TextInput";
+import TextInput from "@/components/UI/input";
+import TextArea from "@/components/UI/textarea";
 import { enqueueSnackbar } from "notistack";
 import { updateIngredient } from "../actions";
 import { useModal } from "@/context/ModalContext";
@@ -61,19 +62,17 @@ export const EditIngredient: React.FC<Props> = ({ ingredient }) => {
       onSubmit={handleUpdate}
     >
       <div className="text-lg font-medium">Edit Ingredient</div>
-      <DebouncedTextInput
+      <TextInput
         label="Name"
         value={formatText(form.name || "")}
         onChange={(value: string) => handleChange("name", value)}
         required
-        variant="standard"
       />
-      <DebouncedTextInput
+      <TextArea
         label="Image URL"
         value={form.image ?? ""}
         onChange={(value: string) => handleChange("image", value || "")}
-        multiline
-        variant="standard"
+        rows={2}
       />
       <div className="flex items-center justify-end">
         <Button label="Update" type="submit" variant="primary" />

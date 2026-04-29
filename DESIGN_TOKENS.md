@@ -16,38 +16,38 @@ Tokens use space-separated RGB channels so Tailwind opacity modifiers work (e.g.
 ### Surfaces
 | Class | Light | Dark | Use for |
 |---|---|---|---|
-| `bg-background` | slate-50 | slate-900 | Page / layout bg |
-| `bg-surface` | white | slate-800 | Cards, modals, dropdowns |
-| `bg-surface-raised` | slate-100 | slate-700 | Inputs, hover rows |
+| `bg-background` | `#f5f4f1` warm-50 | `#0c0f0d` nocturne-bg | Page / layout bg |
+| `bg-surface` | `#ffffff` white | `#141917` nocturne-surface | Cards, modals, dropdowns |
+| `bg-surface-raised` | `#f0eeeb` warm-100 | `#1d2420` nocturne-raised | Inputs, hover rows |
 
 ### Borders
 | Class | Light | Dark | Use for |
 |---|---|---|---|
-| `border-border` | slate-200 | slate-700 | Default dividers |
-| `border-border-strong` | slate-300 | slate-600 | Emphasized borders |
+| `border-border` | `#e2ddd7` warm-200 | `#2a332e` nocturne-border | Default dividers |
+| `border-border-strong` | `#ccc4bb` warm-300 | `#3a4a43` nocturne-border-strong | Emphasized borders |
 
 ### Text
 | Class | Light | Dark | Use for |
 |---|---|---|---|
-| `text-foreground` | slate-900 | slate-100 | Primary text |
-| `text-muted` | slate-500 | slate-400 | Labels, captions |
-| `text-subtle` | slate-400 | slate-500 | Placeholders, hints |
+| `text-foreground` | `#1a1714` warm-900 | `#e8edea` nocturne-fg | Primary text |
+| `text-muted` | `#6b6460` warm-500 | `#8a9a8f` nocturne-muted | Labels, captions |
+| `text-subtle` | `#a09a95` warm-400 | `#566059` nocturne-subtle | Placeholders, hints |
 
 ### Accent (emerald)
 | Class | Light | Dark | Use for |
 |---|---|---|---|
-| `bg-accent` | emerald-600 | emerald-400 | CTA button bg |
-| `hover:bg-accent-hover` | emerald-700 | emerald-300 | CTA hover |
-| `text-accent-foreground` | white | emerald-950 | Text on filled accent button |
+| `bg-accent` | `#059669` emerald-600 | `#34d399` emerald-400 | CTA button bg |
+| `hover:bg-accent-hover` | `#047857` emerald-700 | `#6ee7b7` emerald-300 | CTA hover |
+| `text-accent-foreground` | white | `#022c22` emerald-950 | Text on filled accent button |
 | `bg-accent-subtle` | emerald-50 | emerald-950 | Tinted badge / tag bg |
-| `text-accent-text` | emerald-800 | emerald-300 | Colored text on bg |
+| `text-accent-text` | `#065f46` emerald-800 | `#6ee7b7` emerald-300 | Colored text on bg |
 
 ### Drink category tags
 | Class | Light | Dark | Use for |
 |---|---|---|---|
-| `bg-spirits-subtle text-spirits` | amber-100 / amber-700 | amber-950 / amber-300 | Spirits (rum, whiskey) |
-| `bg-fruity-subtle text-fruity` | rose-50 / rose-800 | rose-950 / rose-300 | Fruity cocktails |
-| `bg-refreshing-subtle text-refreshing` | sky-50 / sky-800 | sky-950 / sky-300 | Light / soda drinks |
+| `bg-spirits-subtle text-spirits` | amber-100 / `#d97706` amber-500 | amber-950 / amber-300 | Spirits (rum, whiskey) |
+| `bg-fruity-subtle text-fruity` | rose-50 / `#e11d48` rose-600 | rose-950 / rose-300 | Fruity cocktails |
+| `bg-refreshing-subtle text-refreshing` | sky-50 / `#0284c7` sky-600 | sky-950 / sky-300 | Light / soda drinks |
 
 ---
 

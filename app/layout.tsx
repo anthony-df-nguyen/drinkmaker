@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import { AuthenticatedProvider } from "@/context/Authenticated";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display, Geist } from "next/font/google";
 import { ModalProvider } from "@/context/ModalContext";
 import { ThemeProvider } from "next-themes";
 import "./styles/globals.scss";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const inter = Inter({ subsets: ["latin"] });
+const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif" });
 
 export const metadata: Metadata = {
   title: "Drinkmaker",
@@ -18,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full " suppressHydrationWarning >
+    <html lang="en" className={cn("h-full", playfair.variable, "font-sans", geist.variable)} suppressHydrationWarning >
       <head>
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css"></link>
         <script src="https://accounts.google.com/gsi/client" async></script>

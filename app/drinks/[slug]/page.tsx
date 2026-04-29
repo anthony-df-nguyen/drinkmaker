@@ -59,45 +59,10 @@ const DrinkPageContent: React.FC<DrinkPageContentProps> = ({ editURL }) => {
 
   return (
     <main>
-      <div className="mt-4 grid gap-8 max-w-[860px] w-full mx-auto border border-border p-4 sm:p-8 rounded-md shadow-sm bg-surface">
-        {!edit && (
-          <div className="flex items-start gap-2">
-            <div className="w-full">
-              <div className="flex items-center justify-between">
-                <div className="text-2xl font-bold text-accent-text dark:text-foreground">
-                  {globalDrinkForm.name}{" "}
-                </div>
-              </div>
-              <div className="text-sm mt-2 italic text-muted">
-                By: {globalDrinkForm.created_by_user}
-              </div>
-              <div className="text-sm mt-2 text-foreground">
-                {globalDrinkForm.description}
-              </div>
-              <div className="mt-2">
-                <Badge
-                  label={globalDrinkForm?.drink_type ?? "other"}
-                  color={
-                    drinkTypeColors[globalDrinkForm?.drink_type ?? "other"]
-                  }
-                />
-              </div>
-            </div>
-
-            {user?.id === globalDrinkForm?.created_by_user_id && (
-              <div>
-                <DrinkActionOptions
-                  setEdit={setEdit}
-                  drink={globalDrinkForm}
-                  drinkCreator={globalDrinkForm.created_by_user_id}
-                />
-              </div>
-            )}
-          </div>
-        )}
-
+      <div className="grid max-w-[860px] w-full mx-auto border border-border">
+        {/* Image */}
         {!edit && globalDrinkForm.picture && (
-          <div className="w-full max-h-[400px] lg:max-w-sm h-auto lg:max-h-sm overflow-hidden rounded-md bg-surface-raised">
+          <div className="w-full max-h-[40vh] lg:max-w-sm h-auto lg:max-h-sm overflow-hidden  bg-surface-raised">
             <img
               src={globalDrinkForm.picture}
               alt={globalDrinkForm.name}
@@ -105,9 +70,53 @@ const DrinkPageContent: React.FC<DrinkPageContentProps> = ({ editURL }) => {
             />
           </div>
         )}
-        {!edit && <DrinkIngredients />}
-        {!edit && <DrinkInstructions />}
+        {/* Container */}
+        <div className="bg-background p-4 border-border border-t-[1px]">
+          {/* Drink Info */}
+          {!edit && (
+            <div className="flex items-start gap-2">
+              <div className="w-full">
+                <div className="flex items-center justify-between">
+                  <div className="text-2xl font-bold font-serif dark:text-foreground">
+                    {globalDrinkForm.name}{" "}
+                  </div>
+                </div>
+                <div className="mt-2">
+                  <Badge
+                    label={globalDrinkForm?.drink_type ?? "other"}
+                    color={
+                      drinkTypeColors[globalDrinkForm?.drink_type ?? "other"]
+                    }
+                  />
+                </div>
+                <div className="text-sm mt-2 italic text-muted">
+                  By: {globalDrinkForm.created_by_user}
+                </div>
+                <div className="text-sm mt-2 text-muted">
+                  {globalDrinkForm.description}
+                </div>
+              </div>
 
+              {user?.id === globalDrinkForm?.created_by_user_id && (
+                <div>
+                  <DrinkActionOptions
+                    setEdit={setEdit}
+                    drink={globalDrinkForm}
+                    drinkCreator={globalDrinkForm.created_by_user_id}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Ingredients */}
+          {!edit && <DrinkIngredients />}
+
+          {/* Instructions */}
+          {!edit && <DrinkInstructions />}
+        </div>
+
+        {/* Edit Form */}
         {edit && <EditDrinkForm setEdit={setEdit} />}
       </div>
     </main>

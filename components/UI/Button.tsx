@@ -1,36 +1,54 @@
-import React from "react";
-import classNames from "@/utils/classNames";
+import { Button as ButtonPrimitive } from "@base-ui/react/button"
+import { cva, type VariantProps } from "class-variance-authority"
 
-type ButtonProps = {
-  label: string;
-  type: "submit" | "button";
-  variant: "primary" | "cancel" | "delete" | "info";
-  onClick?: () => void;
-  disabled?: boolean;
-};
+import { cn } from "@/lib/utils"
 
-const variantClasses = {
-  primary: "bg-accent hover:bg-accent-hover focus-visible:outline-accent",
-  cancel: "bg-gray-600 dark:bg-stone-900 hover:bg-gray-500 focus-visible:outline-gray-600",
-  delete: "bg-red-600 hover:bg-red-500 focus-visible:outline-red-600",
-  info: "bg-gray-400 dark:bg-stone-600 focus-visible:outline-gray-300 hover:bg-gray-400",
-};
+const buttonVariants = cva(
+  "inline-flex shrink-0 items-center justify-center rounded-md border border-transparent text-sm font-medium whitespace-nowrap transition-all outline-none select-none cursor-pointer focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  {
+    variants: {
+      variant: {
+        default:
+          "bg-accent text-accent-foreground hover:bg-accent-hover",
+        outline:
+          "border-border bg-transparent hover:bg-surface-raised text-foreground",
+        secondary:
+          "bg-surface-raised text-foreground hover:bg-border",
+        ghost:
+          "hover:bg-surface-raised text-foreground",
+        destructive:
+          "bg-red-500/10 text-red-500 hover:bg-red-500/20 focus-visible:border-red-500/40 focus-visible:ring-red-500/20",
+        link:
+          "text-accent-text underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-9 gap-1.5 px-4",
+        sm:      "h-7 gap-1 rounded-md px-3 text-xs",
+        lg:      "h-10 gap-2 px-5",
+        icon:    "size-9",
+        "icon-sm": "size-7",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
 
-const Button: React.FC<ButtonProps> = ({ label, onClick, disabled, type, variant }) => {
+function Button({
+  className,
+  variant = "default",
+  size = "default",
+  ...props
+}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
   return (
-    <button
-      onClick={disabled ? undefined : onClick}
-      disabled={disabled}
-      type={type}
-      className={classNames(
-        "rounded px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
-        disabled ? "opacity-50 cursor-not-allowed" : "",
-        variantClasses[variant]
-      )}
-    >
-      {label}
-    </button>
-  );
-};
+    <ButtonPrimitive
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  )
+}
 
-export default Button;
+export { Button, buttonVariants }

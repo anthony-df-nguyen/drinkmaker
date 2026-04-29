@@ -83,14 +83,26 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     <ModalContext.Provider value={{ showModal, hideModal }}>
       {children}
       {modalContent && (
-        <div className="fixed inset-0 bg-black  bg-opacity-70 dark:bg-opacity-80 flex items-center justify-center z-50">
-          <div className="bg-surface ring-1 ring-border p-8 rounded-lg shadow-lg relative">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-70 dark:bg-opacity-80 flex items-end md:items-center justify-center z-50"
+          onClick={hideModal}
+        >
+          <div
+            className="bg-surface ring-1 ring-border p-8 w-full rounded-t-2xl md:rounded-lg md:max-w-lg md:w-auto shadow-lg relative animate-slide-up md:animate-fade-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Drag handle — mobile only */}
+            {/* <div className="flex justify-center mb-4 md:hidden">
+              <div className="w-10 h-1 rounded-full bg-border" />
+            </div> */}
+
             {modalContent}
+
             <div
               onClick={hideModal}
-              className="h-6 w-6 absolute top-2 right-2 text-foreground hover:text-muted cursor-pointer"
+              className="h-6 w-6 absolute top-4 right-4 text-foreground hover:text-muted cursor-pointer"
             >
-              <XMarkIcon className="dark:text-white"/> 
+              <XMarkIcon className="dark:text-white" />
             </div>
           </div>
         </div>

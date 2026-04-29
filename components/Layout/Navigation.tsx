@@ -5,14 +5,13 @@ import { links } from "./Links";
 import Link from "next/link";
 import { SnackbarProvider } from "notistack";
 import classNames from "@/utils/classNames";
-import {
-  Bars3Icon,
-  XMarkIcon,
-  MagnifyingGlassIcon,PlusIcon
-} from "@heroicons/react/24/outline";
+import { Bars3Icon, PlusIcon } from "@heroicons/react/24/outline";
 import ThemeToggle from "./ThemeToggle";
 import ProfileMenu from "./ProfileMenu";
 import { usePathname } from "next/navigation";
+import { useModal } from "@/context/ModalContext";
+import { useAuthenticatedContext } from "@/context/Authenticated";
+import CreateForm from "@/app/drinks/forms/CreateDrinkForm";
 
 interface Props {
   children: any;
@@ -21,77 +20,75 @@ interface Props {
 export default function Navigation({ children }: Props) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { showModal } = useModal();
+  const { user } = useAuthenticatedContext();
+
+  const isDrinksPage = pathname === "/";
+
   return (
-    <>
-      <SnackbarProvider
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-      >
-        <div>
-          {/* Side Nav */}
-          <SideNav sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+    <SnackbarProvider anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
+      <SideNav sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-          {/* Top header bar */}
-          <div className="">
-            <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-border bg-surface px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-              <button
-                type="button"
-                className="-m-2.5 p-2.5 text-foreground lg:hidden"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <span className="sr-only">Open sidebar</span>
-                <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-              </button>
+      {/* Top header */}
+      <div className="sticky top-0 z-40 flex h-14 shrink-0 items-center border-b border-border bg-surface px-4 sm:px-6 lg:px-8">
+        {/* Logo */}
+        <Link
+          href="/"
+          className="shrink-0 text-lg font-bold font-serif tracking-tight text-foreground"
+        >
+          Drinkmaker
+        </Link>
 
-              <Link
-                href="/"
-                className="lg:h-16 shrink-0 items-center  lg:flex text-xl font-bold wider text-accent-text tracking-widest"
-              >
-                DRINKMAKER
-              </Link>
-              {/* Links */}
-              <div className="ml-8 hidden lg:flex gap-8">
-                {links.map((row) => (
-                  <Link
-                    key={row.name}
-                    href={row.href}
-                    className={classNames(
-                      "text-base",
-                      pathname === row.href
-                        ? "font-semibold text-accent-text"
-                        : "font-light text-muted"
-                    )}
-                  >
-                    {row.name}
-                  </Link>
-                ))}
-              </div>
+        {/* Desktop nav links */}
+        <nav className="ml-8 hidden lg:flex gap-8">
+          {links.map((row) => (
+            <Link
+              key={row.name}
+              href={row.href}
+              className={classNames(
+                "text-sm transition-colors",
+                pathname === row.href
+                  ? "font-semibold text-foreground"
+                  : "font-normal text-muted hover:text-foreground"
+              )}
+            >
+              {row.name}
+            </Link>
+          ))}
+        </nav>
 
-              <div className="flex flex-1 gap-x-4 self-stretch  items-center">
-                <div className="relative flex flex-1"></div>
+        <div className="flex-1" />
 
-                <div className="flex items-center gap-x-4 ">
-                    
-                  <div className="mt-[5px] hidden sm:block">
-                    <ThemeToggle />
-                   
-                  </div>
-                 
-                 
-                 
-                  <ProfileMenu />
-                </div>
-              </div>
-            </div>
+        {/* Right actions */}
+        <div className="flex items-center gap-2">
+          {/* Add Drink — drinks browse page + authenticated only */}
+          {isDrinksPage && user && (
+            <button
+              type="button"
+              onClick={() => showModal(<CreateForm />)}
+              className="flex items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-foreground transition-colors"
+            >
+              <PlusIcon className="h-6 w-6" />
+              <span className="hidden sm:inline">Add Drink</span>
+            </button>
+          )}
 
-            <main className="lg:py-8">
-              <div className="px-4 sm:px-6 lg:px-8">{children}</div>
-            </main>
-          </div>
+          {/* <ThemeToggle /> */}
+          {/* <ProfileMenu /> */}
+
+          {/* Mobile hamburger */}
+          <button
+            type="button"
+            className="text-foreground lg:hidden"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <span className="sr-only">Open menu</span>
+            <Bars3Icon className="h-6 w-6" />
+          </button>
         </div>
-      </SnackbarProvider>
-    </>
+      </div>
+
+      <main className="lg:py-8">{children}</main>
+    </SnackbarProvider>
   );
 }

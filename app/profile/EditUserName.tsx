@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import DebouncedTextInput from "@/components/MUIInputs/TextInput";
+import TextInput from "@/components/UI/input";
 import Button from "@/components/UI/Button";
 import { updateUserName } from "./actions";
 import { enqueueSnackbar } from "notistack";
@@ -35,14 +35,13 @@ const EditUserNameForm: React.FC<EditUserNameFormProps> = ({
     >
       <div className="text-lg font-medium">Edit Display Name</div>
       <div className="">
-        <DebouncedTextInput
+        <TextInput
           label="Display Name"
           value={username}
           onChange={(val: string) => {
             setForm(val);
           }}
           delay={300}
-          variant="outlined"
         />
       </div>
       <div className="flex gap-4 justify-end">

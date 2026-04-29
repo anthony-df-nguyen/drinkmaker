@@ -5,8 +5,7 @@ import { formatText } from "@/utils/formatText";
 import { enqueueSnackbar } from "notistack";
 import { deleteDrink } from "../actions";
 import { useModal } from "@/context/ModalContext";
-import MartiniLoader from "@/components/UI/Loading";
-import Button from "@/components/UI/Button";
+import {Button} from "@/components/UI/Button";
 
 interface Props {
   drink: GlobalDrinkForm;
@@ -59,7 +58,7 @@ export const DeleteForm: React.FC<Props> = ({ drink, afterDelete }) => {
         <span className="font-bold">{formatText(drink.name)}?</span>
       </div>
       <div className="flex items-center justify-end">
-        <Button type="submit" label="Delete" variant="delete" />
+        <Button type="submit" variant={"destructive"}>Delete</Button>
       </div>
     </form>
   );

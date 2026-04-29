@@ -1,211 +1,248 @@
+"use client";
+
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useListIngredients } from "./context/ListIngredientsContext";
 import { formatText } from "@/utils/formatText";
-import Card from "@/components/UI/Card";
-import { PencilSquareIcon, TrashIcon } from "@heroicons/react/20/solid";
-import EditForm from "./forms/EditForm";
-import DeleteForm from "./forms/DeleteForm";
-import { queryIngredients } from "./actions";
-import { useModal } from "@/context/ModalContext";
+import { PlusIcon } from "@heroicons/react/20/solid";
+import { queryIngredients, createIngredient, searchForIngredient } from "./actions";
+import { sanitizeInput, validateInput } from "@/utils/sanitizeInput";
+import checkExisting from "@/utils/supabase/checkExisting";
+import { enqueueSnackbar } from "notistack";
+import TextInput from "@/components/UI/input";
+import { cn } from "@/lib/utils";
+import { IngredientsSchema } from "./models";
 
-/**
- * Renders a list of ingredients.
- *
- * @component
- * @returns {JSX.Element} The rendered IngredientList component.
- */
+const PAGE_SIZE = 10;
+
+const THUMBNAIL_COLORS = [
+  "bg-gradient-to-br from-amber-400 to-amber-700",
+  "bg-gradient-to-br from-blue-400 to-blue-700",
+  "bg-gradient-to-br from-emerald-400 to-emerald-700",
+  "bg-gradient-to-br from-rose-400 to-rose-600",
+  "bg-gradient-to-br from-violet-400 to-violet-700",
+  "bg-gradient-to-br from-cyan-400 to-cyan-700",
+  "bg-gradient-to-br from-orange-400 to-orange-600",
+  "bg-gradient-to-br from-teal-400 to-teal-700",
+];
+
+function thumbnailColor(name: string): string {
+  return THUMBNAIL_COLORS[name.charCodeAt(0) % THUMBNAIL_COLORS.length];
+}
+
+// ─── IngredientRow ────────────────────────────────────────────────────────────
+
+interface IngredientRowProps {
+  ingredient: IngredientsSchema;
+}
+
+const IngredientRow: React.FC<IngredientRowProps> = ({ ingredient }) => {
+  const name = formatText(ingredient.name);
+  return (
+    <div className="p-4 bg-background flex flex-row gap-4 items-center hover:bg-surface-raised transition-colors">
+      <div
+        className={cn(
+          "w-10 h-10 rounded flex items-center justify-center flex-shrink-0",
+          thumbnailColor(ingredient.name),
+        )}
+      >
+        <span className="text-white text-base font-semibold select-none">
+          {name.charAt(0).toUpperCase()}
+        </span>
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm text-foreground truncate">{name}</div>
+      </div>
+    </div>
+  );
+};
+
+// ─── CreateRow ────────────────────────────────────────────────────────────────
+
+interface CreateRowProps {
+  name: string;
+  onClick: () => void;
+}
+
+const CreateRow: React.FC<CreateRowProps> = ({ name, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="w-full p-4 flex flex-row gap-4 items-center bg-accent-subtle hover:bg-accent-subtle/80 transition-colors text-left"
+  >
+    <div className="w-10 h-10 rounded flex items-center justify-center flex-shrink-0 bg-accent/20">
+      <PlusIcon className="w-5 h-5 text-accent-text" />
+    </div>
+    <div className="flex-1 min-w-0">
+      <div className="text-sm font-medium text-accent-text truncate">
+        Create &ldquo;{formatText(name)}&rdquo;
+      </div>
+    </div>
+  </button>
+);
+
+// ─── IngredientList ───────────────────────────────────────────────────────────
+
 const IngredientList: React.FC = () => {
-  const { showModal } = useModal();
-  const { ingredients, setIngredients, count, mode } = useListIngredients();
+  const { ingredients, setIngredients, count, mode, setMode, refreshBrowseFirstPage } =
+    useListIngredients();
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [cleanTerm, setCleanTerm] = useState("");
+  const [enableCreate, setEnableCreate] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
-  const observerRef = useRef<IntersectionObserver | null>(null);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const searchRequestRef = useRef(0);
 
-  const pageRef = useRef(1);
-  const isLoadingRef = useRef(false);
-  const hasMoreRef = useRef(true);
-  const modeRef = useRef(mode);
-  const lastUserScrollTsRef = useRef(0);
+  // ── Infinite scroll ────────────────────────────────────────────────────────
 
-  const PAGE_SIZE = 10;
-  const requestVersionRef = useRef(0);
+  const loadMore = useCallback(async () => {
+    if (isLoading || !hasMore || mode !== "browse") return;
+    const nextPage = page + 1;
+    setIsLoading(true);
+    try {
+      const data = await queryIngredients(nextPage, PAGE_SIZE);
+      if (data.length === 0) { setHasMore(false); return; }
+      setIngredients((prev) => {
+        const existing = new Set(prev.map((i) => i.name));
+        return [...prev, ...data.filter((i) => !existing.has(i.name))];
+      });
+      setPage(nextPage);
+      setHasMore(data.length === PAGE_SIZE);
+    } catch {
+      // handled silently
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoading, hasMore, mode, page, setIngredients]);
 
-  const maybeLoadMoreRef = useRef<() => void>(() => {});
-
-  const fetchIngredientsPage = useCallback(
-    async (nextPage: number, mode: "replace" | "append") => {
-      if (isLoadingRef.current) return;
-      isLoadingRef.current = true;
-      setIsLoading(true);
-      const reqVersion = ++requestVersionRef.current;
-      try {
-        const data = await queryIngredients(nextPage, PAGE_SIZE);
-
-        // If mode changed (e.g., search/clear) while this request was in-flight, ignore results.
-        if (requestVersionRef.current !== reqVersion) return;
-        if (modeRef.current !== "browse" && mode === "append") return;
-
-        setIngredients((prev) => {
-          if (mode === "replace") return data;
-          // dedupe by name just in case
-          const existing = new Set(prev.map((i) => i.name));
-          const merged = [...prev, ...data.filter((i) => !existing.has(i.name))];
-          return merged;
-        });
-
-        const nextHasMore =
-          typeof count === "number" ? (mode === "replace" ? data.length < count : true) : data.length === PAGE_SIZE;
-        setHasMore(nextHasMore);
-        hasMoreRef.current = nextHasMore;
-      } catch (error) {
-        console.error("Error querying ingredients: ", error);
-      } finally {
-        isLoadingRef.current = false;
-        setIsLoading(false);
-
-        // If the user is actively scrolling and still near the bottom after this page appended,
-        // trigger one more load so they don't have to scroll up/down to re-fire the observer.
-        const scrolledRecently = Date.now() - lastUserScrollTsRef.current < 1200;
-        const nearBottom =
-          window.innerHeight + window.scrollY >=
-          document.documentElement.scrollHeight - 300;
-
-        if (
-          scrolledRecently &&
-          modeRef.current === "browse" &&
-          hasMoreRef.current &&
-          !isLoadingRef.current &&
-          nearBottom
-        ) {
-          // Defer to let layout/scrollHeight settle
-          requestAnimationFrame(() => {
-            maybeLoadMoreRef.current();
-          });
-        }
-      }
+  // Attach observer to the last rendered ingredient row
+  const lastIngredientRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isLoading) return;
+      observer.current?.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0]?.isIntersecting) loadMore();
+      });
+      if (node) observer.current.observe(node);
     },
-    [count, setIngredients]
+    [isLoading, loadMore],
   );
 
-  const maybeLoadMore = useCallback(() => {
-    if (modeRef.current !== "browse") return;
-    if (isLoadingRef.current) return;
-    if (!hasMoreRef.current) return;
-
-    const nextPage = pageRef.current + 1;
-    pageRef.current = nextPage;
-    setPage(nextPage);
-    fetchIngredientsPage(nextPage, "append");
-  }, [fetchIngredientsPage]);
-
+  // Reset pagination only when mode changes, not on every ingredient append
   useEffect(() => {
-    maybeLoadMoreRef.current = maybeLoadMore;
-  }, [maybeLoadMore]);
-
-  useEffect(() => {
-    pageRef.current = page;
-    isLoadingRef.current = isLoading;
-    hasMoreRef.current = hasMore;
-    modeRef.current = mode;
-  }, [page, isLoading, hasMore, mode]);
-
-  useEffect(() => {
-    const onScroll = () => {
-      lastUserScrollTsRef.current = Date.now();
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    modeRef.current = mode;
-
-    if (mode === "search") {
-      // Disable infinite scroll while showing search results
+    if (mode === "browse") {
+      setPage(1);
+      setHasMore(true);
+    } else {
       setHasMore(false);
-      return;
     }
+  }, [mode]);
 
-    // Returned to browse mode (e.g., cleared search)
-    pageRef.current = 1;
-    setPage(1);
+  // ── Search ─────────────────────────────────────────────────────────────────
 
-    // Re-enable infinite scroll
-    setHasMore(true);
-    hasMoreRef.current = true;
+  const handleSearch = useCallback(
+    async (val: string) => {
+      const requestId = ++searchRequestRef.current;
+      const clean = sanitizeInput(val);
+      const valid = validateInput(clean, { minLength: 3 });
 
-    // Observer will resume loading pages as sentinel intersects
-  }, [mode, count, ingredients.length]);
+      setSearchTerm(val);
+      setCleanTerm(clean);
 
-  // Set up infinite scroll observer (uses the browser viewport as the root)
-  useEffect(() => {
-    const sentinelEl = sentinelRef.current;
-    if (!sentinelEl) return;
-
-    observerRef.current?.disconnect();
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (!entry?.isIntersecting) return;
-        maybeLoadMore();
-      },
-      {
-        root: null,
-        rootMargin: "200px",
-        threshold: 0,
+      if (!valid.isValid) {
+        setEnableCreate(false);
+        if (clean.length === 0) {
+          setMode("browse");
+          refreshBrowseFirstPage().catch(() => {});
+        }
+        return;
       }
-    );
 
-    observerRef.current.observe(sentinelEl);
-  }, [maybeLoadMore, ingredients.length]);
+      try {
+        setMode("search");
+        const data = await searchForIngredient(clean);
+        if (searchRequestRef.current !== requestId) return;
+        setIngredients(data);
+
+        const exists = await checkExisting("ingredients", "name", clean);
+        if (searchRequestRef.current !== requestId) return;
+        setEnableCreate(!exists);
+      } catch {
+        enqueueSnackbar("Could not search ingredients", { variant: "error" });
+      }
+    },
+    [setIngredients, setMode, refreshBrowseFirstPage],
+  );
+
+  // ── Create ─────────────────────────────────────────────────────────────────
+
+  const handleCreate = async () => {
+    if (!enableCreate || isCreating) return;
+    setIsCreating(true);
+    try {
+      await createIngredient({ name: cleanTerm });
+      enqueueSnackbar(`"${formatText(cleanTerm)}" added`, { variant: "success" });
+      setSearchTerm("");
+      setCleanTerm("");
+      setEnableCreate(false);
+      await refreshBrowseFirstPage();
+    } catch {
+      enqueueSnackbar("Could not add ingredient", { variant: "error" });
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div style={{
-      marginTop: mode === "browse" ? "5.2em" : "8.5em",
-    }}>
-      <div className="mt-8  grid gap-2 w-full ">
-        {ingredients.map((ingredient) => (
-          <Card key={ingredient.name}>
-            <div className="flex items-center gap-2 justify-between ">
-              <div className="text-base">{formatText(ingredient.name)}</div>
-              <div className="flex-1"></div>
-              {/* <div
-                className="text-gray-500 w-5 h-5 cursor-pointer"
-                onClick={() => showModal(<EditForm ingredient={ingredient} />)}
-              >
-                <PencilSquareIcon />
-              </div>
-              <div
-                className="text-gray-500 w-5 h-5 cursor-pointer"
-                onClick={() =>
-                  showModal(<DeleteForm ingredient={ingredient} />)
-                }
-              >
-                <TrashIcon />
-              </div> */}
-            </div>
-          </Card>
-        ))}
+    <div>
+      {/* Search bar */}
+      <div className="top-0 inset-x-0 z-30 bg-surface px-4 lg:px-0 py-4 border-b border-border">
+        <TextInput
+          value={searchTerm}
+          onChange={handleSearch}
+          placeholder="Search or add an ingredient..."
+          delay={600}
+        />
+      </div>
 
-        <div ref={sentinelRef} className="h-1" />
-
-        {isLoading && (
-          <div className="py-3 text-center text-sm text-gray-500">
-            Loading…
-          </div>
+      {/* Results */}
+      <div className="grid gap-0 divide-y divide-border max-h-[80vh] overflow-auto">
+        {enableCreate && cleanTerm.length >= 3 && (
+          <CreateRow name={cleanTerm} onClick={handleCreate} />
         )}
 
-        {!isLoading && !hasMore && ingredients.length > 0 && (
-          <div className="py-3 text-center text-sm text-gray-400">
-            You’ve reached the end.
+        {ingredients.map((ingredient, index) => {
+          const isLast = index === ingredients.length - 1;
+          return (
+            <div key={ingredient.name} ref={isLast ? lastIngredientRef : undefined}>
+              <IngredientRow ingredient={ingredient} />
+            </div>
+          );
+        })}
+
+        {!isLoading && !hasMore && ingredients.length > 0 && mode === "browse" && (
+          <div className="py-4 text-center text-muted text-sm">
+            {`${count} ingredients total`}
           </div>
         )}
       </div>
+
+      {isLoading && (
+        <div className="flex justify-center py-4">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-accent" />
+        </div>
+      )}
+
+      {!isLoading && ingredients.length === 0 && !enableCreate && (
+        <div className="py-8 text-center text-muted text-sm">No ingredients found</div>
+      )}
     </div>
   );
 };

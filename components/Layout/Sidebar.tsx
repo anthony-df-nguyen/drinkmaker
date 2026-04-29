@@ -1,4 +1,4 @@
-import { useState } from "react";
+"use client";
 import {
   Transition,
   Dialog,
@@ -6,10 +6,12 @@ import {
   DialogPanel,
 } from "@headlessui/react";
 import Link from "next/link";
-import { XMarkIcon } from "@heroicons/react/20/solid";
-import ThemeToggle from "./ThemeToggle";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { links } from "./Links";
 import classNames from "@/utils/classNames";
+import { usePathname } from "next/navigation";
+import { useAuthenticatedContext } from "@/context/Authenticated";
+import { createSupabaseBrowserClient } from "@/utils/supabase/browser-client";
 
 interface SideBarProps {
   sidebarOpen: boolean;
@@ -17,9 +19,22 @@ interface SideBarProps {
 }
 
 const SideBar: React.FC<SideBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
+  const pathname = usePathname();
+  const { user } = useAuthenticatedContext();
+
+  const handleSignOut = async () => {
+    const supabase = createSupabaseBrowserClient();
+    await supabase.auth.signOut();
+    location.reload();
+  };
+
   return (
     <Transition show={sidebarOpen}>
-      <Dialog className="relative z-50 lg:hidden" onClose={setSidebarOpen}>
+      <Dialog
+        className="relative z-50 lg:hidden"
+        onClose={() => setSidebarOpen(false)}
+      >
+        {/* Backdrop */}
         <TransitionChild
           enter="transition-opacity ease-linear duration-300"
           enterFrom="opacity-0"
@@ -28,78 +43,98 @@ const SideBar: React.FC<SideBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-background/90" />
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
         </TransitionChild>
 
-        <div className="fixed inset-0 flex">
+        {/* Right-side drawer */}
+        <div className="fixed inset-0 flex justify-end">
           <TransitionChild
             enter="transition ease-in-out duration-300 transform"
-            enterFrom="-translate-x-full"
+            enterFrom="translate-x-full"
             enterTo="translate-x-0"
             leave="transition ease-in-out duration-300 transform"
             leaveFrom="translate-x-0"
-            leaveTo="-translate-x-full"
+            leaveTo="translate-x-full"
           >
-            <DialogPanel className="relative mr-16 flex w-full max-w-xs flex-1">
-              <TransitionChild
-                enter="ease-in-out duration-300"
-                enterFrom="opacity-0"
-                enterTo="opacity-100"
-                leave="ease-in-out duration-300"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
-              >
-                <div className="absolute left-full top-0 flex w-16 justify-center pt-5">
+            <DialogPanel className="relative flex w-72 flex-col h-full bg-surface shadow-xl">
+              {/* Drawer header */}
+              <div className="flex items-end justify-between px-5 pt-14 pb-5 border-b border-border">
+                <div>
+                  <div className="text-xl font-bold font-serif text-foreground tracking-tight">
+                    Drinkmaker
+                  </div>
+                  <div className="text-xs text-muted mt-0.5">
+                    Craft · Discover · Share
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="p-1 text-muted hover:text-foreground transition-colors"
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <span className="sr-only">Close menu</span>
+                  <XMarkIcon className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Nav links */}
+              <nav className="flex-1 px-3 py-3">
+                {links.map((item) => {
+                  const active = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={classNames(
+                        "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm mb-0.5 transition-colors",
+                        active
+                          ? "bg-accent/10 text-accent font-semibold"
+                          : "text-foreground font-normal hover:bg-surface-raised"
+                      )}
+                    >
+                      <svg
+                        width={18}
+                        height={18}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={1.8}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d={item.icon} />
+                      </svg>
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </nav>
+
+              {/* Footer */}
+              {user && (
+                <div className="px-3 py-4 border-t border-border">
                   <button
                     type="button"
-                    className="-m-2.5 p-2.5"
-                    onClick={() => setSidebarOpen(false)}
+                    onClick={handleSignOut}
+                    className="flex w-full items-center gap-3 px-3.5 py-3 rounded-xl text-sm text-red-500 hover:bg-surface-raised transition-colors"
                   >
-                    <span className="sr-only">Close sidebar</span>
-                    <XMarkIcon
-                      className="h-6 w-6 text-white"
-                      aria-hidden="true"
-                    />
+                    <svg
+                      width={18}
+                      height={18}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={1.8}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+                    </svg>
+                    Sign Out
                   </button>
                 </div>
-              </TransitionChild>
-              {/* Sidebar component, swap this element with another sidebar if you like */}
-              <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-accent dark:bg-black px-6 pb-4">
-                <div className="flex h-16 shrink-0 items-center">
-                  {/* <img
-                    className="h-8 w-auto"
-                    src="https://tailwindui.com/img/logos/mark.svg?color=white"
-                    alt="Your Company"
-                  />{" "} */}
-                  <div className="shrink-0 items-center  lg:flex text-xl font-bold wider text-white tracking-widest">
-                    DRINKMAKER
-                  </div>
-                  <div className="flex-1"></div>
-                  <ThemeToggle />
-                </div>
-
-                {/* Links */}
-                <nav className="flex flex-1 flex-col">
-                  <ul role="list" className="flex flex-1 flex-col gap-y-7">
-                    <li>
-                      <ul role="list" className="-mx-2 space-y-1">
-                        {links.map((item) => (
-                          <li key={item.name}>
-                            <Link
-                              href={item.href}
-                              className={classNames(
-                                "text-white group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
-                              )}
-                            >
-                              {item.name}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </li>
-                  </ul>
-                </nav>
-              </div>
+              )}
             </DialogPanel>
           </TransitionChild>
         </div>
@@ -107,4 +142,5 @@ const SideBar: React.FC<SideBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
     </Transition>
   );
 };
+
 export default SideBar;

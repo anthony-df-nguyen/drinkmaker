@@ -5,7 +5,7 @@ import { InsertDrinkIngredients, DrinkIngredientViewData } from "./models";
 import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import { formatText } from "@/utils/formatText";
 import CardTable, { Column } from "@/components/UI/CardTable";
-import Button from "@/components/UI/Button";
+import {Button} from "@/components/UI/Button";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { useListIngredients } from "@/app/ingredients/context/ListIngredientsContext";
 
@@ -38,15 +38,15 @@ const ReadView: React.FC = ({}) => {
   };
 
   return (
-    <div className="w-full">
+    <div className="mt-4 w-full">
       {/* Top Row */}
       <div className="flex items-center justify-between">
-        <div className="text-xl text-foreground">Ingredients</div>
+        <div className="text-lg font-bold text-foreground">Ingredients</div>
 
         {/* Multipliers */}
         {data.length > 0 && (
           <div className="">
-            <span className="isolate inline-flex rounded-md shadow-sm">
+            <span className="isolate inline-flex rounded-md">
               <button
                 type="button"
                 disabled={multiplier === 1}
@@ -55,7 +55,7 @@ const ReadView: React.FC = ({}) => {
               >
                 <span className="sr-only">Previous</span>-
               </button>
-              <div className="relative -ml-px inline-flex items-center text-sm  bg-surface px-2 py-2 text-foreground ring-1 ring-inset ring-border hover:bg-surface-raised focus:z-10">
+              <div className="relative -ml-px inline-flex items-center text-sm  bg-surface px-2 py-2 text-foreground ring-1 ring-inset ring-border hover:bg-surface-raised focus:z-10 shadow-inner">
                 {multiplier} Servings
               </div>
               <button

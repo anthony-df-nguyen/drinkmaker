@@ -65,15 +65,19 @@ Semantic Tailwind tokens are defined as CSS custom properties in `globals.scss` 
 
 ### Common migration patterns
 ```tsx
-bg-white dark:bg-slate-800           → bg-surface
-bg-gray-100 dark:bg-stone-900        → bg-background
-bg-stone-800 / dark:bg-stone-800     → bg-surface
-text-slate-900 dark:text-slate-100   → text-foreground
-text-gray-400 dark:text-gray-400     → text-muted
-border-slate-200 dark:border-slate-700 → border-border
-bg-emerald-600 hover:bg-emerald-500  → bg-accent hover:bg-accent-hover
-text-emerald-600 dark:text-emerald-400 → text-accent-text
+bg-white dark:bg-slate-800              → bg-surface
+bg-gray-100 dark:bg-stone-900           → bg-background
+bg-stone-800 / dark:bg-stone-800        → bg-surface
+text-slate-900 dark:text-slate-100      → text-foreground
+text-gray-400 dark:text-gray-400        → text-muted
+border-slate-200 dark:border-slate-700  → border-border
+bg-emerald-600 hover:bg-emerald-500     → bg-accent hover:bg-accent-hover
+text-emerald-600 dark:text-emerald-400  → text-accent-text
 ```
+
+### Palette — "Nocturne" (Variation A)
+Light: `#f5f4f1` bg · `#ffffff` surface · `#f0eeeb` raised · `#e2ddd7` border · `#1a1714` fg · `#6b6460` muted · `#a09a95` subtle
+Dark: `#0c0f0d` bg · `#141917` surface · `#1d2420` raised · `#2a332e` border · `#e8edea` fg · `#8a9a8f` muted · `#566059` subtle
 
 ## Conventions
 

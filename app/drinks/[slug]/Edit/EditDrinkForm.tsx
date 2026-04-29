@@ -5,11 +5,12 @@ import { drinkTypes } from "../../models";
 import Card from "@/components/UI/Card";
 import { TagOption } from "@/components/MUIInputs/Tags";
 import { formatText } from "@/utils/formatText";
-import DebouncedTextInput from "@/components/MUIInputs/TextInput";
-import CustomSelect from "@/components/MUIInputs/Select";
+import TextInput from "@/components/UI/input";
+import TextArea from "@/components/UI/textarea";
+import CustomSelect from "@/components/UI/select";
 import NumberInput from "@/components/MUIInputs/NumberInput";
 import Tags from "@/components/MUIInputs/Tags";
-import Button from "@/components/UI/Button";
+import { Button } from "@/components/UI/Button";
 import Editor from "../instructions/editor/Editor";
 import { measuringUnits } from "../drink_ingredients/utils";
 
@@ -83,28 +84,22 @@ export default function EditDrinkForm({ setEdit }: Props) {
     <form onSubmit={handleFormSubmit}>
       <div className="grid p-2 gap-4 lg:gap-8">
         <div className="text-lg text-accent-text font-bold">Drink Details</div>
-        <DebouncedTextInput
+        <TextInput
           label="Name"
           value={liveFormState.name}
           onChange={(value) => handleChange("name", value || "")}
           required
-          variant="filled"
           errorText="Name is required"
           error={!liveFormState.name}
           delay={500}
-          size="small"
         />
-        <DebouncedTextInput
+        <TextArea
           label="Description"
           value={liveFormState.description}
           onChange={(value) => handleChange("description", value || "")}
-          variant="filled"
           errorText="Description is too long"
           error={liveFormState.description.length > 250}
-          delay={500}
-          multiline
-          minRows={3}
-          size="small"
+          rows={3}
         />
         <CustomSelect
           label="Drink Type"
@@ -112,19 +107,12 @@ export default function EditDrinkForm({ setEdit }: Props) {
           options={drinkTypes.filter((row) => row.value !== "all")}
           value={liveFormState.drink_type}
           onChange={(value) => handleChange("drink_type", value)}
-          variant="filled"
-          size="small"
         />
-         <DebouncedTextInput
+        <TextInput
           label="Image URL"
           value={liveFormState.picture ?? ""}
           onChange={(value) => handleChange("picture", value || "")}
-          variant="filled"
-          errorText="Description is too long"
           delay={500}
-          multiline
-          minRows={3}
-          size="small"
         />
         {/* Ingredients */}
         <h2 className="text-lg text-accent-text font-bold">Ingredients</h2>
@@ -174,8 +162,6 @@ export default function EditDrinkForm({ setEdit }: Props) {
                       handleChangeUnitOrQuantity(value, index, "unit")
                     }
                     options={measuringUnits}
-                    variant="filled"
-                    size="small"
                   />
                 </div>
               </div>
@@ -192,19 +178,12 @@ export default function EditDrinkForm({ setEdit }: Props) {
         />
       </div>
       <div className="flex gap-2 justify-end mt-4">
-        <Button
-          label="Cancel"
-          disabled={false}
-          type="button"
-          variant="cancel"
-          onClick={() => setEdit(false)}
-        />
-        <Button
-          label="Submit"
-          disabled={false}
-          type="submit"
-          variant="primary"
-        />
+        <Button type="button" variant="outline" onClick={() => setEdit(false)}>
+          Cancel
+        </Button>
+        <Button type="submit" variant="default">
+          Submit
+        </Button>
       </div>
     </form>
   );

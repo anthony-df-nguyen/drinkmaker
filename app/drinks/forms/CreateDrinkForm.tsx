@@ -1,9 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import DebouncedTextInput from "@/components/MUIInputs/TextInput";
-import Button from "@/components/UI/Button";
-import Select from "@/components/MUIInputs/Select";
-import { useAuthenticatedContext } from "@/context/Authenticated";
+import TextInput from "@/components/UI/input";
+import TextArea from "@/components/UI/textarea";
+import { Button } from "@/components/UI/Button";
+import Select from "@/components/UI/select";
 import { enqueueSnackbar } from "notistack";
 import { CreateDrinkFields, drinkTypes } from "../models";
 import { createDrink } from "../actions";
@@ -16,7 +16,6 @@ import Error from "next/error";
  * Component for creating a new drink.
  */
 const CreateForm = () => {
-  const { user } = useAuthenticatedContext();
   const { hideModal } = useModal();
   const router = useRouter();
 
@@ -69,13 +68,10 @@ const CreateForm = () => {
   const maxDescriptionLength = 250;
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="grid gap-4 max-w-[300px] md:max-w-lg w-screen"
-    >
-      <div className="text-lg font-medium">Create Drink</div>
+    <form onSubmit={handleSubmit} className="grid gap-4">
+      <div className="font-serif font-bold text-xl">New Drink</div>
       <div className="grid gap-4">
-        <DebouncedTextInput
+        <TextInput
           label="Name"
           value={form.name}
           onChange={(value: string) => handleChange("name", value)}
@@ -83,8 +79,6 @@ const CreateForm = () => {
           error={form.name.length > maxNameLength}
           errorText="Too many characters"
           required
-          variant="filled"
-          size="small"
         />
         <Select
           label="Drink Type"
@@ -92,30 +86,28 @@ const CreateForm = () => {
           options={drinkTypes.filter((row) => row.value !== "all")}
           value={form.drink_type}
           onChange={(value: string) => handleChange("drink_type", value)}
-          size="small"
-          variant="filled"
         />
-        <DebouncedTextInput
+        <TextArea
           label="Description"
           value={form.description}
           onChange={(value: string) => handleChange("description", value)}
           error={form.description.length > maxDescriptionLength}
           errorText="Too many characters"
-          multiline
-          delay={50}
-          minRows={3}
-          variant="filled"
-          size="small"
+          rows={4}
         />
       </div>
 
       <div className="flex items-center justify-end">
         <Button
-          label="Create"
           type="submit"
-          variant="primary"
-          disabled={form.name.length > maxNameLength || form.description.length > maxDescriptionLength}
-        />
+          variant="default"
+          disabled={
+            form.name.length > maxNameLength ||
+            form.description.length > maxDescriptionLength
+          }
+        >
+          Create
+        </Button>
       </div>
     </form>
   );

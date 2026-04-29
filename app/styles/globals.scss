@@ -19,18 +19,18 @@
   --background-end-rgb  : 255, 255, 255;
 
   // ── Surfaces ────────────────────────────────────────────────────────────────
-  --color-background   : 248 250 252;   // slate-50   — page bg
-  --color-surface      : 255 255 255;   // white      — card / modal
-  --color-surface-raised: 241 245 249;  // slate-100  — input bg, hover row
+  --color-background   : 245 244 241;   // warm-50   — page bg
+  --color-surface      : 255 255 255;   // white     — card / modal
+  --color-surface-raised: 240 238 235;  // warm-100  — input bg, hover row
 
   // ── Borders ─────────────────────────────────────────────────────────────────
-  --color-border       : 226 232 240;   // slate-200
-  --color-border-strong: 203 213 225;   // slate-300
+  --color-border       : 226 221 215;   // warm-200
+  --color-border-strong: 204 196 187;   // warm-300
 
   // ── Text ────────────────────────────────────────────────────────────────────
-  --color-foreground   : 15 23 42;      // slate-900  — primary text
-  --color-muted        : 100 116 139;   // slate-500  — labels, captions
-  --color-subtle       : 148 163 184;   // slate-400  — placeholders, hints
+  --color-foreground   : 26 23 20;      // warm-900  — primary text
+  --color-muted        : 107 100 96;    // warm-500  — labels, captions
+  --color-subtle       : 160 154 149;   // warm-400  — placeholders, hints
 
   // ── Accent (emerald) ────────────────────────────────────────────────────────
   --color-accent           : 5 150 105;   // emerald-600 — CTA bg
@@ -41,33 +41,33 @@
 
   // ── Drink category colors ───────────────────────────────────────────────────
   // Spirits (amber/whiskey/rum)
-  --color-spirits        : 180 83 9;     // amber-700
+  --color-spirits        : 217 119 6;    // amber-500 (#d97706)
   --color-spirits-subtle : 254 243 199;  // amber-100
 
   // Fruity / cocktails (rose)
-  --color-fruity         : 159 18 57;   // rose-800
+  --color-fruity         : 225 29 72;   // rose-600 (#e11d48)
   --color-fruity-subtle  : 255 241 242; // rose-50
 
   // Refreshing / light (sky)
-  --color-refreshing        : 7 89 133;    // sky-800
+  --color-refreshing        : 2 132 199;   // sky-600 (#0284c7)
   --color-refreshing-subtle : 240 249 255; // sky-50
 }
 
 // Dark mode — toggled by next-themes via class="dark" on <html>
 .dark {
   // ── Surfaces ────────────────────────────────────────────────────────────────
-  --color-background   : 15 23 42;      // slate-900
-  --color-surface      : 30 41 59;      // slate-800
-  --color-surface-raised: 51 65 85;     // slate-700
+  --color-background   : 12 15 13;      // nocturne-bg
+  --color-surface      : 20 25 23;      // nocturne-surface
+  --color-surface-raised: 29 36 32;     // nocturne-raised
 
   // ── Borders ─────────────────────────────────────────────────────────────────
-  --color-border       : 51 65 85;      // slate-700
-  --color-border-strong: 71 85 105;     // slate-600
+  --color-border       : 42 51 46;      // nocturne-border
+  --color-border-strong: 58 74 67;      // nocturne-border-strong
 
   // ── Text ────────────────────────────────────────────────────────────────────
-  --color-foreground   : 241 245 249;   // slate-100
-  --color-muted        : 148 163 184;   // slate-400
-  --color-subtle       : 100 116 139;   // slate-500
+  --color-foreground   : 232 237 234;   // nocturne-fg
+  --color-muted        : 138 154 143;   // nocturne-muted
+  --color-subtle       : 86 96 89;      // nocturne-subtle
 
   // ── Accent (emerald — lighter for dark backgrounds) ──────────────────────────
   --color-accent           : 52 211 153;  // emerald-400
