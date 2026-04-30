@@ -1,72 +1,69 @@
+"use client";
+
 import React, { useState, useCallback } from "react";
 import { useGlobalDrinkForm } from "../context";
 import { useListIngredients } from "@/app/ingredients/context/ListIngredientsContext";
-import { drinkTypes } from "../../models";
-import Card from "@/components/UI/Card";
-import { TagOption } from "@/components/MUIInputs/Tags";
-import { formatText } from "@/utils/formatText";
+import { drinkTypeFormOptions, alcoholicOptions, encodeAlcoholic, decodeAlcoholic } from "../../models";
 import TextInput from "@/components/UI/input";
 import TextArea from "@/components/UI/textarea";
 import CustomSelect from "@/components/UI/select";
 import NumberInput from "@/components/MUIInputs/NumberInput";
-import Tags from "@/components/MUIInputs/Tags";
 import { Button } from "@/components/UI/Button";
 import Editor from "../instructions/editor/Editor";
-import { measuringUnits } from "../drink_ingredients/utils";
+import { measuringUnits } from "../drink_ingredients/constants";
+import classNames from "@/utils/classNames";
+import { PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import IngredientPicker from "./IngredientPicker";
+import { IngredientsSchema } from "@/app/ingredients/models";
+
+const ROLES = ["required", "optional", "garnish"] as const;
 
 type Props = {
   setEdit: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export default function EditDrinkForm({ setEdit }: Props) {
-  const { allIngredients } = useListIngredients();
+  const { allIngredients, setAllIngredients } = useListIngredients();
   const { globalDrinkForm, setGlobalDrinkForm, setFormSubmitted } =
     useGlobalDrinkForm();
 
   const [liveFormState, setLiveFormState] = useState(globalDrinkForm);
-  console.log('liveFormState: ', liveFormState);
-  const findIngredientById = (id: string) =>
-    allIngredients.find((ingredient) => ingredient.id === id);
-  const [selectedTags, setSelectedTags] = useState<TagOption[]>(() =>
-    liveFormState.ingredients.map((row) => ({
-      label: formatText(findIngredientById(row.ingredient_id)?.name ?? ""),
-      value: row.ingredient_id,
-    }))
-  );
+
   const [quillEditorContent, setQuillEditorContent] = useState<string>(
-    liveFormState.instructions ?? ""
+    liveFormState.instructions ?? "",
   );
 
   const handleChange = useCallback((key: string, value: any) => {
     setLiveFormState((prev) => ({ ...prev, [key]: value }));
   }, []);
 
-  const handleChangeUnitOrQuantity = (
+  const handleChangeIngredientField = (
     value: string | number,
     index: number,
-    key: "unit" | "quantity"
+    key: "ingredient_id" | "unit" | "quantity" | "role",
   ) => {
     const updatedIngredients = liveFormState.ingredients.map((ingredient, i) =>
-      i === index ? { ...ingredient, [key]: value } : ingredient
+      i === index ? { ...ingredient, [key]: value } : ingredient,
     );
     handleChange("ingredients", updatedIngredients);
   };
 
-  const handleTagsChange = (event: TagOption[]) => {
-    setSelectedTags(event);
+  const addIngredient = () => {
+    handleChange("ingredients", [
+      ...liveFormState.ingredients,
+      { ingredient_id: "", quantity: 0, unit: "oz", role: "required" },
+    ]);
+  };
 
-    const updatedIngredients = event.map((tag) => ({
-      ingredient_id: tag.value,
-      quantity:
-        liveFormState.ingredients.find(
-          (ingredient) => ingredient.ingredient_id === tag.value
-        )?.quantity ?? 0,
-      unit:
-        liveFormState.ingredients.find(
-          (ingredient) => ingredient.ingredient_id === tag.value
-        )?.unit ?? "oz",
-    }));
-    handleChange("ingredients", updatedIngredients);
+  const removeIngredient = (index: number) => {
+    handleChange(
+      "ingredients",
+      liveFormState.ingredients.filter((_, i) => i !== index),
+    );
+  };
+
+  const handleIngredientCreated = (ingredient: IngredientsSchema) => {
+    setAllIngredients((prev) => [...prev, ingredient]);
   };
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -74,6 +71,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
     const updatedFormState = {
       ...liveFormState,
       instructions: quillEditorContent,
+      ingredients: liveFormState.ingredients.filter((ing) => ing.ingredient_id),
     };
     setLiveFormState(updatedFormState);
     setGlobalDrinkForm(updatedFormState);
@@ -81,9 +79,12 @@ export default function EditDrinkForm({ setEdit }: Props) {
   };
 
   return (
-    <form onSubmit={handleFormSubmit}>
-      <div className="grid p-2 gap-4 lg:gap-8">
-        <div className="text-lg text-accent-text font-bold">Drink Details</div>
+    <form onSubmit={handleFormSubmit} className="p-4 lg:p-6 space-y-8">
+      {/* ── Drink Details ── */}
+      <section className="space-y-4">
+        <h2 className="text-xs font-semibold text-muted uppercase tracking-widest">
+          Drink Details
+        </h2>
         <TextInput
           label="Name"
           value={liveFormState.name}
@@ -101,88 +102,176 @@ export default function EditDrinkForm({ setEdit }: Props) {
           error={liveFormState.description.length > 250}
           rows={3}
         />
-        <CustomSelect
-          label="Drink Type"
-          required
-          options={drinkTypes.filter((row) => row.value !== "all")}
-          value={liveFormState.drink_type}
-          onChange={(value) => handleChange("drink_type", value)}
-        />
-        <TextInput
-          label="Image URL"
-          value={liveFormState.picture ?? ""}
-          onChange={(value) => handleChange("picture", value || "")}
-          delay={500}
-        />
-        {/* Ingredients */}
-        <h2 className="text-lg text-accent-text font-bold">Ingredients</h2>
-        <div className="">
-          <div className="font-semibold text-sm mb-4">
-            Step 1: Add or remove ingredients
-          </div>
-          <Tags
-            label="Ingredients"
-            options={allIngredients.map((row) => ({
-              label: formatText(row.name),
-              value: row.id,
-            }))}
-            defaultValue={selectedTags}
-            placeholder="Select ingredients"
-            onChange={handleTagsChange}
+        <div className="grid grid-cols-1 gap-4">
+          <CustomSelect
+            label="Drink Type"
+            required
+            options={drinkTypeFormOptions}
+            value={liveFormState.drink_type}
+            onChange={(value) => handleChange("drink_type", value)}
           />
-          {selectedTags.length > 0 && (
-            <div className="font-semibold text-sm mt-8">
-              Step 2: Manage Ingredient Details
-            </div>
-          )}
-          <div className="mt-4 lg:grid lg:grid-cols-2">
-            {liveFormState.ingredients.map((ingredient, index) => (
-              <div key={index} className="px-2 lg:px-4">
-                <div className="text-sm text-muted">
-                  {selectedTags.find(
-                    (tag) => tag.value === ingredient.ingredient_id
-                  )?.label || ""}
-                </div>
-                <div className="my-4 flex items-center gap-2">
-                  <NumberInput
-                    label="Quantity"
-                    value={ingredient.quantity}
-                    onChange={(value) =>
-                      handleChangeUnitOrQuantity(value, index, "quantity")
-                    }
-                    required
-                    //helperText="Enter a number"
-                    variant="filled"
-                    min={0}
-                  />
-                  <CustomSelect
-                    label="Unit"
-                    value={ingredient.unit}
-                    onChange={(value) =>
-                      handleChangeUnitOrQuantity(value, index, "unit")
-                    }
-                    options={measuringUnits}
-                  />
-                </div>
-              </div>
-            ))}
+          <CustomSelect
+            label="Alcoholic?"
+            options={alcoholicOptions}
+            value={encodeAlcoholic(liveFormState.is_alcoholic)}
+            onChange={(value: string) => handleChange("is_alcoholic", decodeAlcoholic(value as "true" | "false"))}
+          />
+          <TextInput
+            label="Image URL"
+            value={liveFormState.picture ?? ""}
+            onChange={(value) => handleChange("picture", value || "")}
+            delay={500}
+          />
+          <div className="-mt-1 text-sm text-muted font-medium">
+            Tip: Using a landscape photo will look nicer.
           </div>
         </div>
+      </section>
 
-        <div className="text-lg text-accent-text font-bold">Instructions</div>
+      {/* ── Ingredients ── */}
+      <section className="space-y-4 border-t border-border pt-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-semibold text-muted uppercase tracking-widest">
+            Ingredients
+          </h2>
+          {liveFormState.ingredients.length === 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addIngredient}
+            >
+              <PlusIcon />
+              Add ingredient
+            </Button>
+          )}
+        </div>
+
+        {liveFormState.ingredients.length === 0 && (
+          <p className="text-sm text-muted italic">No ingredients added yet.</p>
+        )}
+
+        <div className="space-y-2">
+          {liveFormState.ingredients.map((ingredient, index) => {
+            const usedIds = new Set(
+              liveFormState.ingredients
+                .filter((_, i) => i !== index)
+                .map((ing) => ing.ingredient_id)
+                .filter(Boolean),
+            );
+
+            return (
+              <div
+                key={index}
+                className="rounded-lg border border-border bg-surface p-3 space-y-3"
+              >
+                {/* Ingredient picker + remove button */}
+                <div className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <IngredientPicker
+                      value={ingredient.ingredient_id}
+                      allIngredients={allIngredients}
+                      usedIds={usedIds}
+                      onChange={(id) =>
+                        handleChangeIngredientField(id, index, "ingredient_id")
+                      }
+                      onCreated={handleIngredientCreated}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={() => removeIngredient(index)}
+                    aria-label="Remove ingredient"
+                  >
+                    <XMarkIcon />
+                  </Button>
+                </div>
+
+                {/* Quantity + Unit */}
+                <div className="flex items-end gap-2">
+                  <div className="w-28 shrink-0">
+                    <NumberInput
+                      label="Quantity"
+                      value={ingredient.quantity}
+                      onChange={(value) =>
+                        handleChangeIngredientField(value, index, "quantity")
+                      }
+                      required
+                      min={0}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <CustomSelect
+                      label="Unit"
+                      value={ingredient.unit}
+                      onChange={(value) =>
+                        handleChangeIngredientField(value, index, "unit")
+                      }
+                      options={measuringUnits}
+                    />
+                  </div>
+                </div>
+
+                {/* Role pills */}
+                <div className="flex items-center gap-1.5">
+                  {ROLES.map((role) => (
+                    <button
+                      key={role}
+                      type="button"
+                      onClick={() =>
+                        handleChangeIngredientField(role, index, "role")
+                      }
+                      className={classNames(
+                        "px-3 py-1 rounded-full text-xs font-medium border transition-colors capitalize",
+                        ingredient.role === role
+                          ? "bg-accent text-accent-foreground border-transparent"
+                          : "bg-transparent text-muted border-border hover:bg-surface-raised hover:text-foreground",
+                      )}
+                    >
+                      {role}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        {liveFormState.ingredients.length > 0 && (
+          <div className="flex justify-center">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addIngredient}
+              className={""}
+            >
+              <PlusIcon />
+              Add ingredient
+            </Button>
+          </div>
+        )}
+      </section>
+
+      {/* ── Instructions ── */}
+      <section className="space-y-4 border-t border-border pt-6">
+        <h2 className="text-xs font-semibold text-muted uppercase tracking-widest">
+          Instructions
+        </h2>
         <Editor
           initialContent={globalDrinkForm.instructions}
-          onChangeHandler={(content) => {
-            setQuillEditorContent(content);
-          }}
+          onChangeHandler={(content) => setQuillEditorContent(content)}
         />
-      </div>
-      <div className="flex gap-2 justify-end mt-4">
+      </section>
+
+      {/* ── Actions ── */}
+      <div className="flex gap-2 justify-end border-t border-border pt-4">
         <Button type="button" variant="outline" onClick={() => setEdit(false)}>
           Cancel
         </Button>
         <Button type="submit" variant="default">
-          Submit
+          Save recipe
         </Button>
       </div>
     </form>

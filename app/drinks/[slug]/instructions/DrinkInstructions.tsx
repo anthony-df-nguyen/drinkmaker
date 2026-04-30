@@ -8,11 +8,6 @@ import { upsertDrinkInstruction, getDrinkInstructionByID } from "./actions";
 import Editor from "./editor/Editor";
 import ViewOnlyQuill from "./editor/ViewOnlyQuill";
 import { useGlobalDrinkForm } from "../context";
-import Button from "@/components/UI/Button";
-import { PencilSquareIcon } from "@heroicons/react/24/solid";
-import { enqueueSnackbar } from "notistack";
-import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
-import Card from "@/components/UI/Card";
 
 /**
  * Component for displaying and editing drink instructions.
@@ -29,7 +24,7 @@ const DrinkInstructions: React.FC = () => {
     useState<InstructionFormat | null>(instructions);
 
   return (
-    <div className="w-full grid gap-4">
+    <div className="mt-8 w-full grid gap-4">
       <div className="flex justify-between w-full">
         <div className="grid items-center gap-4">
           <div className="text-xl mb-2 text-foreground">Instructions</div>

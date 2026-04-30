@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import TextInput from "@/components/UI/input";
-import Button from "@/components/UI/Button";
+import { Button } from "@/components/UI/Button";
 import { updateUserName } from "./actions";
 import { enqueueSnackbar } from "notistack";
 
@@ -45,8 +45,12 @@ const EditUserNameForm: React.FC<EditUserNameFormProps> = ({
         />
       </div>
       <div className="flex gap-4 justify-end">
-        <Button label="Cancel" type="button" variant="cancel" />
-        <Button label="Update" type="submit" variant="primary" />
+        <Button type="button" variant="secondary">
+          Cancel
+        </Button>
+        <Button type="submit" variant="default">
+          Update
+        </Button>
       </div>
     </form>
   );

@@ -88,7 +88,8 @@ const queryDrinks = async (
   limit: number,
   searchName?: string,
   drinkType?: string,
-  includeCount: boolean = true
+  includeCount: boolean = true,
+  isAlcoholic?: boolean | null
 ): Promise<{
   data: (DrinkSchema & { username: string | null })[];
   totalCount: number | null;
@@ -118,6 +119,11 @@ const queryDrinks = async (
   }
   if (drinkType && drinkType !== "all") {
     query = query.eq("drink_type", drinkType);
+  }
+  if (isAlcoholic === true) {
+    query = query.eq("is_alcoholic", true);
+  } else if (isAlcoholic === false) {
+    query = query.eq("is_alcoholic", false);
   }
 
   // Apply range (after filters)

@@ -27,6 +27,7 @@ export type GlobalDrinkForm = {
   name: string;
   unique_name: string;
   drink_type: string;
+  is_alcoholic: boolean;
   id: string;
   description: string;
   ingredients: DrinkIngredientDetail[];
@@ -57,6 +58,7 @@ export const DrinkFormProvider: React.FC<{
     name: "",
     unique_name: "",
     drink_type: "",
+    is_alcoholic: true,
     id: "",
     description: "",
     ingredients: [],
@@ -96,6 +98,7 @@ export const DrinkFormProvider: React.FC<{
           : [],
         instructions: instructions?.instructions ?? null,
         drink_type: basic.drink_type,
+        is_alcoholic: basic.is_alcoholic,
         created_by_user_id: basic.created_by,
         created_by_user: basic.profiles?.username ?? "Unknown",
         picture: basic.picture,
@@ -123,6 +126,7 @@ export const DrinkFormProvider: React.FC<{
           name,
           description,
           drink_type,
+          is_alcoholic,
           ingredients,
           instructions,
           picture,
@@ -132,6 +136,7 @@ export const DrinkFormProvider: React.FC<{
           name,
           description,
           drink_type,
+          is_alcoholic,
           picture,
         };
         await updateDrinkBasics(id, basicDrinkPayload);
@@ -147,7 +152,7 @@ export const DrinkFormProvider: React.FC<{
         enqueueSnackbar("Drink successfully updated", { variant: "success" });
 
         setTimeout(() => {
-          router.push(`/`);
+          router.push(`/drinks/${globalDrinkForm.unique_name}`);
         }, 1000);
       } catch (error) {
         console.error("Failed to update the database: ", error);

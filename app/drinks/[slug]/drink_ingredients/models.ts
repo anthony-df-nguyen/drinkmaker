@@ -6,10 +6,14 @@ export interface DrinkIngredientDetail {
 }
 
 export interface DrinkIngredientViewData {
-  name: string,
+  name: string;
   quantity: number;
   unit: string;
   role: string;
+  displayQty: string;
+  displayUnit: string;
+  isVolumeUnit: boolean;
+  isOverridden: boolean;
 }
 
 export type DrinkIngredientSchema = {

@@ -195,6 +195,7 @@ function SelectScrollDownButton({
 
 type CustomSelectProps = {
   label?: string;
+  placeholder?: string;
   options: { value: string; label: string }[];
   value: string;
   onChange: (value: string) => void;
@@ -206,6 +207,7 @@ type CustomSelectProps = {
 
 function CustomSelect({
   label,
+  placeholder,
   options,
   value,
   onChange,
@@ -227,7 +229,7 @@ function CustomSelect({
           aria-invalid={error ? true : undefined}
           className={cn(error ? "border-red-500" : "", className)}
         >
-          <SelectValue />
+          <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
           {options.map((option) => (

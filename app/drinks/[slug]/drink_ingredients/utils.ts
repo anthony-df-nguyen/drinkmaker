@@ -1,4 +1,46 @@
-import { TagOption } from "@/components/MUIInputs/Tags";
+export const VOLUME_UNITS = ["tsp", "tbsp", "oz", "ml"] as const;
+export type VolumeUnit = (typeof VOLUME_UNITS)[number];
+
+export function toTsp(qty: number, unit: VolumeUnit): number {
+  switch (unit) {
+    case "tsp":  return qty;
+    case "tbsp": return qty * 3;
+    case "oz":   return qty * 6;
+    case "ml":   return (qty / 29.574) * 6;
+  }
+}
+
+export function fromTsp(tsp: number, unit: VolumeUnit): number {
+  switch (unit) {
+    case "tsp":  return tsp;
+    case "tbsp": return tsp / 3;
+    case "oz":   return tsp / 6;
+    case "ml":   return (tsp / 6) * 29.574;
+  }
+}
+
+export function smartUnit(tspTotal: number): VolumeUnit {
+  if (tspTotal >= 192) return "ml";
+  if (tspTotal >= 6)   return "oz";
+  if (tspTotal >= 3)   return "tbsp";
+  return "tsp";
+}
+
+export function formatQty(val: number): string {
+  const fracs: [number, string][] = [
+    [0.125, "⅛"], [0.25, "¼"], [0.33, "⅓"],
+    [0.5, "½"], [0.67, "⅔"], [0.75, "¾"],
+  ];
+  const whole = Math.floor(val);
+  const rem = val - whole;
+  for (const [dec, sym] of fracs) {
+    if (Math.abs(rem - dec) < 0.04) {
+      return (whole ? `${whole} ` : "") + sym;
+    }
+  }
+  return parseFloat(val.toFixed(2)).toString();
+}
+
 export const getStepForUnit = (unit: string): number => {
   switch (unit) {
     case "oz":
@@ -24,21 +66,3 @@ export const getStepForUnit = (unit: string): number => {
       return 1;
   }
 };
-
-export const measuringUnits: TagOption[] = [
-  { value: "oz", label: "oz" },
-  { value: "ml", label: "ml" },
-  { value: "dash", label: "dash" },
-  { value: "tsp", label: "tsp" },
-  { value: "tbsp", label: "tbsp" },
-  { value: "cup", label: "cup" },
-  { value: "part", label: "part" },
-  { value: "slice", label: "slice" },
-  { value: "wedge", label: "wedge" },
-  { value: "piece", label: "piece" },
-  { value: "pinch", label: "pinch" },
-  { value: "drop", label: "drop" },
-  { value: "splash", label: "splash" },
-  { value: "shot", label: "shot" },
-  { value: "glass", label: "glass" },
-]

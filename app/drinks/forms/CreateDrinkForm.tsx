@@ -5,7 +5,13 @@ import TextArea from "@/components/UI/textarea";
 import { Button } from "@/components/UI/Button";
 import Select from "@/components/UI/select";
 import { enqueueSnackbar } from "notistack";
-import { CreateDrinkFields, drinkTypes } from "../models";
+import {
+  CreateDrinkFields,
+  drinkTypeFormOptions,
+  alcoholicOptions,
+  decodeAlcoholic,
+  encodeAlcoholic,
+} from "../models";
 import { createDrink } from "../actions";
 import { useModal } from "@/context/ModalContext";
 import { sanitizeInput } from "@/utils/sanitizeInput";
@@ -25,9 +31,8 @@ const CreateForm = () => {
     description: "",
     created_by: "",
     drink_type: "cocktail",
+    is_alcoholic: true,
   });
-
-  const [formErrors, setFormErrors] = useState({});
 
   /**
    * Handles the change event for the form fields.
@@ -83,9 +88,17 @@ const CreateForm = () => {
         <Select
           label="Drink Type"
           required
-          options={drinkTypes.filter((row) => row.value !== "all")}
+          options={drinkTypeFormOptions}
           value={form.drink_type}
           onChange={(value: string) => handleChange("drink_type", value)}
+        />
+        <Select
+          label="Alcoholic?"
+          options={alcoholicOptions}
+          value={encodeAlcoholic(form.is_alcoholic)}
+          onChange={(value: string) =>
+            setForm((prev) => ({ ...prev, is_alcoholic: decodeAlcoholic(value as "true" | "false") }))
+          }
         />
         <TextArea
           label="Description"

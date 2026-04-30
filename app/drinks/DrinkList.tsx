@@ -4,7 +4,7 @@ import { useListDrinks } from "./contexts/DrinksContext";
 import Link from "next/link";
 import Badge from "@/components/UI/Badge";
 import { queryDrinks } from "./actions";
-import { drinkTypeColors, DrinkSchema } from "./models";
+import { drinkTypeColors, DrinkSchema, drinkTypes } from "./models";
 import TextInput from "@/components/UI/input";
 import classNames from "@/utils/classNames";
 
@@ -91,14 +91,26 @@ const DrinkCard: React.FC<DrinkCardProps> = ({ drink }) => {
 
 // ─── DrinkList ────────────────────────────────────────────────────────────────
 
+// "All / Alcoholic / Non-alcoholic" pill options
+const ALCOHOLIC_FILTERS: { label: string; value: "all" | "yes" | "no" }[] = [
+  { label: "All", value: "all" },
+  { label: "Alcoholic", value: "yes" },
+  { label: "Non-alcoholic", value: "no" },
+];
+
 const DrinkList: React.FC = () => {
   const { drinksList, setDrinksList, setCount } = useListDrinks();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectDrinkType, setSelectDrinkType] = useState<string>("all");
+  const [alcoholicFilter, setAlcoholicFilter] = useState<"all" | "yes" | "no">("all");
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const observer = useRef<IntersectionObserver | null>(null);
+
+  // Derive is_alcoholic value for the query
+  const isAlcoholicParam =
+    alcoholicFilter === "yes" ? true : alcoholicFilter === "no" ? false : undefined;
 
   // Reset pagination when search or filter changes
   useEffect(() => {
@@ -106,7 +118,7 @@ const DrinkList: React.FC = () => {
     setCount(0);
     setHasMore(true);
     setPage(1);
-  }, [searchTerm, selectDrinkType, setDrinksList, setCount]);
+  }, [searchTerm, selectDrinkType, alcoholicFilter, setDrinksList, setCount]);
 
   // Fetch first page when search or filter changes
   useEffect(() => {
@@ -120,6 +132,8 @@ const DrinkList: React.FC = () => {
           PAGE_SIZE,
           searchTerm,
           selectDrinkType,
+          true,
+          isAlcoholicParam,
         );
         if (cancelled) return;
 
@@ -142,7 +156,7 @@ const DrinkList: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [searchTerm, selectDrinkType, setDrinksList, setCount]);
+  }, [searchTerm, selectDrinkType, alcoholicFilter, isAlcoholicParam, setDrinksList, setCount]);
 
   const loadMoreDrinks = useCallback(async () => {
     if (isLoading || !hasMore) return;
@@ -156,6 +170,7 @@ const DrinkList: React.FC = () => {
         searchTerm,
         selectDrinkType,
         false,
+        isAlcoholicParam,
       );
 
       if (data.data.length === 0) {
@@ -179,6 +194,7 @@ const DrinkList: React.FC = () => {
   }, [
     hasMore,
     isLoading,
+    isAlcoholicParam,
     page,
     searchTerm,
     selectDrinkType,
@@ -204,16 +220,49 @@ const DrinkList: React.FC = () => {
   return (
     <div>
       {/* Controls */}
-      <div className="top-0 inset-x-0 z-30 bg-surface px-4 lg:px-0 py-4 box-border max-w-[860px] mx-auto border-b-[1px] border-border">
-        <div className="max-w-full flex-row gap-4 flex items-center justify-between">
-          <div className="flex-1 min-w-0">
-            <TextInput
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e)}
-              placeholder="Search drinks..."
-              delay={500}
-            />
-          </div>
+      <div className="top-0 inset-x-0 z-30 bg-surface px-4 lg:px-0 py-4 box-border max-w-[860px] mx-auto border-b-[1px] border-border space-y-3">
+        {/* Search */}
+        <TextInput
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e)}
+          placeholder="Search drinks..."
+          delay={500}
+        />
+
+        {/* Type filter chips */}
+        <div className="flex flex-wrap gap-1.5">
+          {drinkTypes.map((type) => (
+            <button
+              key={type.value}
+              onClick={() => setSelectDrinkType(type.value)}
+              className={classNames(
+                "px-3 py-1 rounded-full text-xs font-medium border transition-colors",
+                selectDrinkType === type.value
+                  ? "bg-accent text-accent-foreground border-transparent"
+                  : "bg-transparent text-muted border-border hover:bg-surface-raised hover:text-foreground",
+              )}
+            >
+              {type.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Alcoholic filter chips */}
+        <div className="flex gap-1.5">
+          {ALCOHOLIC_FILTERS.map((f) => (
+            <button
+              key={f.value}
+              onClick={() => setAlcoholicFilter(f.value)}
+              className={classNames(
+                "px-3 py-1 rounded-full text-xs font-medium border transition-colors",
+                alcoholicFilter === f.value
+                  ? "bg-surface-raised text-foreground border-border"
+                  : "bg-transparent text-muted border-border hover:bg-surface-raised hover:text-foreground",
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
         </div>
       </div>
 

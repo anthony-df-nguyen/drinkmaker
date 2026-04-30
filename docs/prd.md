@@ -83,14 +83,25 @@ Interactions
 
 1. Serving Scaling
 
-* User adjusts serving size
+* User adjusts serving size (multiplier: 1×–20×)
 * System recalculates all ingredient quantities instantly
+* Smart Scale is on by default — system auto-promotes units when scaled quantities cross thresholds (e.g. 8 tsp → 2 tbsp + 2 tsp, or expressed in oz)
+* Smart Scale can be toggled off to lock all units to their original values
+* User can tap any individual unit chip to override that ingredient's unit manually
+* Per-ingredient overrides are visually distinct (amber chip) so users know which rows were manually set
+* Overrides reset when the scale factor changes
 
 2. Unit Conversion
 
-* Toggle:
-    * oz ↔ ml
-* Only applies to convertible units
+* Full volume conversion chain: tsp → tbsp → oz → ml
+* Conversion ratios: 3 tsp = 1 tbsp, 2 tbsp = 1 oz, 1 oz = 29.57 ml
+* Smart Scale auto-promotes unit when scaled total crosses threshold:
+    * < 3 tsp → stay in tsp
+    * ≥ 3 tsp → promote to tbsp
+    * ≥ 6 tsp (1 oz) → promote to oz
+    * ≥ 192 tsp → promote to ml
+* Non-volume units (leaves, dashes, pieces) are never converted
+* Quantities are stored as entered; scaling and conversion are applied at display time (non-destructive)
 
 ⸻
 
@@ -342,15 +353,20 @@ Units
 
 Supported:
 
+* tsp
+* tbsp
 * oz
 * ml
 * dash
 * piece
+* leaves
 
 Rules:
 
-* Only convert compatible units
-* Leave non-convertible units unchanged
+* Full conversion chain for volume units: tsp → tbsp → oz → ml
+* Only convert compatible (volume) units
+* Leave non-convertible units (dash, piece, leaves) unchanged
+* Unit stored as VARCHAR(50); UI enforces allowed values via Select input — no free text
 
 ⸻
 

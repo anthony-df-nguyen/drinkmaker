@@ -9,7 +9,7 @@ import { enqueueSnackbar } from "notistack";
 import { updateIngredient } from "../actions";
 import { useModal } from "@/context/ModalContext";
 import { formatText } from "@/utils/formatText";
-import Button from "@/components/UI/Button";
+import {Button} from "@/components/UI/Button";
 
 interface Props {
   ingredient: IngredientsSchema;
@@ -75,7 +75,7 @@ export const EditIngredient: React.FC<Props> = ({ ingredient }) => {
         rows={2}
       />
       <div className="flex items-center justify-end">
-        <Button label="Update" type="submit" variant="primary" />
+        <Button type="submit" variant="default">Update</Button>
       </div>
     </form>
   );
