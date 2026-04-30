@@ -21,7 +21,7 @@ import { useModal } from "@/context/ModalContext";
 import DeleteForm from "../forms/DeleteDrinkForm";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { thumbnailColor } from "@/utils/thumbnail";
+import { thumbnailColor} from "@/components/UI/Thumbnail";
 
 type ImgRatio = "portrait" | "landscape" | "square" | null;
 
