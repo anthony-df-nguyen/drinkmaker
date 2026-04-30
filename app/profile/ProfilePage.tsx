@@ -7,7 +7,7 @@ export default function ProfilePage() {
   const { user } = useAuthenticatedContext();
   const items: {
     name: string;
-    value: string | undefined | React.ReactNode
+    value: string | undefined | React.ReactNode;
   }[] = [
     { name: "Display Name", value: <DisplayName /> },
     { name: "Email", value: user?.email },
@@ -21,14 +21,14 @@ export default function ProfilePage() {
     { name: "User ID", value: user?.id },
   ];
   return (
-    <div className="overflow-hidden  shadow rounded-lg max-w-[800px] mx-auto">
+    <div className="overflow-hidden  max-w-[800px] mx-auto">
       <div className="px-4 py-4 sm:px-6 flex items-center gap-2 bg-surface">
         <h3 className="text-base font-semibold leading-7 text-foreground">
           My Profile
         </h3>
       </div>
-      <div className="border-t bg-surface border-border">
-        <dl className="divide-y bg-surface divide-border">
+      <div className="border-t bg-background border-border">
+        <dl className="divide-y bg-background divide-border">
           {items.map((item) => {
             return (
               <div
