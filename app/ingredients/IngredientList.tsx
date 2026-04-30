@@ -2,12 +2,18 @@
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useListIngredients } from "./context/ListIngredientsContext";
+import { useAuthenticatedContext } from "@/context/Authenticated";
 import { formatText } from "@/utils/formatText";
 import { PlusIcon } from "@heroicons/react/20/solid";
-import { queryIngredients, createIngredient, searchForIngredient } from "./actions";
+import {
+  queryIngredients,
+  createIngredient,
+  searchForIngredient,
+} from "./actions";
 import { sanitizeInput, validateInput } from "@/utils/sanitizeInput";
 import checkExisting from "@/utils/supabase/checkExisting";
 import { enqueueSnackbar } from "notistack";
+import PleaseSignIn from "@/components/SignIn/PleaseSignIn";
 import TextInput from "@/components/UI/input";
 import { cn } from "@/lib/utils";
 import { IngredientsSchema } from "./models";
@@ -63,28 +69,62 @@ interface CreateRowProps {
   onClick: () => void;
 }
 
-const CreateRow: React.FC<CreateRowProps> = ({ name, onClick }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className="w-full p-4 flex flex-row gap-4 items-center bg-accent-subtle hover:bg-accent-subtle/80 transition-colors text-left"
-  >
-    <div className="w-10 h-10 rounded flex items-center justify-center flex-shrink-0 bg-accent/20">
-      <PlusIcon className="w-5 h-5 text-accent-text" />
+const CreateRow: React.FC<CreateRowProps> = ({ name, onClick }) => {
+  const { user } = useAuthenticatedContext();
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={!user}
+        className={cn(
+          "w-full p-4 flex flex-row gap-4 items-center transition-colors text-left",
+          !user && "opacity-20",
+          user && "bg-accent-subtle hover:bg-accent-subtle/80",
+        )}
+      >
+        <div
+          className={cn(
+            "w-10 h-10 rounded flex items-center justify-center flex-shrink-0",
+            user && "bg-accent/20",
+          )}
+        >
+          <PlusIcon className={cn("w-5 h-5", user && "text-accent-text")} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div
+            className={cn(
+              "text-sm font-medium  truncate",
+              user && "text-accent-text",
+            )}
+          >
+            Create &ldquo;{formatText(name)}&rdquo;
+          </div>
+        </div>
+      </button>
+      {!user && (
+        <div className="px-8">
+          <PleaseSignIn
+            title="Create Ingredients"
+            text="Sign in to contribute to the list of ingredients."
+          />
+        </div>
+      )}
     </div>
-    <div className="flex-1 min-w-0">
-      <div className="text-sm font-medium text-accent-text truncate">
-        Create &ldquo;{formatText(name)}&rdquo;
-      </div>
-    </div>
-  </button>
-);
+  );
+};
 
 // ─── IngredientList ───────────────────────────────────────────────────────────
 
 const IngredientList: React.FC = () => {
-  const { ingredients, setIngredients, count, mode, setMode, refreshBrowseFirstPage } =
-    useListIngredients();
+  const {
+    ingredients,
+    setIngredients,
+    count,
+    mode,
+    setMode,
+    refreshBrowseFirstPage,
+  } = useListIngredients();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [cleanTerm, setCleanTerm] = useState("");
@@ -106,7 +146,10 @@ const IngredientList: React.FC = () => {
     setIsLoading(true);
     try {
       const data = await queryIngredients(nextPage, PAGE_SIZE);
-      if (data.length === 0) { setHasMore(false); return; }
+      if (data.length === 0) {
+        setHasMore(false);
+        return;
+      }
       setIngredients((prev) => {
         const existing = new Set(prev.map((i) => i.name));
         return [...prev, ...data.filter((i) => !existing.has(i.name))];
@@ -186,7 +229,9 @@ const IngredientList: React.FC = () => {
     setIsCreating(true);
     try {
       await createIngredient({ name: cleanTerm });
-      enqueueSnackbar(`"${formatText(cleanTerm)}" added`, { variant: "success" });
+      enqueueSnackbar(`"${formatText(cleanTerm)}" added`, {
+        variant: "success",
+      });
       setSearchTerm("");
       setCleanTerm("");
       setEnableCreate(false);
@@ -221,17 +266,23 @@ const IngredientList: React.FC = () => {
         {ingredients.map((ingredient, index) => {
           const isLast = index === ingredients.length - 1;
           return (
-            <div key={ingredient.name} ref={isLast ? lastIngredientRef : undefined}>
+            <div
+              key={ingredient.name}
+              ref={isLast ? lastIngredientRef : undefined}
+            >
               <IngredientRow ingredient={ingredient} />
             </div>
           );
         })}
 
-        {!isLoading && !hasMore && ingredients.length > 0 && mode === "browse" && (
-          <div className="py-4 text-center text-muted text-sm">
-            {`${count} ingredients total`}
-          </div>
-        )}
+        {!isLoading &&
+          !hasMore &&
+          ingredients.length > 0 &&
+          mode === "browse" && (
+            <div className="py-4 text-center text-muted text-sm">
+              {`${count} ingredients total`}
+            </div>
+          )}
       </div>
 
       {isLoading && (
@@ -241,7 +292,9 @@ const IngredientList: React.FC = () => {
       )}
 
       {!isLoading && ingredients.length === 0 && !enableCreate && (
-        <div className="py-8 text-center text-muted text-sm">No ingredients found</div>
+        <div className="py-8 text-center text-muted text-sm">
+          No ingredients found
+        </div>
       )}
     </div>
   );
