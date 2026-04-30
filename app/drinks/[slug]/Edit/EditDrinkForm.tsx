@@ -11,7 +11,7 @@ import NumberInput from "@/components/UI/NumberInput";
 import { Button } from "@/components/UI/Button";
 import Editor from "../instructions/editor/Editor";
 import { measuringUnits } from "../drink_ingredients/constants";
-import classNames from "@/utils/classNames";
+import { cn } from "@/lib/utils";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import IngredientPicker from "./IngredientPicker";
 import { IngredientsSchema } from "@/app/ingredients/models";
@@ -223,7 +223,7 @@ export default function EditDrinkForm({ setEdit }: Props) {
                       onClick={() =>
                         handleChangeIngredientField(role, index, "role")
                       }
-                      className={classNames(
+                      className={cn(
                         "px-3 py-1 rounded-full text-xs font-medium border transition-colors capitalize",
                         ingredient.role === role
                           ? "bg-accent text-accent-foreground border-transparent"

@@ -9,7 +9,7 @@ import Link from "next/link";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { links } from "./Links";
 import ThemeToggle from "./ThemeToggle";
-import classNames from "@/utils/classNames";
+import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { useAuthenticatedContext } from "@/context/Authenticated";
 import { createSupabaseBrowserClient } from "@/utils/supabase/browser-client";
@@ -87,7 +87,7 @@ const SideBar: React.FC<SideBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                       key={item.name}
                       href={item.href}
                       onClick={() => setSidebarOpen(false)}
-                      className={classNames(
+                      className={cn(
                         "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm mb-0.5 transition-colors",
                         active
                           ? "bg-accent/10 text-accent font-semibold"

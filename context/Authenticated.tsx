@@ -6,20 +6,16 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
-import { User } from "@supabase/supabase-js";
 import { createSupabaseBrowserClient } from "@/utils/supabase/browser-client";
-import { useTheme } from "next-themes";
-
-export type FinalUserObject = User & { username: string };
+import type { AuthenticatedUser } from "@/types";
 
 interface AuthenticatedContextProps {
-  user: FinalUserObject | null;
-  setUser: (user: FinalUserObject | null) => void;
+  user: AuthenticatedUser | null;
+  setUser: (user: AuthenticatedUser | null) => void;
 }
 
 const pg = createSupabaseBrowserClient();
 
-// Create the context with a default value
 const AuthenticatedContext = createContext<
   AuthenticatedContextProps | undefined
 >(undefined);
@@ -42,7 +38,7 @@ export const getUserName = async (userId: string): Promise<string> => {
   return data.username;
 };
 
-export const getUserSession = async (): Promise<FinalUserObject | null> => {
+export const getUserSession = async (): Promise<AuthenticatedUser | null> => {
   try {
     const {
       data: { user },
@@ -58,7 +54,7 @@ export const getUserSession = async (): Promise<FinalUserObject | null> => {
     }
 
     const username = await getUserName(user.id);
-    return { ...user, username } as FinalUserObject;
+    return { ...user, username } as AuthenticatedUser;
   } catch (error) {
     console.info("No user session was found", error);
     return null;
@@ -68,7 +64,7 @@ export const getUserSession = async (): Promise<FinalUserObject | null> => {
 export const AuthenticatedProvider: React.FC<AuthenticatedProviderProps> = ({
   children,
 }) => {
-  const [user, setUser] = useState<FinalUserObject | null>(null);
+  const [user, setUser] = useState<AuthenticatedUser | null>(null);
 
   const checkAuth = async () => {
     try {
@@ -91,7 +87,6 @@ export const AuthenticatedProvider: React.FC<AuthenticatedProviderProps> = ({
   );
 };
 
-// Custom hook for consuming the context
 export const useAuthenticatedContext = (): AuthenticatedContextProps => {
   const context = useContext(AuthenticatedContext);
   if (!context) {

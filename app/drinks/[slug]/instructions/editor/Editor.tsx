@@ -1,19 +1,12 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { InstructionFormat } from "../models";
+import { QuillEditorProps } from "../models";
 import { modules, formats } from "./modules";
 import { useQuill } from "react-quilljs";
-import classNames from "@/utils/classNames";
+import { cn } from "@/lib/utils";
 import "quill/dist/quill.snow.css";
 
-interface EditorProps {
-  initialContent: InstructionFormat;
-  onChangeHandler: (value: string) => void;
-}
-
-
-
-const Editor: React.FC<EditorProps> = ({ initialContent, onChangeHandler }) => {
+const Editor: React.FC<QuillEditorProps> = ({ initialContent, onChangeHandler }) => {
   const { quill, quillRef } = useQuill({
     modules: modules,
     formats: formats,
@@ -61,7 +54,7 @@ const Editor: React.FC<EditorProps> = ({ initialContent, onChangeHandler }) => {
       </div>
       <div className="flex justify-end mt-2">
         <div
-          className={classNames(
+          className={cn(
             "inputLimit",
             length === limit ? "text-red-600" : "text-gray-500"
           )}

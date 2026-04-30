@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useListIngredients } from "./context/ListIngredientsContext";
-import { useAuthenticatedContext } from "@/context/Authenticated";
 import { formatText } from "@/utils/formatText";
-import { PlusIcon } from "@heroicons/react/20/solid";
 import {
   queryIngredients,
   createIngredient,
@@ -13,108 +11,12 @@ import {
 import { sanitizeInput, validateInput } from "@/utils/sanitizeInput";
 import checkExisting from "@/utils/supabase/checkExisting";
 import { enqueueSnackbar } from "notistack";
-import PleaseSignIn from "@/components/SignIn/PleaseSignIn";
 import TextInput from "@/components/UI/input";
-import { cn } from "@/lib/utils";
-import { IngredientsSchema } from "./models";
+import IngredientRow from "./components/IngredientRow";
+import CreateIngredientRow from "./components/CreateIngredientRow";
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 
 const PAGE_SIZE = 10;
-
-const THUMBNAIL_COLORS = [
-  "bg-gradient-to-br from-amber-400 to-amber-700",
-  "bg-gradient-to-br from-blue-400 to-blue-700",
-  "bg-gradient-to-br from-emerald-400 to-emerald-700",
-  "bg-gradient-to-br from-rose-400 to-rose-600",
-  "bg-gradient-to-br from-violet-400 to-violet-700",
-  "bg-gradient-to-br from-cyan-400 to-cyan-700",
-  "bg-gradient-to-br from-orange-400 to-orange-600",
-  "bg-gradient-to-br from-teal-400 to-teal-700",
-];
-
-function thumbnailColor(name: string): string {
-  return THUMBNAIL_COLORS[name.charCodeAt(0) % THUMBNAIL_COLORS.length];
-}
-
-// ─── IngredientRow ────────────────────────────────────────────────────────────
-
-interface IngredientRowProps {
-  ingredient: IngredientsSchema;
-}
-
-const IngredientRow: React.FC<IngredientRowProps> = ({ ingredient }) => {
-  const name = formatText(ingredient.name);
-  return (
-    <div className="p-4 bg-background flex flex-row gap-4 items-center hover:bg-surface-raised transition-colors">
-      <div
-        className={cn(
-          "w-10 h-10 rounded flex items-center justify-center flex-shrink-0",
-          thumbnailColor(ingredient.name),
-        )}
-      >
-        <span className="text-white text-base font-semibold select-none">
-          {name.charAt(0).toUpperCase()}
-        </span>
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="text-sm text-foreground truncate">{name}</div>
-      </div>
-    </div>
-  );
-};
-
-// ─── CreateRow ────────────────────────────────────────────────────────────────
-
-interface CreateRowProps {
-  name: string;
-  onClick: () => void;
-}
-
-const CreateRow: React.FC<CreateRowProps> = ({ name, onClick }) => {
-  const { user } = useAuthenticatedContext();
-  return (
-    <div>
-      <button
-        type="button"
-        onClick={onClick}
-        disabled={!user}
-        className={cn(
-          "w-full p-4 flex flex-row gap-4 items-center transition-colors text-left",
-          !user && "opacity-20",
-          user && "bg-accent-subtle hover:bg-accent-subtle/80",
-        )}
-      >
-        <div
-          className={cn(
-            "w-10 h-10 rounded flex items-center justify-center flex-shrink-0",
-            user && "bg-accent/20",
-          )}
-        >
-          <PlusIcon className={cn("w-5 h-5", user && "text-accent-text")} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div
-            className={cn(
-              "text-sm font-medium  truncate",
-              user && "text-accent-text",
-            )}
-          >
-            Create &ldquo;{formatText(name)}&rdquo;
-          </div>
-        </div>
-      </button>
-      {!user && (
-        <div className="px-8">
-          <PleaseSignIn
-            title="Create Ingredients"
-            text="Sign in to contribute to the list of ingredients."
-          />
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ─── IngredientList ───────────────────────────────────────────────────────────
 
 const IngredientList: React.FC = () => {
   const {
@@ -135,17 +37,14 @@ const IngredientList: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
-  const observer = useRef<IntersectionObserver | null>(null);
   const searchRequestRef = useRef(0);
-
-  // ── Infinite scroll ────────────────────────────────────────────────────────
 
   const loadMore = useCallback(async () => {
     if (isLoading || !hasMore || mode !== "browse") return;
     const nextPage = page + 1;
     setIsLoading(true);
     try {
-      const data = await queryIngredients(nextPage, PAGE_SIZE);
+      const { data } = await queryIngredients(nextPage, PAGE_SIZE);
       if (data.length === 0) {
         setHasMore(false);
         return;
@@ -163,20 +62,8 @@ const IngredientList: React.FC = () => {
     }
   }, [isLoading, hasMore, mode, page, setIngredients]);
 
-  // Attach observer to the last rendered ingredient row
-  const lastIngredientRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (isLoading) return;
-      observer.current?.disconnect();
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0]?.isIntersecting) loadMore();
-      });
-      if (node) observer.current.observe(node);
-    },
-    [isLoading, loadMore],
-  );
+  const lastIngredientRef = useIntersectionObserver(loadMore, isLoading);
 
-  // Reset pagination only when mode changes, not on every ingredient append
   useEffect(() => {
     if (mode === "browse") {
       setPage(1);
@@ -185,8 +72,6 @@ const IngredientList: React.FC = () => {
       setHasMore(false);
     }
   }, [mode]);
-
-  // ── Search ─────────────────────────────────────────────────────────────────
 
   const handleSearch = useCallback(
     async (val: string) => {
@@ -222,8 +107,6 @@ const IngredientList: React.FC = () => {
     [setIngredients, setMode, refreshBrowseFirstPage],
   );
 
-  // ── Create ─────────────────────────────────────────────────────────────────
-
   const handleCreate = async () => {
     if (!enableCreate || isCreating) return;
     setIsCreating(true);
@@ -243,11 +126,8 @@ const IngredientList: React.FC = () => {
     }
   };
 
-  // ── Render ─────────────────────────────────────────────────────────────────
-
   return (
     <div>
-      {/* Search bar */}
       <div className="top-0 inset-x-0 z-30 bg-surface px-4 lg:px-0 py-4 border-b border-border">
         <TextInput
           value={searchTerm}
@@ -257,10 +137,9 @@ const IngredientList: React.FC = () => {
         />
       </div>
 
-      {/* Results */}
       <div className="grid gap-0 divide-y divide-border max-h-[80vh] overflow-auto">
         {enableCreate && cleanTerm.length >= 3 && (
-          <CreateRow name={cleanTerm} onClick={handleCreate} />
+          <CreateIngredientRow name={cleanTerm} onClick={handleCreate} />
         )}
 
         {ingredients.map((ingredient, index) => {

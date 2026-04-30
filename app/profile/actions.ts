@@ -1,16 +1,13 @@
 "use server";
 
 import { createSupabaseServerActionClient } from "@/utils/supabase/server-client";
-// import type { Database } from "@/types/supabase"; // if you have generated types
-// type Profile = Database["public"]["Tables"]["profiles"]["Row"];
-
-type Profile = { id: string; username: string | null }; // minimal shape if no generated types
+import type { Profile } from "@/types";
 
 export async function updateUserName(
   userID: string,
   username: string
 ): Promise<Profile> {
-  const pg = await createSupabaseServerActionClient(); // ✅ action-scoped client
+  const pg = await createSupabaseServerActionClient();
 
   const { data, error } = await pg
     .from("profiles")

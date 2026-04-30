@@ -1,41 +1,11 @@
-// context/DrinkFormContext.tsx
-import React, {
-  createContext,
-  useContext,
-  ReactNode,
-  useState,
-  useEffect,
-} from "react";
-import {
-  getDrinkIngredients,
-  upsertDrinkIngredients,
-} from "./drink_ingredients/actions";
-import {
-  getDrinkInstructionByID,
-  upsertDrinkInstruction,
-} from "./instructions/actions";
-import { updateDrinkBasics, getDrinkByID } from "../actions";
-import {
-  DrinkIngredientDetail,
-  InsertDrinkIngredients,
-} from "./drink_ingredients/models";
-import { useRouter } from "next/navigation";
-import { MutableDrinkFields } from "../models";
-import { enqueueSnackbar } from "notistack";
+"use client";
+import React, { ReactNode, useEffect } from "react";
+import { createTypedContext } from "@/context/createListContext";
+import { useDrinkFormData } from "./hooks/useDrinkFormData";
+import { useDrinkFormSave } from "./hooks/useDrinkFormSave";
+import type { GlobalDrinkForm } from "./formTypes";
 
-export type GlobalDrinkForm = {
-  name: string;
-  unique_name: string;
-  drink_type: string;
-  is_alcoholic: boolean;
-  id: string;
-  description: string;
-  ingredients: DrinkIngredientDetail[];
-  instructions: string | null;
-  created_by_user_id: string;
-  created_by_user: string;
-  picture: string | null;
-};
+export type { GlobalDrinkForm } from "./formTypes";
 
 interface DrinkFormContextProps {
   globalDrinkForm: GlobalDrinkForm;
@@ -46,148 +16,41 @@ interface DrinkFormContextProps {
   setFormSubmitted: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const DrinkFormContext = createContext<DrinkFormContextProps | undefined>(
-  undefined
-);
+const { Context, useTypedContext } =
+  createTypedContext<DrinkFormContextProps>("DrinkForm");
 
-export const DrinkFormProvider: React.FC<{
+interface DrinkFormProviderProps {
   slug: string;
   children: ReactNode;
-}> = ({ slug, children }) => {
-  const [globalDrinkForm, setGlobalDrinkForm] = useState<GlobalDrinkForm>({
-    name: "",
-    unique_name: "",
-    drink_type: "",
-    is_alcoholic: true,
-    id: "",
-    description: "",
-    ingredients: [],
-    instructions: null,
-    created_by_user_id: "",
-    created_by_user: "",
-    picture: null,
-  });
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
-  const router = useRouter();
-  console.debug("globalDrinkForm: ", globalDrinkForm);
+}
 
-  const fetchGlobalDrinkForm = async (slug: string) => {
-    setLoading(true);
-    try {
-      const basic = await getDrinkByID(slug);
-      const [ingredients, instructions] = await Promise.all([
-        getDrinkIngredients(basic.id),
-        getDrinkInstructionByID(basic.id),
-      ]);
-
-      const newForm = {
-        id: basic.id,
-        name: basic.name,
-        unique_name: basic.unique_name,
-        description: basic.description,
-        ingredients: ingredients
-          ? ingredients.map((ingredient) => ({
-              ingredient_id: ingredient.ingredient_id,
-              drink_id: ingredient.drink_id,
-              quantity: ingredient.quantity,
-              unit: ingredient.unit,
-              role: ingredient.role,
-            }))
-          : [],
-        instructions: instructions?.instructions ?? null,
-        drink_type: basic.drink_type,
-        is_alcoholic: basic.is_alcoholic,
-        created_by_user_id: basic.created_by,
-        created_by_user: basic.profiles?.username ?? "Unknown",
-        picture: basic.picture,
-      };
-
-      setGlobalDrinkForm(newForm);
-      setLoading(false);
-    } catch (err: any) {
-      setError(err.message);
-      setLoading(false);
-    }
-  };
+export const DrinkFormProvider: React.FC<DrinkFormProviderProps> = ({
+  slug,
+  children,
+}) => {
+  const { form, setForm, loading: dataLoading, error } = useDrinkFormData(slug);
+  const { save, saving } = useDrinkFormSave();
+  const [formSubmitted, setFormSubmitted] = React.useState(false);
 
   useEffect(() => {
-    fetchGlobalDrinkForm(slug);
-  }, [slug]);
-
-  useEffect(() => {
-    const updateDatabase = async () => {
-      if (!formSubmitted) return;
-      setLoading(true);
-      try {
-        const {
-          id,
-          name,
-          description,
-          drink_type,
-          is_alcoholic,
-          ingredients,
-          instructions,
-          picture,
-        } = globalDrinkForm;
-
-        const basicDrinkPayload: MutableDrinkFields = {
-          name,
-          description,
-          drink_type,
-          is_alcoholic,
-          picture,
-        };
-        await updateDrinkBasics(id, basicDrinkPayload);
-
-        const ingredientPayload: InsertDrinkIngredients = {
-          drink_id: id,
-          ingredient_details: ingredients,
-        };
-        await upsertDrinkIngredients(ingredientPayload);
-
-        await upsertDrinkInstruction(id, instructions);
-        setLoading(false);
-        enqueueSnackbar("Drink successfully updated", { variant: "success" });
-
-        setTimeout(() => {
-          router.push(`/drinks/${globalDrinkForm.unique_name}`);
-        }, 1000);
-      } catch (error) {
-        console.error("Failed to update the database: ", error);
-        enqueueSnackbar("There was an error updating the drink", {
-          variant: "error",
-        });
-      } finally {
-        setFormSubmitted(false);
-      }
-    };
-    updateDatabase();
-  }, [globalDrinkForm, formSubmitted, router]);
+    if (!formSubmitted) return;
+    save(form).finally(() => setFormSubmitted(false));
+  }, [formSubmitted, form, save]);
 
   return (
-    <DrinkFormContext.Provider
+    <Context.Provider
       value={{
-        globalDrinkForm,
-        setGlobalDrinkForm,
-        loading,
+        globalDrinkForm: form,
+        setGlobalDrinkForm: setForm,
+        loading: dataLoading || saving,
         error,
         formSubmitted,
         setFormSubmitted,
       }}
     >
       {children}
-    </DrinkFormContext.Provider>
+    </Context.Provider>
   );
 };
 
-export const useGlobalDrinkForm = () => {
-  const context = useContext(DrinkFormContext);
-  if (context === undefined) {
-    throw new Error(
-      "useGlobalDrinkForm must be used within a DrinkFormProvider"
-    );
-  }
-  return context;
-};
+export const useGlobalDrinkForm = useTypedContext;

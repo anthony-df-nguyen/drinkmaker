@@ -17,7 +17,7 @@
  * ```
  */
 import React from "react";
-import classNames from "@/utils/classNames";
+import { cn } from "@/lib/utils";
 
 type Props = {
   /**
@@ -35,7 +35,7 @@ export default function Card({ children, className = "", onClick }: Props) {
   return (
     <div
       onClick={onClick}
-      className={classNames(
+      className={cn(
         "relative rounded-lg bg-surface p-4 border focus-visible:outline-offset-0",
         className
       )}

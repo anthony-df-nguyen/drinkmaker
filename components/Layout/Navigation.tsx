@@ -4,7 +4,7 @@ import SideNav from "./Sidebar";
 import { links } from "./Links";
 import Link from "next/link";
 import { SnackbarProvider } from "notistack";
-import classNames from "@/utils/classNames";
+import { cn } from "@/lib/utils";
 import { Bars3Icon, PlusIcon } from "@heroicons/react/24/outline";
 import { usePathname } from "next/navigation";
 import { useModal } from "@/context/ModalContext";
@@ -13,7 +13,7 @@ import CreateForm from "@/app/drinks/forms/CreateDrinkForm";
 import PleaseSignIn from "@/components/SignIn/PleaseSignIn";
 
 interface Props {
-  children: any;
+  children: React.ReactNode;
 }
 
 export default function Navigation({ children }: Props) {
@@ -44,7 +44,7 @@ export default function Navigation({ children }: Props) {
             <Link
               key={row.name}
               href={row.href}
-              className={classNames(
+              className={cn(
                 "text-sm transition-colors",
                 pathname === row.href
                   ? "font-semibold text-foreground"

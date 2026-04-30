@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { DrinkIngredientViewData } from "./models";
 import { VOLUME_UNITS, VolumeUnit } from "./utils";
-import classNames from "@/utils/classNames";
+import { cn } from "@/lib/utils";
 
 interface DropdownState {
   index: number;
@@ -64,7 +64,7 @@ const IngredientTable: React.FC<IngredientTableProps> = ({
           // Each Row
           <div
             key={originalIndex}
-            className={classNames(
+            className={cn(
               "px-4 py-4",
               i % 2 === 1 ? "bg-background" : "",
             )}
@@ -84,7 +84,7 @@ const IngredientTable: React.FC<IngredientTableProps> = ({
                   <button
                     type="button"
                     onClick={(e) => openDropdown(originalIndex, e)}
-                    className={classNames(
+                    className={cn(
                       "flex w-12 items-center justify-end gap-0.5 rounded px-2 py-0.5 text-foreground text-sm ring-1 ring-border bg-background hover:bg-surface-raised transition-colors",
                       dropdown?.index === originalIndex ? "ring-accent-text ring-2" : "",
                     )}
@@ -119,7 +119,7 @@ const IngredientTable: React.FC<IngredientTableProps> = ({
                   key={unit}
                   type="button"
                   onClick={() => handleUnitSelect(dropdown.index, unit)}
-                  className={classNames(
+                  className={cn(
                     "block w-full px-3 py-1.5 text-left text-sm hover:bg-surface-raised",
                     data[dropdown.index].displayUnit === unit
                       ? "font-medium text-accent-text"

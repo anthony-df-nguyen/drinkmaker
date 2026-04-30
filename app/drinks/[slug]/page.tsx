@@ -20,24 +20,10 @@ import { ShareIcon, HeartIcon, PencilSquareIcon, TrashIcon } from "@heroicons/re
 import { useModal } from "@/context/ModalContext";
 import DeleteForm from "../forms/DeleteDrinkForm";
 import { useRouter } from "next/navigation";
-import classNames from "@/utils/classNames";
+import { cn } from "@/lib/utils";
+import { thumbnailColor } from "@/utils/thumbnail";
 
 type ImgRatio = "portrait" | "landscape" | "square" | null;
-
-const THUMBNAIL_COLORS = [
-  "from-amber-400 to-amber-700",
-  "from-blue-400 to-blue-700",
-  "from-emerald-400 to-emerald-700",
-  "from-rose-400 to-rose-600",
-  "from-violet-400 to-violet-700",
-  "from-cyan-400 to-cyan-700",
-  "from-orange-400 to-orange-600",
-  "from-teal-400 to-teal-700",
-];
-
-function thumbnailGradient(name: string): string {
-  return THUMBNAIL_COLORS[name.charCodeAt(0) % THUMBNAIL_COLORS.length];
-}
 
 export default function Page() {
   // ✅ Read route pieces with client hooks
@@ -130,9 +116,9 @@ const DrinkPageContent: React.FC<DrinkPageContentProps> = ({ editURL }) => {
             ) : (
               /* Monogram fallback */
               <div
-                className={classNames(
-                  "absolute inset-0 flex items-center justify-center bg-gradient-to-br",
-                  thumbnailGradient(globalDrinkForm.name),
+                className={cn(
+                  "absolute inset-0 flex items-center justify-center",
+                  thumbnailColor(globalDrinkForm.name),
                 )}
               >
                 <span className="text-white text-8xl font-bold font-serif select-none opacity-80">

@@ -17,6 +17,8 @@ export interface DrinkSchema {
   };
 }
 
+export type DrinkWithUsername = DrinkSchema & { username: string | null };
+
 export interface CreateDrinkFields {
   name: string;
   unique_name: string;
@@ -58,19 +60,11 @@ export const alcoholicOptions = [
   { value: "false", label: "No" },
 ];
 
-/** Encode boolean → select string value */
-export const encodeAlcoholic = (v: true | false): string => {
-  return v ? "true" : "false"
-};
+export const encodeAlcoholic = (v: boolean): string => (v ? "true" : "false");
 
-/** Decode select string value → boolean  */
-export const decodeAlcoholic = (v: "true" | "false"): boolean => {
-  return v === "true" ? true : false
-};
+export const decodeAlcoholic = (v: "true" | "false"): boolean => v === "true";
 
-export const drinkTypeColors: {
-  [key: string]: string;
-} = {
+export const drinkTypeColors: Record<string, string> = {
   cocktail: "bg-blue-100",
   coffee: "bg-yellow-100",
   juice: "bg-emerald-100",

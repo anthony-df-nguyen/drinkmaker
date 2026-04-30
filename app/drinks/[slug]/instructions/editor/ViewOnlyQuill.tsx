@@ -1,31 +1,16 @@
-/**
- * React component for a view-only Quill editor.
- *
- * @component
- * @param {EditorProps} props - The props for the component.
- * @param {InstructionFormat} props.initialContent - The initial content of the editor.
- * @returns {JSX.Element} The rendered component.
- */
-
 "use client";
-import React, { useState, useEffect } from "react";
-import { InstructionFormat } from "../models";
+import React, { useEffect } from "react";
+import { QuillViewerProps } from "../models";
 import { formats } from "./modules";
 import { useQuill } from "react-quilljs";
-import Card from "@/components/UI/Card";
 import "quill/dist/quill.snow.css";
 
-interface EditorProps {
-  initialContent: InstructionFormat;
-}
-
-const ViewOnlyQuill: React.FC<EditorProps> = ({ initialContent }) => {
+const ViewOnlyQuill: React.FC<QuillViewerProps> = ({ initialContent }) => {
   const { quill, quillRef } = useQuill({
     modules: { toolbar: [] },
     formats: formats,
     readOnly: true,
   });
-
 
   useEffect(() => {
     if (quill) {

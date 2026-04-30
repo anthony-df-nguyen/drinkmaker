@@ -1,7 +1,13 @@
 "use server";
 
 import { createSupabaseServerActionClient } from "@/utils/supabase/server-client";
-import { DrinkSchema, CreateDrinkFields, MutableDrinkFields } from "./models";
+import { calculateRange } from "@/utils/supabase/pagination";
+import {
+  DrinkSchema,
+  DrinkWithUsername,
+  CreateDrinkFields,
+  MutableDrinkFields,
+} from "./models";
 import { sanitizeInput } from "@/utils/sanitizeInput";
 import getUserSessionOnServer from "@/utils/supabase/getUserSessionServer";
 
@@ -91,12 +97,11 @@ const queryDrinks = async (
   includeCount: boolean = true,
   isAlcoholic?: boolean | null
 ): Promise<{
-  data: (DrinkSchema & { username: string | null })[];
+  data: DrinkWithUsername[];
   totalCount: number | null;
 }> => {
   const pg = await createSupabaseServerActionClient();
-  const from = (page - 1) * limit;
-  const to = from + limit - 1;
+  const { from, to } = calculateRange(page, limit);
 
   const trimmedSearch = searchName?.trim();
 
@@ -135,15 +140,15 @@ const queryDrinks = async (
     throw new Error(`Error querying drinks: ${error.message}`);
   }
 
-  const withUser = (data ?? []).map((d: any) => ({
-    ...(d as DrinkSchema),
-    username: d.profiles?.username ?? null,
-  }));
+  const withUser: DrinkWithUsername[] = (data ?? []).map((d) => {
+    const drink = d as DrinkSchema;
+    return { ...drink, username: drink.profiles?.username ?? null };
+  });
 
   return { data: withUser, totalCount: includeCount ? (count ?? 0) : null };
 };
 
-const getDrinkByID = async (slug: string): Promise<DrinkSchema & { username: string | null }> => {
+const getDrinkByID = async (slug: string): Promise<DrinkWithUsername> => {
   const pg = await createSupabaseServerActionClient();
   const { data, error } = await pg
     .from("drinks")
@@ -158,8 +163,8 @@ const getDrinkByID = async (slug: string): Promise<DrinkSchema & { username: str
 
   if (error) throw new Error(`Error querying for unique_name: ${error.message}`);
 
-  const drink = data as any;
-  return { ...(drink as DrinkSchema), username: drink?.profiles?.username ?? null };
+  const drink = data as DrinkSchema;
+  return { ...drink, username: drink.profiles?.username ?? null };
 };
 
 export { createDrink, deleteDrink, updateDrinkBasics, queryDrinks, getDrinkByID };

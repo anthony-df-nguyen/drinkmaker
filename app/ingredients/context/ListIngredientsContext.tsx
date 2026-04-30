@@ -1,6 +1,5 @@
+"use client";
 import React, {
-  createContext,
-  useContext,
   useState,
   ReactNode,
   useEffect,
@@ -9,9 +8,9 @@ import React, {
   SetStateAction,
 } from "react";
 import { IngredientsSchema } from "../models";
-import { queryIngredientsWithCount, queryAllIngredients } from "../actions";
-
-type ListMode = "browse" | "search";
+import { queryIngredients, queryAllIngredients } from "../actions";
+import type { ListMode } from "@/types";
+import { createTypedContext } from "@/context/createListContext";
 
 interface ListIngredientsContextType {
   ingredients: IngredientsSchema[];
@@ -20,21 +19,19 @@ interface ListIngredientsContextType {
   allIngredients: IngredientsSchema[];
   setAllIngredients: Dispatch<SetStateAction<IngredientsSchema[]>>;
 
-  // Total number of ingredients in the DB (used for pagination/infinite scroll)
   count: number;
   setCount: Dispatch<SetStateAction<number>>;
 
-  // Explicit mode so list UIs can disable infinite scroll during search
   mode: ListMode;
   setMode: Dispatch<SetStateAction<ListMode>>;
 
-  // Helper: restore browse state (page 1 + correct total count)
   refreshBrowseFirstPage: () => Promise<void>;
 }
 
-const ListIngredientsContext = createContext<
-  ListIngredientsContextType | undefined
->(undefined);
+const PAGE_SIZE = 10;
+
+const { Context, useTypedContext } =
+  createTypedContext<ListIngredientsContextType>("ListIngredients");
 
 interface ListIngredientsProviderProps {
   children: ReactNode;
@@ -48,34 +45,30 @@ export const ListIngredientsProvider: React.FC<
   const [count, setCount] = useState<number>(0);
   const [mode, setMode] = useState<ListMode>("browse");
 
-  const PAGE_SIZE = 10;
-
   const refreshBrowseFirstPage = useCallback(async () => {
-    const { data, totalCount } = await queryIngredientsWithCount(1, PAGE_SIZE);
+    const { data, totalCount } = await queryIngredients(1, PAGE_SIZE, true);
     setIngredients(data);
-    setCount(totalCount);
+    setCount(totalCount ?? 0);
     setMode("browse");
   }, []);
 
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [_, allIngredientData] = await Promise.all([
+        const [, allIngredientData] = await Promise.all([
           refreshBrowseFirstPage(),
           queryAllIngredients(),
         ]);
-
         setAllIngredients(allIngredientData);
-      } catch (error: any) {
+      } catch (error) {
         console.error("Error fetching initial data: ", error);
       }
     };
-
     fetchInitialData();
   }, [refreshBrowseFirstPage]);
 
   return (
-    <ListIngredientsContext.Provider
+    <Context.Provider
       value={{
         ingredients,
         setIngredients,
@@ -89,16 +82,8 @@ export const ListIngredientsProvider: React.FC<
       }}
     >
       {children}
-    </ListIngredientsContext.Provider>
+    </Context.Provider>
   );
 };
 
-export const useListIngredients = (): ListIngredientsContextType => {
-  const context = useContext(ListIngredientsContext);
-  if (!context) {
-    throw new Error(
-      "useListIngredients must be used within a ListIngredientsProvider"
-    );
-  }
-  return context;
-};
+export const useListIngredients = useTypedContext;
