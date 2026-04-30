@@ -7,7 +7,7 @@ import { drinkTypeFormOptions, alcoholicOptions, encodeAlcoholic, decodeAlcoholi
 import TextInput from "@/components/UI/input";
 import TextArea from "@/components/UI/textarea";
 import CustomSelect from "@/components/UI/select";
-import NumberInput from "@/components/MUIInputs/NumberInput";
+import NumberInput from "@/components/UI/NumberInput";
 import { Button } from "@/components/UI/Button";
 import Editor from "../instructions/editor/Editor";
 import { measuringUnits } from "../drink_ingredients/constants";

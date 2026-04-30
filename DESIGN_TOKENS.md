@@ -93,4 +93,4 @@ bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300  → bg
 
 ## Existing class to leave alone
 - `pageTitle` in globals.scss uses `text-emerald-600 dark:text-white` — can migrate to `text-accent-text dark:text-foreground` or keep as-is
-- MUI / Quill styles in `_mui_styles.scss` and `_quill_styles.scss` — leave untouched
+- Quill styles in `_quill_styles.scss` — leave untouched

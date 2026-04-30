@@ -1,6 +1,4 @@
-import { TagOption } from "@/components/MUIInputs/Tags";
-
-export const measuringUnits: TagOption[] = [
+export const measuringUnits = [
   { value: "oz", label: "oz" },
   { value: "ml", label: "ml" },
   { value: "dash", label: "dash" },
