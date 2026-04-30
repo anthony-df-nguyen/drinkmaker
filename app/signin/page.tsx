@@ -1,5 +1,5 @@
 import providers from "./providers";
-import SignInButton from "@/components/Layout/SignInButton";
+import SignInButton from "@/components/SignIn/SignInButton";
 export default function SignInPage() {
   return (
     <>

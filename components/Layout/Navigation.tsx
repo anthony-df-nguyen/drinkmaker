@@ -6,12 +6,11 @@ import Link from "next/link";
 import { SnackbarProvider } from "notistack";
 import classNames from "@/utils/classNames";
 import { Bars3Icon, PlusIcon } from "@heroicons/react/24/outline";
-import ThemeToggle from "./ThemeToggle";
-import ProfileMenu from "./ProfileMenu";
 import { usePathname } from "next/navigation";
 import { useModal } from "@/context/ModalContext";
 import { useAuthenticatedContext } from "@/context/Authenticated";
 import CreateForm from "@/app/drinks/forms/CreateDrinkForm";
+import PleaseSignIn from "@/components/SignIn/PleaseSignIn";
 
 interface Props {
   children: any;
@@ -62,10 +61,10 @@ export default function Navigation({ children }: Props) {
         {/* Right actions */}
         <div className="flex items-center gap-2">
           {/* Add Drink — drinks browse page + authenticated only */}
-          {isDrinksPage && user && (
+          {isDrinksPage && (
             <button
               type="button"
-              onClick={() => showModal(<CreateForm />)}
+              onClick={() => showModal(user ? <CreateForm /> : <PleaseSignIn />)}
               className="flex items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-foreground transition-colors"
             >
               <PlusIcon className="h-6 w-6" />

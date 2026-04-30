@@ -60,7 +60,7 @@ export const getUserSession = async (): Promise<FinalUserObject | null> => {
     const username = await getUserName(user.id);
     return { ...user, username } as FinalUserObject;
   } catch (error) {
-    console.error("Error getting user session:", error);
+    console.info("No user session was found", error);
     return null;
   }
 };
