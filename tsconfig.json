@@ -14,7 +14,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -36,7 +36,8 @@
     "utils/auth/handleSignInWithGoogle.js",
     "components/Inputs/RichText/Editor.rsx",
     "app/drinks/forms/Instructions.jsx",
-    "app/api/cron/route.ts"
+    "app/api/cron/route.ts",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
