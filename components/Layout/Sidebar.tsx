@@ -8,6 +8,7 @@ import {
 import Link from "next/link";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { links } from "./Links";
+import ThemeToggle from "./ThemeToggle";
 import classNames from "@/utils/classNames";
 import { usePathname } from "next/navigation";
 import { useAuthenticatedContext } from "@/context/Authenticated";
@@ -90,26 +91,23 @@ const SideBar: React.FC<SideBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                         "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm mb-0.5 transition-colors",
                         active
                           ? "bg-accent/10 text-accent font-semibold"
-                          : "text-foreground font-normal hover:bg-surface-raised"
+                          : "text-foreground font-normal hover:bg-surface-raised",
                       )}
                     >
-                      <svg
-                        width={18}
-                        height={18}
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth={1.8}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d={item.icon} />
-                      </svg>
+                      {item.icon && <item.icon className="w-6 h-6" />}
                       {item.name}
                     </Link>
                   );
                 })}
               </nav>
+
+              {/* Dark Mode */}
+              <div className="flex items-center gap-2 mx-auto my-4">
+                <div className="text-foreground text-sm">Color Mode:</div>
+                <ThemeToggle />
+              </div>
+
+
 
               {/* Footer */}
               {user && (

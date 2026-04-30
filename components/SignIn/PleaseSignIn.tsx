@@ -1,8 +1,8 @@
 import SignInButton from "./SignInButton";
 
 interface Props {
-  title: string;
-  text: string;
+  title?: string;
+  text?: string;
 }
 const PleaseSignIn = ({
   title = "Save & Share Your Drinks 🍸",

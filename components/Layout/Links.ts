@@ -1,19 +1,27 @@
+import { IconType } from "react-icons/lib";
+import { TbGlassCocktail } from "react-icons/tb";
+import { FaRegLemon, FaRegCircleUser } from "react-icons/fa6";
 interface NavLinks {
   name: string;
   href: string;
-  icon: string;
+  icon: IconType;
 }
 
 const links: NavLinks[] = [
   {
     name: "Drinks",
     href: "/",
-    icon: "M9 3h6M9 3v6l-4 9a1 1 0 0 0 .9 1.5h12.2a1 1 0 0 0 .9-1.5L15 9V3",
+    icon: TbGlassCocktail,
   },
   {
     name: "Ingredients",
     href: "/ingredients",
-    icon: "M3 6h18M3 12h12M3 18h8",
+    icon: FaRegLemon,
+  },
+    {
+    name: "My Profile",
+    href: "/profile",
+     icon: FaRegCircleUser,
   },
 ];
 
