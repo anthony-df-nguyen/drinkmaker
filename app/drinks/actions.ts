@@ -110,7 +110,7 @@ const queryDrinks = async (
     .select(
       `
       *,
-      profiles ( username )
+      profiles!created_by ( username )
     `,
       includeCount ? { count: "exact" } : undefined
     )
@@ -155,7 +155,7 @@ const getDrinkByID = async (slug: string): Promise<DrinkWithUsername> => {
     .select(
       `
       *,
-      profiles ( username )
+      profiles!created_by ( username )
     `
     )
     .eq("unique_name", slug)
@@ -167,4 +167,53 @@ const getDrinkByID = async (slug: string): Promise<DrinkWithUsername> => {
   return { ...drink, username: drink.profiles?.username ?? null };
 };
 
-export { createDrink, deleteDrink, updateDrinkBasics, queryDrinks, getDrinkByID };
+const getDrinkCountByUser = async (userId: string): Promise<number> => {
+  const pg = await createSupabaseServerActionClient();
+  const { count, error } = await pg
+    .from("drinks")
+    .select("*", { count: "exact", head: true })
+    .eq("created_by", userId);
+
+  if (error) throw new Error(`Error counting drinks for user: ${error.message}`);
+  return count ?? 0;
+};
+
+const toggleFavorite = async (drinkId: string): Promise<{ favorited: boolean }> => {
+  const user = await getUserSessionOnServer();
+  if (!user) throw new Error("User not authenticated");
+
+  const pg = await createSupabaseServerActionClient();
+
+  const { data: existing } = await pg
+    .from("favorites")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("drink_id", drinkId)
+    .maybeSingle();
+
+  if (existing) {
+    const { error } = await pg.from("favorites").delete().eq("id", existing.id);
+    if (error) throw new Error(error.message || "Error removing favorite");
+    return { favorited: false };
+  } else {
+    const { error } = await pg.from("favorites").insert({ user_id: user.id, drink_id: drinkId });
+    if (error) throw new Error(error.message || "Error adding favorite");
+    return { favorited: true };
+  }
+};
+
+const getUserFavoriteDrinkIds = async (): Promise<string[]> => {
+  const user = await getUserSessionOnServer();
+  if (!user) return [];
+
+  const pg = await createSupabaseServerActionClient();
+  const { data, error } = await pg
+    .from("favorites")
+    .select("drink_id")
+    .eq("user_id", user.id);
+
+  if (error) throw new Error(error.message || "Error fetching favorites");
+  return (data ?? []).map((row) => row.drink_id as string);
+};
+
+export { createDrink, deleteDrink, updateDrinkBasics, queryDrinks, getDrinkByID, getDrinkCountByUser, toggleFavorite, getUserFavoriteDrinkIds };

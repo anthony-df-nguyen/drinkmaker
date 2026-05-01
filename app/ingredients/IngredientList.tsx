@@ -128,7 +128,7 @@ const IngredientList: React.FC = () => {
 
   return (
     <div>
-      <div className="top-0 inset-x-0 z-30 bg-surface px-4 lg:px-0 py-4 border-b border-border">
+      <div className="top-0 inset-x-0 z-30 bg-surface md:bg-transparent px-4 lg:px-0 py-4 border-b border-border">
         <TextInput
           value={searchTerm}
           onChange={handleSearch}

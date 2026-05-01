@@ -1,27 +1,39 @@
 import { IconType } from "react-icons/lib";
-import { TbGlassCocktail } from "react-icons/tb";
-import { FaRegLemon, FaRegCircleUser } from "react-icons/fa6";
+import { BiSolidDrink } from "react-icons/bi";
+import { FaRegLemon, FaRegUser } from "react-icons/fa6";
+import { FiLogIn } from "react-icons/fi";
+
 interface NavLinks {
   name: string;
-  href: string;
+  href?: string;
   icon: IconType;
+  requiresAuth?: boolean;
+  guestOnly?: boolean;
+  action?: "signIn";
 }
 
 const links: NavLinks[] = [
   {
     name: "Drinks",
     href: "/",
-    icon: TbGlassCocktail,
+    icon: BiSolidDrink,
   },
   {
     name: "Ingredients",
     href: "/ingredients",
     icon: FaRegLemon,
   },
-    {
+  {
     name: "My Profile",
     href: "/profile",
-     icon: FaRegCircleUser,
+    icon: FaRegUser,
+    requiresAuth: true,
+  },
+  {
+    name: "Sign In",
+    icon: FiLogIn,
+    guestOnly: true,
+    action: "signIn",
   },
 ];
 

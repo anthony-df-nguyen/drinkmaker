@@ -73,56 +73,61 @@ const CreateForm = () => {
   const maxDescriptionLength = 250;
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4">
-      <div className="font-serif font-bold text-xl">New Drink</div>
-      <div className="grid gap-4">
-        <TextInput
-          label="Name"
-          value={form.name}
-          onChange={(value: string) => handleChange("name", value)}
-          delay={50}
-          error={form.name.length > maxNameLength}
-          errorText="Too many characters"
-          required
-        />
-        <Select
-          label="Drink Type"
-          required
-          options={drinkTypeFormOptions}
-          value={form.drink_type}
-          onChange={(value: string) => handleChange("drink_type", value)}
-        />
-        <Select
-          label="Alcoholic?"
-          options={alcoholicOptions}
-          value={encodeAlcoholic(form.is_alcoholic)}
-          onChange={(value: string) =>
-            setForm((prev) => ({ ...prev, is_alcoholic: decodeAlcoholic(value as "true" | "false") }))
-          }
-        />
-        <TextArea
-          label="Description"
-          value={form.description}
-          onChange={(value: string) => handleChange("description", value)}
-          error={form.description.length > maxDescriptionLength}
-          errorText="Too many characters"
-          rows={4}
-        />
-      </div>
+    <div className="">
+      <form onSubmit={handleSubmit} className="grid gap-4">
+        <div className="font-serif font-bold text-xl">New Drink</div>
+        <div className="grid gap-4">
+          <TextInput
+            label="Name"
+            value={form.name}
+            onChange={(value: string) => handleChange("name", value)}
+            delay={50}
+            error={form.name.length > maxNameLength}
+            errorText="Too many characters"
+            required
+          />
+          <Select
+            label="Drink Type"
+            required
+            options={drinkTypeFormOptions}
+            value={form.drink_type}
+            onChange={(value: string) => handleChange("drink_type", value)}
+          />
+          <Select
+            label="Alcoholic?"
+            options={alcoholicOptions}
+            value={encodeAlcoholic(form.is_alcoholic)}
+            onChange={(value: string) =>
+              setForm((prev) => ({
+                ...prev,
+                is_alcoholic: decodeAlcoholic(value as "true" | "false"),
+              }))
+            }
+          />
+          <TextArea
+            label="Description"
+            value={form.description}
+            onChange={(value: string) => handleChange("description", value)}
+            error={form.description.length > maxDescriptionLength}
+            errorText="Too many characters"
+            rows={4}
+          />
+        </div>
 
-      <div className="flex items-center justify-end">
-        <Button
-          type="submit"
-          variant="default"
-          disabled={
-            form.name.length > maxNameLength ||
-            form.description.length > maxDescriptionLength
-          }
-        >
-          Create
-        </Button>
-      </div>
-    </form>
+        <div className="flex items-center justify-end">
+          <Button
+            type="submit"
+            variant="default"
+            disabled={
+              form.name.length > maxNameLength ||
+              form.description.length > maxDescriptionLength
+            }
+          >
+            Create
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 };
 

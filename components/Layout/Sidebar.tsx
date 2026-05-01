@@ -9,10 +9,12 @@ import Link from "next/link";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { links } from "./Links";
 import ThemeToggle from "./ThemeToggle";
+import LogoutButton from "./SignOutButton";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { useAuthenticatedContext } from "@/context/Authenticated";
-import { createSupabaseBrowserClient } from "@/utils/supabase/browser-client";
+import { useModal } from "@/context/ModalContext";
+import PleaseSignIn from "@/components/SignIn/PleaseSignIn";
 
 interface SideBarProps {
   sidebarOpen: boolean;
@@ -22,12 +24,13 @@ interface SideBarProps {
 const SideBar: React.FC<SideBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   const pathname = usePathname();
   const { user } = useAuthenticatedContext();
+  const { showModal } = useModal();
 
-  const handleSignOut = async () => {
-    const supabase = createSupabaseBrowserClient();
-    await supabase.auth.signOut();
-    location.reload();
-  };
+  const visibleLinks = links.filter((item) => {
+    if (item.requiresAuth && !user) return false;
+    if (item.guestOnly && user) return false;
+    return true;
+  });
 
   return (
     <Transition show={sidebarOpen}>
@@ -80,19 +83,37 @@ const SideBar: React.FC<SideBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
 
               {/* Nav links */}
               <nav className="flex-1 px-3 py-3">
-                {links.map((item) => {
-                  const active = pathname === item.href;
+                {visibleLinks.map((item) => {
+                  const active = item.href ? pathname === item.href : false;
+                  const sharedClassName = cn(
+                    "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm mb-0.5 transition-colors",
+                    active
+                      ? "bg-accent/10 text-accent font-semibold"
+                      : "text-foreground font-normal hover:bg-surface-raised",
+                  );
+
+                  if (item.action === "signIn") {
+                    return (
+                      <button
+                        key={item.name}
+                        onClick={() => {
+                          setSidebarOpen(false);
+                          showModal(<PleaseSignIn />);
+                        }}
+                        className={cn(sharedClassName, "w-full text-left")}
+                      >
+                        {item.icon && <item.icon className="w-6 h-6" />}
+                        {item.name}
+                      </button>
+                    );
+                  }
+
                   return (
                     <Link
                       key={item.name}
-                      href={item.href}
+                      href={item.href!}
                       onClick={() => setSidebarOpen(false)}
-                      className={cn(
-                        "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm mb-0.5 transition-colors",
-                        active
-                          ? "bg-accent/10 text-accent font-semibold"
-                          : "text-foreground font-normal hover:bg-surface-raised",
-                      )}
+                      className={sharedClassName}
                     >
                       {item.icon && <item.icon className="w-6 h-6" />}
                       {item.name}
@@ -107,32 +128,8 @@ const SideBar: React.FC<SideBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                 <ThemeToggle />
               </div>
 
-
-
               {/* Footer */}
-              {user && (
-                <div className="px-3 py-4 border-t border-border">
-                  <button
-                    type="button"
-                    onClick={handleSignOut}
-                    className="flex w-full items-center gap-3 px-3.5 py-3 rounded-xl text-sm text-red-500 hover:bg-surface-raised transition-colors"
-                  >
-                    <svg
-                      width={18}
-                      height={18}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={1.8}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
-                    </svg>
-                    Sign Out
-                  </button>
-                </div>
-              )}
+              {user && <LogoutButton />}
             </DialogPanel>
           </TransitionChild>
         </div>

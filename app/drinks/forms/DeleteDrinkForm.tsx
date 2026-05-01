@@ -51,11 +51,11 @@ export const DeleteForm: React.FC<Props> = ({ drink, afterDelete }) => {
     }
   };
   return (
-    <form onSubmit={handleDelete} className="grid gap-4 max-w-[300px] w-screen">
-      <div className="text-lg font-medium">Delete Drink</div>
+    <form onSubmit={handleDelete} className="grid gap-4 ">
+      <div className="font-serif font-bold text-xl">Delete Drink</div>
       <div>
         Are you sure you wish to delete{" "}
-        <span className="font-bold">{formatText(drink.name)}?</span>
+        <span className="font-bold">{formatText(drink.name)}?</span> This action cannot be undone.
       </div>
       <div className="flex items-center justify-end">
         <Button type="submit" variant={"destructive"}>Delete</Button>

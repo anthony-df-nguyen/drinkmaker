@@ -1,8 +1,10 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import TextInput from "@/components/UI/input";
 import { cn } from "@/lib/utils";
 import { drinkTypes } from "../models";
+import { Heart, SlidersHorizontal } from "lucide-react";
+import { useModal } from "@/context/ModalContext";
 
 export type AlcoholicFilter = "all" | "yes" | "no";
 
@@ -19,7 +21,78 @@ interface DrinkFiltersProps {
   onDrinkTypeChange: (type: string) => void;
   alcoholicFilter: AlcoholicFilter;
   onAlcoholicFilterChange: (filter: AlcoholicFilter) => void;
+  favoritesActive: boolean;
+  onFavoritesToggle: () => void;
+  activeFilterCount: number;
 }
+
+interface FilterSheetContentProps {
+  drinkType: string;
+  alcoholicFilter: AlcoholicFilter;
+  onApply: (drinkType: string, alcoholicFilter: AlcoholicFilter) => void;
+}
+
+const FilterSheetContent: React.FC<FilterSheetContentProps> = ({
+  drinkType: initialDrinkType,
+  alcoholicFilter: initialAlcoholicFilter,
+  onApply,
+}) => {
+  const [draftDrinkType, setDraftDrinkType] = useState(initialDrinkType);
+  const [draftAlcoholicFilter, setDraftAlcoholicFilter] = useState(initialAlcoholicFilter);
+
+  return (
+    <div className="space-y-5">
+      <h2 className="text-base font-semibold text-foreground">Filters</h2>
+
+      <div className="space-y-2">
+        <p className="text-xs font-medium text-muted uppercase tracking-wide">Type</p>
+        <div className="flex flex-wrap gap-1.5">
+          {drinkTypes.map((type) => (
+            <button
+              key={type.value}
+              onClick={() => setDraftDrinkType(type.value)}
+              className={cn(
+                "px-3 py-1 rounded-full text-xs font-medium border transition-colors",
+                draftDrinkType === type.value
+                  ? "bg-accent text-accent-foreground border-transparent"
+                  : "bg-transparent text-muted border-border hover:bg-surface-raised hover:text-foreground",
+              )}
+            >
+              {type.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <p className="text-xs font-medium text-muted uppercase tracking-wide">Alcohol</p>
+        <div className="flex gap-1.5">
+          {ALCOHOLIC_FILTERS.map((f) => (
+            <button
+              key={f.value}
+              onClick={() => setDraftAlcoholicFilter(f.value)}
+              className={cn(
+                "px-3 py-1 rounded-full text-xs font-medium border transition-colors",
+                draftAlcoholicFilter === f.value
+                  ? "bg-accent text-accent-foreground border-transparent"
+                  : "bg-transparent text-muted border-border hover:bg-surface-raised hover:text-foreground",
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <button
+        onClick={() => onApply(draftDrinkType, draftAlcoholicFilter)}
+        className="w-full py-2.5 rounded-xl bg-accent text-accent-foreground text-sm font-medium transition-colors hover:bg-accent-hover"
+      >
+        Apply
+      </button>
+    </div>
+  );
+};
 
 const DrinkFilters: React.FC<DrinkFiltersProps> = ({
   searchTerm,
@@ -28,9 +101,28 @@ const DrinkFilters: React.FC<DrinkFiltersProps> = ({
   onDrinkTypeChange,
   alcoholicFilter,
   onAlcoholicFilterChange,
+  favoritesActive,
+  onFavoritesToggle,
+  activeFilterCount,
 }) => {
+  const { showModal, hideModal } = useModal();
+
+  const openFilterSheet = () => {
+    showModal(
+      <FilterSheetContent
+        drinkType={drinkType}
+        alcoholicFilter={alcoholicFilter}
+        onApply={(type, alcoholic) => {
+          onDrinkTypeChange(type);
+          onAlcoholicFilterChange(alcoholic);
+          hideModal();
+        }}
+      />,
+    );
+  };
+
   return (
-    <div className="top-0 inset-x-0 z-30 bg-surface px-4 lg:px-0 py-4 box-border max-w-[860px] mx-auto border-b-[1px] border-border space-y-3">
+    <div className="top-0 inset-x-0 z-30 bg-surface md:bg-transparent px-4 lg:px-0 py-4 box-border max-w-[860px] mx-auto border-b-[1px] border-border space-y-3">
       <TextInput
         value={searchTerm}
         onChange={onSearchChange}
@@ -38,38 +130,32 @@ const DrinkFilters: React.FC<DrinkFiltersProps> = ({
         delay={500}
       />
 
-      <div className="flex flex-wrap gap-1.5">
-        {drinkTypes.map((type) => (
-          <button
-            key={type.value}
-            onClick={() => onDrinkTypeChange(type.value)}
-            className={cn(
-              "px-3 py-1 rounded-full text-xs font-medium border transition-colors",
-              drinkType === type.value
-                ? "bg-accent text-accent-foreground border-transparent"
-                : "bg-transparent text-muted border-border hover:bg-surface-raised hover:text-foreground",
-            )}
-          >
-            {type.label}
-          </button>
-        ))}
-      </div>
+      <div className="flex gap-2">
+        <button
+          onClick={onFavoritesToggle}
+          className={cn(
+            "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors",
+            favoritesActive
+              ? "bg-accent-subtle text-accent-text border-transparent"
+              : "bg-transparent text-muted border-border hover:bg-surface-raised hover:text-foreground",
+          )}
+        >
+          <Heart className={cn("w-3.5 h-3.5", favoritesActive && "fill-current")} />
+          Favorites
+        </button>
 
-      <div className="flex gap-1.5">
-        {ALCOHOLIC_FILTERS.map((f) => (
-          <button
-            key={f.value}
-            onClick={() => onAlcoholicFilterChange(f.value)}
-            className={cn(
-              "px-3 py-1 rounded-full text-xs font-medium border transition-colors",
-              alcoholicFilter === f.value
-                ? "bg-surface-raised text-foreground border-border"
-                : "bg-transparent text-muted border-border hover:bg-surface-raised hover:text-foreground",
-            )}
-          >
-            {f.label}
-          </button>
-        ))}
+        <button
+          onClick={openFilterSheet}
+          className={cn(
+            "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors",
+            activeFilterCount > 0
+              ? "bg-surface-raised text-foreground border-border"
+              : "bg-transparent text-muted border-border hover:bg-surface-raised hover:text-foreground",
+          )}
+        >
+          <SlidersHorizontal className="w-3.5 h-3.5" />
+          {activeFilterCount > 0 ? `Filters · ${activeFilterCount}` : "Filters"}
+        </button>
       </div>
     </div>
   );

@@ -88,7 +88,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
           onClick={hideModal}
         >
           <div
-            className="bg-surface ring-1 ring-border p-8 w-full rounded-t-2xl md:rounded-lg md:max-w-lg md:w-auto shadow-lg relative animate-slide-up md:animate-fade-in"
+            className="bg-surface ring-1 ring-border p-8 w-full rounded-t-2xl md:rounded-lg md:max-w-[500px] md:w-full shadow-lg relative animate-slide-up md:animate-fade-in"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drag handle — mobile only */}

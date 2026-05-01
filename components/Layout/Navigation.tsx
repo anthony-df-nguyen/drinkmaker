@@ -3,13 +3,13 @@ import { useState } from "react";
 import SideNav from "./Sidebar";
 import { links } from "./Links";
 import Link from "next/link";
+import CreateDrinkButton from "../UI/CreateDrinkButton";
 import { SnackbarProvider } from "notistack";
 import { cn } from "@/lib/utils";
-import { Bars3Icon, PlusIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon } from "@heroicons/react/24/outline";
 import { usePathname } from "next/navigation";
-import { useModal } from "@/context/ModalContext";
 import { useAuthenticatedContext } from "@/context/Authenticated";
-import CreateForm from "@/app/drinks/forms/CreateDrinkForm";
+import { useModal } from "@/context/ModalContext";
 import PleaseSignIn from "@/components/SignIn/PleaseSignIn";
 
 interface Props {
@@ -19,71 +19,84 @@ interface Props {
 export default function Navigation({ children }: Props) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { showModal } = useModal();
   const { user } = useAuthenticatedContext();
+  const { showModal } = useModal();
 
   const isDrinksPage = pathname === "/";
 
+  const visibleLinks = links.filter((item) => {
+    if (item.requiresAuth && !user) return false;
+    if (item.guestOnly && user) return false;
+    return true;
+  });
+
   return (
-    <SnackbarProvider anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
+    <SnackbarProvider
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+    >
       <SideNav sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       {/* Top header */}
-      <div className="sticky top-0 z-40 flex h-14 shrink-0 items-center border-b border-border bg-surface px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="shrink-0 text-lg font-bold font-serif tracking-tight text-foreground"
-        >
-          Drinkmaker
-        </Link>
-
-        {/* Desktop nav links */}
-        <nav className="ml-8 hidden lg:flex gap-8">
-          {links.map((row) => (
-            <Link
-              key={row.name}
-              href={row.href}
-              className={cn(
+      <div className="sticky top-0 z-40  bg-surface border-b border-border">
+        {/* Container */}
+        <div className="max-w-[860px] w-full mx-auto flex items-center h-14 shrink-0   px-4 lg:px-0">
+          {" "}
+          {/* Logo */}
+          <Link
+            href="/"
+            className="shrink-0 text-lg font-bold font-serif tracking-tight text-foreground"
+          >
+            Drinkmaker
+          </Link>
+          {/* Desktop nav links */}
+          <nav className="ml-8 hidden lg:flex gap-8">
+            {visibleLinks.map((row) => {
+              const activeClass = cn(
                 "text-sm transition-colors",
                 pathname === row.href
                   ? "font-semibold text-foreground"
-                  : "font-normal text-muted hover:text-foreground"
-              )}
-            >
-              {row.name}
-            </Link>
-          ))}
-        </nav>
+                  : "font-normal text-muted hover:text-foreground",
+              );
 
-        <div className="flex-1" />
+              if (row.action === "signIn") {
+                return (
+                  <button
+                    key={row.name}
+                    onClick={() => showModal(<PleaseSignIn />)}
+                    className={activeClass}
+                  >
+                    {row.name}
+                  </button>
+                );
+              }
 
-        {/* Right actions */}
-        <div className="flex items-center gap-2">
-          {/* Add Drink — drinks browse page + authenticated only */}
-          {isDrinksPage && (
+              return (
+                <Link
+                  key={row.name}
+                  href={row.href!}
+                  className={activeClass}
+                >
+                  {row.name}
+                </Link>
+              );
+            })}
+          </nav>
+          <div className="flex-1" />
+          {/* Right actions */}
+          <div className="flex items-center gap-2">
+            {/* Add Drink — drinks browse page + authenticated only */}
+            {isDrinksPage && <CreateDrinkButton showBreakpoint="lg" />}
+
+            {/* Mobile hamburger */}
             <button
               type="button"
-              onClick={() => showModal(user ? <CreateForm /> : <PleaseSignIn />)}
-              className="flex items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-foreground transition-colors"
+              className="text-foreground lg:hidden"
+              onClick={() => setSidebarOpen(true)}
             >
-              <PlusIcon className="h-6 w-6" />
-              <span className="hidden sm:inline">Add Drink</span>
+              <span className="sr-only">Open menu</span>
+              <Bars3Icon className="h-6 w-6" />
             </button>
-          )}
-
-          {/* <ThemeToggle /> */}
-          {/* <ProfileMenu /> */}
-
-          {/* Mobile hamburger */}
-          <button
-            type="button"
-            className="text-foreground lg:hidden"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <span className="sr-only">Open menu</span>
-            <Bars3Icon className="h-6 w-6" />
-          </button>
+          </div>
         </div>
       </div>
 

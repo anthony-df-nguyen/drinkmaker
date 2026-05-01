@@ -37,7 +37,7 @@ export function useDrinkFormSave(): UseDrinkFormSaveResult {
 
         enqueueSnackbar("Drink successfully updated", { variant: "success" });
         setTimeout(() => {
-          router.push(`/drinks/${form.unique_name}`);
+          router.push(`/drinks/${form.unique_name}/`);
         }, 1000);
       } catch (error) {
         console.error("Failed to update the database: ", error);
