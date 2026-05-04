@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TextInput from "@/components/UI/input";
 import { cn } from "@/lib/utils";
 import { drinkTypes } from "../models";
@@ -7,6 +7,65 @@ import { Heart, SlidersHorizontal } from "lucide-react";
 import { useModal } from "@/context/ModalContext";
 
 export type AlcoholicFilter = "all" | "yes" | "no";
+
+const FILTERS_STORAGE_KEY = "drinkmaker:filters";
+
+interface StoredFilters {
+  searchTerm: string;
+  drinkType: string;
+  alcoholicFilter: AlcoholicFilter;
+  favoritesActive: boolean;
+}
+
+function readStoredFilters(): Partial<StoredFilters> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = localStorage.getItem(FILTERS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function useDrinkFilters() {
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [drinkType, setDrinkType] = useState<string>("all");
+  const [alcoholicFilter, setAlcoholicFilter] = useState<AlcoholicFilter>("all");
+  const [favoritesActive, setFavoritesActive] = useState<boolean>(false);
+  const [hydrated, setHydrated] = useState(false);
+
+  // Load after mount to avoid server/client HTML mismatch
+  useEffect(() => {
+    const stored = readStoredFilters();
+    if (stored.searchTerm !== undefined) setSearchTerm(stored.searchTerm);
+    if (stored.drinkType !== undefined) setDrinkType(stored.drinkType);
+    if (stored.alcoholicFilter !== undefined) setAlcoholicFilter(stored.alcoholicFilter);
+    if (stored.favoritesActive !== undefined) setFavoritesActive(stored.favoritesActive);
+    setHydrated(true);
+  }, []);
+
+  // Persist only after hydration so defaults don't overwrite stored values
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(
+        FILTERS_STORAGE_KEY,
+        JSON.stringify({ searchTerm, drinkType, alcoholicFilter, favoritesActive }),
+      );
+    } catch {}
+  }, [hydrated, searchTerm, drinkType, alcoholicFilter, favoritesActive]);
+
+  return {
+    searchTerm,
+    setSearchTerm,
+    drinkType,
+    setDrinkType,
+    alcoholicFilter,
+    setAlcoholicFilter,
+    favoritesActive,
+    setFavoritesActive,
+  };
+}
 
 const ALCOHOLIC_FILTERS: { label: string; value: AlcoholicFilter }[] = [
   { label: "All", value: "all" },

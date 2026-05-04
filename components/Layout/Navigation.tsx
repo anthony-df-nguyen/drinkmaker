@@ -4,6 +4,7 @@ import SideNav from "./Sidebar";
 import { links } from "./Links";
 import Link from "next/link";
 import CreateDrinkButton from "../UI/CreateDrinkButton";
+import ThemeToggle from "./ThemeToggle";
 import { SnackbarProvider } from "notistack";
 import { cn } from "@/lib/utils";
 import { Bars3Icon } from "@heroicons/react/24/outline";
@@ -49,13 +50,14 @@ export default function Navigation({ children }: Props) {
             Drinkmaker
           </Link>
           {/* Desktop nav links */}
-          <nav className="ml-8 hidden lg:flex gap-8">
+          <nav className="ml-6 hidden lg:flex gap-1">
             {visibleLinks.map((row) => {
+              const isActive = pathname === row.href;
               const activeClass = cn(
-                "text-sm transition-colors",
-                pathname === row.href
-                  ? "font-semibold text-foreground"
-                  : "font-normal text-muted hover:text-foreground",
+                "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors",
+                isActive
+                  ? "bg-accent/10 text-accent font-semibold"
+                  : "font-normal text-muted hover:bg-surface-raised hover:text-foreground",
               );
 
               if (row.action === "signIn") {
@@ -65,6 +67,7 @@ export default function Navigation({ children }: Props) {
                     onClick={() => showModal(<PleaseSignIn />)}
                     className={activeClass}
                   >
+                    {row.icon && <row.icon className="w-4 h-4" />}
                     {row.name}
                   </button>
                 );
@@ -76,6 +79,7 @@ export default function Navigation({ children }: Props) {
                   href={row.href!}
                   className={activeClass}
                 >
+                  {row.icon && <row.icon className="w-4 h-4" />}
                   {row.name}
                 </Link>
               );
@@ -83,9 +87,14 @@ export default function Navigation({ children }: Props) {
           </nav>
           <div className="flex-1" />
           {/* Right actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             {/* Add Drink — drinks browse page + authenticated only */}
             {isDrinksPage && <CreateDrinkButton showBreakpoint="lg" />}
+
+            {/* Theme toggle — desktop only */}
+            <div className="hidden lg:flex">
+              <ThemeToggle />
+            </div>
 
             {/* Mobile hamburger */}
             <button

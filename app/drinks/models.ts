@@ -65,11 +65,11 @@ export const encodeAlcoholic = (v: boolean): string => (v ? "true" : "false");
 export const decodeAlcoholic = (v: "true" | "false"): boolean => v === "true";
 
 export const drinkTypeColors: Record<string, string> = {
-  cocktail: "bg-blue-100",
-  coffee: "bg-yellow-100",
-  juice: "bg-emerald-100",
-  shake: "bg-pink-100",
-  smoothie: "bg-red-100",
-  tea: "bg-orange-100",
-  other: "bg-surface-raised",
+  cocktail: "#dbeafe",
+  coffee: "#fef9c3",
+  juice: "#d1fae5",
+  shake: "#fce7f3",
+  smoothie: "#fee2e2",
+  tea: "#ffedd5",
+  other: "#e5e7eb",
 };

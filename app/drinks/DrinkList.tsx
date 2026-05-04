@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useListDrinks } from "./contexts/DrinksContext";
 import { queryDrinks, getUserFavoriteDrinkIds } from "./actions";
 import DrinkCard from "./components/DrinkCard";
-import DrinkFilters, { AlcoholicFilter } from "./components/DrinkFilters";
+import DrinkFilters, { useDrinkFilters } from "./components/DrinkFilters";
 import CreateDrinkButton from "@/components/UI/CreateDrinkButton";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 
@@ -11,11 +11,16 @@ const PAGE_SIZE = 30;
 
 const DrinkList: React.FC = () => {
   const { drinksList, setDrinksList, setCount } = useListDrinks();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [drinkType, setDrinkType] = useState("all");
-  const [alcoholicFilter, setAlcoholicFilter] =
-    useState<AlcoholicFilter>("all");
-  const [favoritesActive, setFavoritesActive] = useState(false);
+  const {
+    searchTerm,
+    setSearchTerm,
+    drinkType,
+    setDrinkType,
+    alcoholicFilter,
+    setAlcoholicFilter,
+    favoritesActive,
+    setFavoritesActive,
+  } = useDrinkFilters();
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
